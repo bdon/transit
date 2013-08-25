@@ -35,8 +35,8 @@ func NewReferencer(shapeId string) Referencer {
           return ref
       }
       if record[0] == shapeId {
-        lat, _ := strconv.ParseFloat(record[1],64)
-        lon, _ := strconv.ParseFloat(record[2],64)
+        lon, _ := strconv.ParseFloat(record[1],64)
+        lat, _ := strconv.ParseFloat(record[2],64)
         coords = append(coords, geos.NewCoord(lat, lon))
       }
   }
