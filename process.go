@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-    file, err := os.Open("raw_gtfs/shapes.txt")
+    file, err := os.Open("muni_gtfs/shapes.txt")
     if err != nil {
         log.Fatal(err)
         return
