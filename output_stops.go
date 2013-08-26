@@ -5,6 +5,8 @@ import (
   "os"
   "fmt"
   "io"
+  "github.com/bdon/jklmnt/linref"
+  "strconv"
 )
 
 func main() {
@@ -44,6 +46,9 @@ func main() {
   }
   fmt.Printf("stop ids: %s\n", stopMap)
 
+  // create a linear referencer
+  nReferencer := linref.NewReferencer("102909")
+
   // print all stops given a list of stop IDs
   stopsFile, _ := os.Open("muni_gtfs/stops.txt")
   defer stopsFile.Close()
@@ -56,6 +61,9 @@ func main() {
     }
     if stopMap[record[0]] {
      fmt.Println(record[1])
+     stop_lat, _ := strconv.ParseFloat(record[3],64)
+     stop_lon, _ := strconv.ParseFloat(record[4],64)
+     fmt.Println(nReferencer.Reference(stop_lat, stop_lon))
     }
   }
 }

@@ -14,7 +14,6 @@ type Referencer struct {
   Path *geos.Geometry
 }
 
-
 func NewReferencer(shapeId string) Referencer {
   ref := Referencer{}
   file, err := os.Open("muni_gtfs/shapes.txt")
