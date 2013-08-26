@@ -15,6 +15,7 @@ type Thingy struct {
 func (t Thingy) handler(w http.ResponseWriter, r *http.Request) {
     result, _ := json.Marshal(t.Response.Repr())
     //fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
+    w.Header().Set("Content-Type", "application/json")
     fmt.Fprintf(w, string(result))
 }
 
