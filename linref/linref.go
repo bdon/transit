@@ -48,5 +48,5 @@ func NewReferencer(shapeId string) Referencer {
 func (r Referencer) Reference(lat float64, lon float64) float64 {
   coord := geos.NewCoord(lat, lon)
   point, _ := geos.NewPoint(coord)
-  return r.Path.Project(point)
+  return r.Path.ProjectNormalized(point)
 }

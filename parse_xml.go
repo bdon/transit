@@ -21,6 +21,8 @@ type NextBusResponse struct {
 }
 
 func main() {
+  // For now, let's assume that all Trips for a Route have the same Shape
+  // N Judah is Route # 1093, Shape 102909
   nReferencer := linref.NewReferencer("102909")
 
   file, err := os.Open("N/1377452461.xml")
@@ -39,7 +41,4 @@ func main() {
     log.Printf("%f\n", nReferencer.Reference(report.Lat, report.Lon))
   }
 
-  // For now, let's assume that all Trips for a Route have the same Shape
-  // N Judah is Route # 1093, Shape 102909
-  //log.Printf("%f", nReferencer.Reference(37.0,-122.0))
 }
