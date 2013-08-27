@@ -44,15 +44,13 @@ func (state SystemState) handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (state SystemState) Tick(unixtime int) {
-  log.Println("Ticking")
-  //log.Println(getXML())
+  log.Println("Fetching from NextBus...")
   foo := nextbus.NextBusResponse{}
   xml.Unmarshal(getXML(), &foo)
   nReferencer := linref.NewReferencer("102909")
 
   state.Mutex.Lock()
   for _, report := range foo.Reports {
-    //log.Println(report.LatString)
     theslice := state.Map[report.Id]
     if report.LeadingVehicleId != "" {
       continue
@@ -61,14 +59,11 @@ func (state SystemState) Tick(unixtime int) {
        report.LonString == theslice[len(theslice)-1].LonString {
       continue
     }
-    //log.Printf("%f %f", report.Lat, report.Lon)
     index := nReferencer.Reference(report.Lat(), report.Lon())
-    //log.Printf("%f\n", index)
     state.Map[report.Id] = append(state.Map[report.Id], VehicleState{Index:index, Time:unixtime - report.SecsSinceReport,LatString:report.LatString, LonString:report.LonString})
-    //state.Map[report.Id] = append(state.Map[report.Id], VehicleState{Index:index, Time:unixtime - report.SecsSinceReport})
   }
   state.Mutex.Unlock()
-  log.Println("Done Ticking")
+  log.Println("Done Fetching.")
 }
 
 func getXML() []byte {
