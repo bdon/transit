@@ -6,17 +6,29 @@ import (
   "io/ioutil"
   "log"
   "github.com/bdon/jklmnt/linref"
+  "strconv"
 )
 
 type NextBusVehicleReport struct {
   Id string `xml:"id,attr"`
   DirTag string `xml:"dirTag,attr"`
-  Lat float64 `xml:"lat,attr"`
-  Lon float64 `xml:"lon,attr"`
+  LatString string `xml:"lat,attr"`
+  LonString string `xml:"lon,attr"`
   SecsSinceReport int `xml:"secsSinceReport,attr"`
+  LeadingVehicleId string `xml:"leadingVehicleId,attr"`
 
   Index float64
   UnixTime int
+}
+
+func (report NextBusVehicleReport) Lat() float64 {
+  f, _ := strconv.ParseFloat(report.LatString, 64)
+  return f
+}
+
+func (report NextBusVehicleReport) Lon() float64 {
+  f, _ := strconv.ParseFloat(report.LonString, 64)
+  return f
 }
 
 type NextBusVehicleReportRepr struct {
@@ -64,7 +76,7 @@ func ResponseFromFile(filename string) NextBusResponse {
   xml.Unmarshal(body, &foo)
 
   for i, report := range foo.Reports {
-    foo.Reports[i].Index = nReferencer.Reference(report.Lat, report.Lon)
+    foo.Reports[i].Index = nReferencer.Reference(report.Lat(), report.Lon())
     foo.Reports[i].UnixTime = 1377452461 - report.SecsSinceReport
   }
 
