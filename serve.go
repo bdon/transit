@@ -16,6 +16,7 @@ import (
 type VehicleState struct {
   Time int `json:"time"`
   Index float64 `json:"index"`
+
   LatString string `json:"-"`
   LonString string `json:"-"`
 }
