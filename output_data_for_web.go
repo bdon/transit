@@ -23,11 +23,8 @@ func main() {
   list, _ := filepath.Glob("/Volumes/shrub/njudahdata/N/*.xml")
   relevantFiles := []string{}
   for _, entry := range list {
-    extension := filepath.Ext(entry)
-    filename := filepath.Base(entry)
-    var unixstamp = filename[0:len(filename)-len(extension)]
-    theint, _ := strconv.ParseInt(unixstamp, 10, 64)
-    theTime := time.Unix(theint, 0)
+    unixstamp := filepathToTime(entry)
+    theTime := time.Unix(unixstamp, 0)
     if theTime.After(t1) && theTime.Before(t2) {
       relevantFiles = append(relevantFiles, entry)
     }
@@ -37,12 +34,9 @@ func main() {
 
   stat := state.NewSystemState()
   for _, entry := range relevantFiles {
-    extension := filepath.Ext(entry)
-    filename := filepath.Base(entry)
-    var unixstamp = filename[0:len(filename)-len(extension)]
-    theint, _ := strconv.ParseInt(unixstamp, 10, 64)
-    resp := nextbus.ResponseFromFileWithReferencer(entry, stat.Referencer, int(theint))
-    stat.AddResponse(resp, int(theint))
+    unixstamp := filepathToTime(entry)
+    resp := nextbus.ResponseFromFileWithReferencer(entry, stat.Referencer, int(unixstamp))
+    stat.AddResponse(resp, int(unixstamp))
   }
 
   arr := []ArrEntry{}
@@ -56,5 +50,13 @@ func main() {
 
   result, _ := json.Marshal(arr)
   fmt.Println(string(result))
+}
+
+func filepathToTime(entry string) int64 {
+    extension := filepath.Ext(entry)
+    filename := filepath.Base(entry)
+    var unixstamp = filename[0:len(filename)-len(extension)]
+    theint, _ := strconv.ParseInt(unixstamp, 10, 64)
+    return theint
 }
 

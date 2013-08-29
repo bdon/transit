@@ -28,6 +28,12 @@ type SystemState struct {
 
 func NewSystemState() SystemState {
   retval := SystemState{}
+
+  // we're gonna need more data structures.
+  //the underlying data structure is a list []
+  // we hold a map of vehicle ids
+  // with pointers into elements
+
   retval.Map = make(map[string][]VehicleState)
   retval.Mutex = sync.RWMutex{}
   retval.Referencer = linref.NewReferencer("102909")
@@ -46,6 +52,10 @@ func (s SystemState) Handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s SystemState) AddResponse(foo nextbus.NextBusResponse, unixtime int) {
+  // here's the magic
+  // maintain a list of current vehicle runs
+
+  // we care about 'runs' where the direction tag is the same
   for _, report := range foo.Reports {
     theslice := s.Map[report.Id]
     if report.LeadingVehicleId != "" {
