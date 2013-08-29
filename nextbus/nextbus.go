@@ -59,11 +59,7 @@ func (response NextBusResponse) Repr() NextBusResponseRepr {
   return retval
 }
 
-func ResponseFromFile(filename string) NextBusResponse {
-  // For now, let's assume that all Trips for a Route have the same Shape
-  // N Judah is Route # 1093, Shape 102909
-  nReferencer := linref.NewReferencer("102909")
-
+func ResponseFromFileWithReferencer(filename string, r linref.Referencer, unixtime int) NextBusResponse {
   file, err := os.Open(filename)
   if err != nil {
     log.Fatal(err)
@@ -76,10 +72,9 @@ func ResponseFromFile(filename string) NextBusResponse {
   xml.Unmarshal(body, &foo)
 
   for i, report := range foo.Reports {
-    foo.Reports[i].Index = nReferencer.Reference(report.Lat(), report.Lon())
-    foo.Reports[i].UnixTime = 1377452461 - report.SecsSinceReport
+    foo.Reports[i].Index = r.Reference(report.Lat(), report.Lon())
+    foo.Reports[i].UnixTime = unixtime - report.SecsSinceReport
   }
 
   return foo
 }
-
