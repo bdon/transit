@@ -15,6 +15,7 @@ type ArrEntry struct {
   States []state.VehicleState `json:"states"`
 }
 
+
 func main() {
   const longForm = "2006-01-02 15:04:05 -0700 MST"
   t1, _ := time.Parse(longForm, "2013-08-26 06:00:01 -0700 PDT")
