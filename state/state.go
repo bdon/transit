@@ -73,7 +73,15 @@ func (s *SystemState) AddResponse(foo nextbus.Response, unixtime int) {
     c := s.CurrentRuns[report.VehicleId]
     if c != nil {
       lastState := c.States[len(c.States)-1]
-      if lastState.LatString != newState.LatString || lastState.LonString != newState.LonString {
+
+      if (newState.Time - lastState.Time > 600) {
+        // create a new Run
+        newRun := VehicleRun{VehicleId: report.VehicleId}
+        newRun.States = append(newRun.States, newState)
+        s.Runs = append(s.Runs,&newRun)
+        s.CurrentRuns[newRun.VehicleId] = &newRun
+
+      } else if lastState.LatString != newState.LatString || lastState.LonString != newState.LonString {
         c.States = append(c.States, newState)
       }
     } else {
