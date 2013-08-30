@@ -67,16 +67,21 @@ func (s *SystemState) AddResponse(foo nextbus.Response, unixtime int) {
       continue
     }
 
+
     index := s.Referencer.Reference(report.Lat(), report.Lon())
+    // cull data on first and last stops
+    if index > 0.9975 || index < 0.0268 {
+      continue
+    }
     newState := VehicleState{Index:index, Time:unixtime - report.SecsSinceReport,LatString:report.LatString, LonString:report.LonString}
 
     c := s.CurrentRuns[report.VehicleId]
     if c != nil {
       lastState := c.States[len(c.States)-1]
 
-      if (newState.Time - lastState.Time > 600) {
+      if (newState.Time - lastState.Time > 900 || report.Dir() != c.Dir) {
         // create a new Run
-        newRun := VehicleRun{VehicleId: report.VehicleId}
+        newRun := VehicleRun{VehicleId: report.VehicleId, Dir: report.Dir()}
         newRun.States = append(newRun.States, newState)
         s.Runs = append(s.Runs,&newRun)
         s.CurrentRuns[newRun.VehicleId] = &newRun
@@ -85,7 +90,7 @@ func (s *SystemState) AddResponse(foo nextbus.Response, unixtime int) {
         c.States = append(c.States, newState)
       }
     } else {
-      newRun := VehicleRun{VehicleId: report.VehicleId}
+      newRun := VehicleRun{VehicleId: report.VehicleId, Dir: report.Dir()}
       newRun.States = append(newRun.States, newState)
       s.Runs = append(s.Runs,&newRun)
       s.CurrentRuns[newRun.VehicleId] = &newRun

@@ -100,7 +100,7 @@ func TestTwo(t *testing.T) {
 	}
 }
 
-func TestIgnoreTenMinutes(t *testing.T) {
+func TestIgnoreFifteenMinutes(t *testing.T) {
 	stat := state.NewSystemState()
 
 	response := nextbus.Response{}
@@ -121,9 +121,37 @@ func TestIgnoreTenMinutes(t *testing.T) {
 		LeadingVehicleId: ""}
 
 	laterResponse.Reports = append(laterResponse.Reports, laterReport)
-	stat.AddResponse(laterResponse, 10000700)
+	stat.AddResponse(laterResponse, 10001000)
 
 	if len(stat.Runs) != 2 {
 		t.Error("Runs should have 2 elements, because too much time passed")
+	}
+}
+
+func TestChangeDirection(t *testing.T) {
+	stat := state.NewSystemState()
+
+	response := nextbus.Response{}
+	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
+		LonString: "-122.0", SecsSinceReport: 15,
+		LeadingVehicleId: ""}
+
+	response.Reports = append(response.Reports, report1)
+	stat.AddResponse(response, 10000000)
+
+	if len(stat.Runs) != 1 {
+		t.Error("Runs should have 1 element")
+	}
+
+	laterResponse := nextbus.Response{}
+	laterReport := nextbus.VehicleReport{VehicleId: "1000", DirTag: "OB", LatString: "37.1",
+		LonString: "-122.1", SecsSinceReport: 15,
+		LeadingVehicleId: ""}
+
+	laterResponse.Reports = append(laterResponse.Reports, laterReport)
+	stat.AddResponse(laterResponse, 10000001)
+
+	if len(stat.Runs) != 2 {
+		t.Error("Runs should have 2 elements, because direction changed")
 	}
 }
