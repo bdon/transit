@@ -3,13 +3,11 @@ package state
 import (
   "sync"
   "encoding/json"
-  "encoding/xml"
   "github.com/bdon/jklmnt/linref"
   "github.com/bdon/jklmnt/nextbus"
   "net/http"
   "log"
   "fmt"
-  "io/ioutil"
 )
 
 // The instantaneous state of a vehicle as returned by NextBus
@@ -87,17 +85,3 @@ func (s *SystemState) AddResponse(foo nextbus.Response, unixtime int) {
   }
 }
 
-func (s *SystemState) Tick(unixtime int) {
-  log.Println("Fetching from NextBus...")
-  response := nextbus.Response{}
-  get, _ := http.Get("http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=sf-muni&r=N&t=0")
-  defer get.Body.Close()
-  str, _ := ioutil.ReadAll(get.Body)
-  xml.Unmarshal(str, &response)
-
-  s.Mutex.Lock()
-  s.AddResponse(response, unixtime)
-  log.Println(len(s.Runs))
-  s.Mutex.Unlock()
-  log.Println("Done Fetching.")
-}
