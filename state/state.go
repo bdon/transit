@@ -20,7 +20,6 @@ type VehicleState struct {
 }
 
 // One inbound or outbound run of a vehicle
-// TODO: with contiguous observations no more than five minutes apart
 type VehicleRun struct {
   VehicleId string `json:"vehicle_id"`
   Dir nextbus.Direction `json:"dir"`
@@ -66,7 +65,6 @@ func (s *SystemState) AddResponse(foo nextbus.Response, unixtime int) {
     if report.LeadingVehicleId != "" {
       continue
     }
-
 
     index := s.Referencer.Reference(report.Lat(), report.Lon())
     // cull data on first and last stops

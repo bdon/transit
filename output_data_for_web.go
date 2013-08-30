@@ -15,7 +15,7 @@ func main() {
   t1, _ := time.Parse(longForm, "2013-08-26 06:00:01 -0700 PDT")
   t2, _ := time.Parse(longForm, "2013-08-27 03:00:01 -0700 PDT")
 
-  list, _ := filepath.Glob("/Volumes/shrub/njudahdata/N/*.xml")
+  list, _ := filepath.Glob("/Users/Bdon/workspace/njudahdata/N/*.xml")
   relevantFiles := []string{}
   for _, entry := range list {
     unixstamp := filepathToTime(entry)
