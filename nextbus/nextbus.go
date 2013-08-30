@@ -31,32 +31,8 @@ func (report NextBusVehicleReport) Lon() float64 {
   return f
 }
 
-type NextBusVehicleReportRepr struct {
-  Vid string `json:"vid"`
-  Index float64 `json:"index"`
-  Time int `json:"time"`
-}
-
-type NextBusResponseRepr struct {
-  Reports []NextBusVehicleReportRepr
-}
-
 type NextBusResponse struct {
   Reports []NextBusVehicleReport `xml:"vehicle"`
-}
-
-func (response NextBusResponse) Repr() NextBusResponseRepr {
-  retval := NextBusResponseRepr{}
-  reprList := []NextBusVehicleReportRepr{}
-  for _, report := range response.Reports {
-    newReport := NextBusVehicleReportRepr{}
-    newReport.Index = report.Index
-    newReport.Time = report.UnixTime
-    newReport.Vid = report.Id
-    reprList = append(reprList, newReport)
-  }
-  retval.Reports = reprList
-  return retval
 }
 
 func ResponseFromFileWithReferencer(filename string, r linref.Referencer, unixtime int) NextBusResponse {
