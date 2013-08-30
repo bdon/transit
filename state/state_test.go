@@ -41,9 +41,9 @@ func TestOne(t *testing.T) {
 	if len(stat.Runs) != 1 {
 		t.Error("Runs should have 1 element")
 	}
-  if len(stat.Runs[0].States) != 1 {
-    t.Error("First run should have 1 state")
-  }
+	if len(stat.Runs[0].States) != 1 {
+		t.Error("First run should have 1 state")
+	}
 
 	testResponse2 := nextbus.Response{}
 	report2 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
@@ -56,9 +56,9 @@ func TestOne(t *testing.T) {
 	if len(stat.Runs) != 1 {
 		t.Error("Runs should have 1 element")
 	}
-  if len(stat.Runs[0].States) != 1 {
-    t.Error("First run should have still 1 state if position has not changed")
-  }
+	if len(stat.Runs[0].States) != 1 {
+		t.Error("First run should have still 1 state if position has not changed")
+	}
 
 	testResponse3 := nextbus.Response{}
 	report3 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.1",
@@ -71,9 +71,9 @@ func TestOne(t *testing.T) {
 	if len(stat.Runs) != 1 {
 		t.Error("Runs should have 1 element")
 	}
-  if len(stat.Runs[0].States) != 2 {
-    t.Error("First run should have 2 states if position has changed")
-  }
+	if len(stat.Runs[0].States) != 2 {
+		t.Error("First run should have 2 states if position has changed")
+	}
 }
 
 func TestTwo(t *testing.T) {
