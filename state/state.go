@@ -1,13 +1,8 @@
 package state
 
 import (
-  "sync"
-  "encoding/json"
   "github.com/bdon/jklmnt/linref"
   "github.com/bdon/jklmnt/nextbus"
-  "net/http"
-  "log"
-  "fmt"
 )
 
 // The instantaneous state of a vehicle as returned by NextBus
@@ -29,13 +24,11 @@ type VehicleRun struct {
 // The entire state of the system is a list of vehicle runs.
 // It also has bookkeeping so it knows how to add an observation to the state.
 // And synchronization primitives.
-// TODO: only have mutex in the http case.
 type SystemState struct {
   Runs []*VehicleRun
 
   //Bookkeeping for vehicle ID to current run.
   CurrentRuns map[string]*VehicleRun
-  Mutex sync.RWMutex
   Referencer linref.Referencer
 }
 
@@ -43,21 +36,11 @@ func NewSystemState() *SystemState {
   retval := SystemState{}
   retval.Runs = []*VehicleRun{}
   retval.CurrentRuns = make(map[string]*VehicleRun)
-  retval.Mutex = sync.RWMutex{}
   retval.Referencer = linref.NewReferencer("102909")
   return &retval
 }
 
-func (s *SystemState) Handler(w http.ResponseWriter, r *http.Request) {
-    s.Mutex.RLock()
-    result, err := json.Marshal(s.Runs)
-    if err != nil {
-      log.Println(err)
-    }
-    s.Mutex.RUnlock()
-    w.Header().Set("Content-Type", "application/json")
-    fmt.Fprintf(w, string(result))
-}
+
 
 // Must be called in chronological order
 func (s *SystemState) AddResponse(foo nextbus.Response, unixtime int) {
@@ -68,9 +51,9 @@ func (s *SystemState) AddResponse(foo nextbus.Response, unixtime int) {
 
     index := s.Referencer.Reference(report.Lat(), report.Lon())
     // cull data on first and last stops
-    if index > 0.9975 || index < 0.0268 {
-      continue
-    }
+    //if index > 0.9975 || index < 0.0268 {
+    //  continue
+    //}
     newState := VehicleState{Index:index, Time:unixtime - report.SecsSinceReport,LatString:report.LatString, LonString:report.LonString}
 
     c := s.CurrentRuns[report.VehicleId]
