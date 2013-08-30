@@ -5,12 +5,19 @@ import (
   "os"
   "io/ioutil"
   "log"
-  "github.com/bdon/jklmnt/linref"
   "strconv"
+  "strings"
 )
 
-type NextBusVehicleReport struct {
-  Id string `xml:"id,attr"`
+type Direction int
+
+const (
+  Inbound Direction = iota
+  Outbound Direction = iota
+)
+
+type VehicleReport struct {
+  VehicleId string `xml:"id,attr"`
   DirTag string `xml:"dirTag,attr"`
   LatString string `xml:"lat,attr"`
   LonString string `xml:"lon,attr"`
@@ -21,36 +28,43 @@ type NextBusVehicleReport struct {
   UnixTime int
 }
 
-func (report NextBusVehicleReport) Lat() float64 {
+func (report VehicleReport) Lat() float64 {
   f, _ := strconv.ParseFloat(report.LatString, 64)
   return f
 }
 
-func (report NextBusVehicleReport) Lon() float64 {
+func (report VehicleReport) Lon() float64 {
   f, _ := strconv.ParseFloat(report.LonString, 64)
   return f
 }
 
-type NextBusResponse struct {
-  Reports []NextBusVehicleReport `xml:"vehicle"`
+func (report VehicleReport) Dir() Direction {
+  if strings.Contains(report.DirTag, "IB") {
+    return Inbound
+  } else {
+    return Outbound
+  }
 }
 
-func ResponseFromFileWithReferencer(filename string, r linref.Referencer, unixtime int) NextBusResponse {
+type Response struct {
+  Reports []VehicleReport `xml:"vehicle"`
+}
+
+func ResponseFromFile(filename string, unixtime int) Response {
   file, err := os.Open(filename)
   if err != nil {
     log.Fatal(err)
   }
-  foo := NextBusResponse{}
+  response := Response{}
   body, err := ioutil.ReadAll(file)
   if err != nil {
     log.Fatal(err)
   }
-  xml.Unmarshal(body, &foo)
+  xml.Unmarshal(body, &response)
 
-  for i, report := range foo.Reports {
-    foo.Reports[i].Index = r.Reference(report.Lat(), report.Lon())
-    foo.Reports[i].UnixTime = unixtime - report.SecsSinceReport
+  for i, report := range response.Reports {
+    response.Reports[i].UnixTime = unixtime - report.SecsSinceReport
   }
 
-  return foo
+  return response
 }

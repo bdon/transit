@@ -10,12 +10,6 @@ import (
   "encoding/json"
 )
 
-type ArrEntry struct {
-  VehicleId string `json:"vehicle_id"`
-  States []state.VehicleState `json:"states"`
-}
-
-
 func main() {
   const longForm = "2006-01-02 15:04:05 -0700 MST"
   t1, _ := time.Parse(longForm, "2013-08-26 06:00:01 -0700 PDT")
@@ -36,20 +30,11 @@ func main() {
   stat := state.NewSystemState()
   for _, entry := range relevantFiles {
     unixstamp := filepathToTime(entry)
-    resp := nextbus.ResponseFromFileWithReferencer(entry, stat.Referencer, int(unixstamp))
+    resp := nextbus.ResponseFromFile(entry, int(unixstamp))
     stat.AddResponse(resp, int(unixstamp))
   }
 
-  arr := []ArrEntry{}
-  // turn this into an array
-  for k, _ := range stat.Map {
-    entry := ArrEntry{}
-    entry.VehicleId = k
-    entry.States = stat.Map[k]
-    arr = append(arr, entry)
-  }
-
-  result, _ := json.Marshal(arr)
+  result, _ := json.Marshal(stat.Runs)
   fmt.Println(string(result))
 }
 
@@ -60,4 +45,3 @@ func filepathToTime(entry string) int64 {
     theint, _ := strconv.ParseInt(unixstamp, 10, 64)
     return theint
 }
-
