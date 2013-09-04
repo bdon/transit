@@ -12,11 +12,12 @@ import (
 )
 
 type StopRepr struct {
-	Index  float64 `json:"index"`
-	Name   string  `json:"name"`
-	MyName string  `json:"my_name"`
-	Lat    float64 `json:"lat"`
-	Lon    float64 `json:"lon"`
+	Index     float64 `json:"index"`
+	Name      string  `json:"name"`
+	MyName    string  `json:"my_name"`
+	Lat       float64 `json:"lat"`
+	Lon       float64 `json:"lon"`
+	DeltaTime int     `json:"delta_time"`
 }
 
 func main() {
@@ -26,6 +27,7 @@ func main() {
 	reader := csv.NewReader(tripsFile)
 	reader.TrailingComma = true
 	var tripId string
+
 	for {
 		record, err := reader.Read()
 		if err == io.EOF {
@@ -44,14 +46,21 @@ func main() {
 	defer stopTimesFile.Close()
 	stopTimesReader := csv.NewReader(stopTimesFile)
 	stopTimesReader.TrailingComma = true
-	stopMap := make(map[string]bool)
+	stopMap := make(map[string]int)
+	firstTime := 0
 	for {
 		record, err := stopTimesReader.Read()
 		if err == io.EOF {
 			break
 		}
 		if record[0] == tripId {
-			stopMap[record[3]] = true
+			if firstTime == 0 {
+				firstTime = hstoi(record[1])
+				stopMap[record[3]] = 0
+			} else {
+				// Store the integer value of time since trip started
+				stopMap[record[3]] = hstoi(record[1]) - firstTime
+			}
 		}
 	}
 	//fmt.Printf("stop ids: %s\n", stopMap)
@@ -102,12 +111,14 @@ func main() {
 	defer stopsFile.Close()
 	stopsReader := csv.NewReader(stopsFile)
 	stopsReader.TrailingComma = true
+	oceanBeachSeen := false
 	for {
 		record, err := stopsReader.Read()
 		if err == io.EOF {
 			break
 		}
-		if stopMap[record[0]] {
+
+		if _, ok := stopMap[record[0]]; ok {
 			newStop := StopRepr{}
 			stop_lat, _ := strconv.ParseFloat(record[3], 64)
 			stop_lon, _ := strconv.ParseFloat(record[4], 64)
@@ -117,10 +128,26 @@ func main() {
 			newStop.Index = index
 			newStop.Name = strings.TrimSpace(record[1])
 			newStop.MyName = myNames[strings.TrimSpace(record[1])]
+			newStop.DeltaTime = stopMap[record[0]]
+			if newStop.MyName == "Ocean Beach" {
+				if oceanBeachSeen {
+					continue
+				}
+				oceanBeachSeen = true
+			}
 			output = append(output, newStop)
 		}
 	}
 
 	marshalled, _ := json.Marshal(output)
 	fmt.Printf(string(marshalled))
+}
+
+func hstoi(str string) int {
+	components := strings.Split(str, ":")
+	hour, _ := strconv.Atoi(components[0])
+	min, _ := strconv.Atoi(components[1])
+	sec, _ := strconv.Atoi(components[2])
+	retval := hour*60*60 + min*60 + sec
+	return retval
 }
