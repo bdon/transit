@@ -38,6 +38,7 @@ func main() {
 		}
 		mutex.RUnlock()
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		fmt.Fprintf(w, string(result))
 	}
 

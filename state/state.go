@@ -10,8 +10,9 @@ import (
 
 // The instantaneous state of a vehicle as returned by NextBus
 type VehicleState struct {
-	Time  int     `json:"time"`
-	Index float64 `json:"index"`
+	Time      int     `json:"time"`
+	Index     float64 `json:"index"`
+	TimeAdded int     `json:"-"`
 
 	LatString string `json:"-"`
 	LonString string `json:"-"`
@@ -75,7 +76,9 @@ func (s *SystemState) AddResponse(foo nextbus.Response, unixtime int) {
 		//if index > 0.9975 || index < 0.0268 {
 		//  continue
 		//}
-		newState := VehicleState{Index: index, Time: unixtime - report.SecsSinceReport, LatString: report.LatString, LonString: report.LonString}
+		newState := VehicleState{Index: index, Time: unixtime - report.SecsSinceReport,
+			LatString: report.LatString, LonString: report.LonString,
+			TimeAdded: unixtime}
 
 		c := s.CurrentRuns[report.VehicleId]
 		if c != nil {
@@ -107,7 +110,7 @@ func (s *SystemState) After(time int) map[string]VehicleRun {
 
 	for token, run := range s.Runs {
 		for _, s := range run.States {
-			if s.Time > time {
+			if s.TimeAdded > time {
 				if _, ok := filtered[token]; ok {
 					foo := filtered[token]
 					foo.States = append(filtered[token].States, s)

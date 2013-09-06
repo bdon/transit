@@ -3,7 +3,6 @@ package state
 import (
 	"github.com/bdon/jklmnt/nextbus"
 	"github.com/bdon/jklmnt/state"
-	"log"
 	"testing"
 )
 
@@ -195,9 +194,6 @@ func TestFilteredByTime(t *testing.T) {
 	stat.AddResponse(response2, 10000115)
 
 	filtered := stat.After(10000099)
-	for k, _ := range filtered {
-		log.Printf("key: %s", k)
-	}
 
 	if len(filtered["1000_10000000"].States) != 1 {
 		t.Error("Runs should have 1 element")
