@@ -1,8 +1,11 @@
 package state
 
 import (
+	"fmt"
 	"github.com/bdon/jklmnt/linref"
 	"github.com/bdon/jklmnt/nextbus"
+	"strconv"
+	"strings"
 )
 
 // The instantaneous state of a vehicle as returned by NextBus
@@ -25,7 +28,8 @@ type VehicleRun struct {
 // It also has bookkeeping so it knows how to add an observation to the state.
 // And synchronization primitives.
 type SystemState struct {
-	Runs []*VehicleRun
+	// has an identifier which is vehicleid+timestamp
+	Runs map[string]*VehicleRun
 
 	//Bookkeeping for vehicle ID to current run.
 	CurrentRuns map[string]*VehicleRun
@@ -34,10 +38,29 @@ type SystemState struct {
 
 func NewSystemState() *SystemState {
 	retval := SystemState{}
-	retval.Runs = []*VehicleRun{}
+	retval.Runs = map[string]*VehicleRun{}
 	retval.CurrentRuns = make(map[string]*VehicleRun)
 	retval.Referencer = linref.NewReferencer("102909")
 	return &retval
+}
+
+func (s VehicleState) Lat() float64 {
+	f, _ := strconv.ParseFloat(s.LatString, 64)
+	return f
+}
+
+func (s VehicleState) Lon() float64 {
+	f, _ := strconv.ParseFloat(s.LonString, 64)
+	return f
+}
+
+// simplify needs to act on arbitrary objects
+func (r *VehicleRun) Simplify() {
+}
+
+func newToken(vehicleId string, timestamp int) string {
+	time := fmt.Sprintf("%d", timestamp)
+	return strings.Join([]string{vehicleId, time}, "_")
 }
 
 // Must be called in chronological order
@@ -62,7 +85,8 @@ func (s *SystemState) AddResponse(foo nextbus.Response, unixtime int) {
 				// create a new Run
 				newRun := VehicleRun{VehicleId: report.VehicleId, Dir: report.Dir()}
 				newRun.States = append(newRun.States, newState)
-				s.Runs = append(s.Runs, &newRun)
+				//s.Runs = append(s.Runs, &newRun)
+				s.Runs[newToken(report.VehicleId, unixtime-report.SecsSinceReport)] = &newRun
 				s.CurrentRuns[newRun.VehicleId] = &newRun
 
 			} else if lastState.LatString != newState.LatString || lastState.LonString != newState.LonString {
@@ -71,8 +95,30 @@ func (s *SystemState) AddResponse(foo nextbus.Response, unixtime int) {
 		} else {
 			newRun := VehicleRun{VehicleId: report.VehicleId, Dir: report.Dir()}
 			newRun.States = append(newRun.States, newState)
-			s.Runs = append(s.Runs, &newRun)
+			//s.Runs = append(s.Runs, &newRun)
+			s.Runs[newToken(report.VehicleId, unixtime-report.SecsSinceReport)] = &newRun
 			s.CurrentRuns[newRun.VehicleId] = &newRun
 		}
 	}
+}
+
+func (s *SystemState) After(time int) map[string]VehicleRun {
+	filtered := map[string]VehicleRun{}
+
+	for token, run := range s.Runs {
+		for _, s := range run.States {
+			if s.Time > time {
+				if _, ok := filtered[token]; ok {
+					foo := filtered[token]
+					foo.States = append(filtered[token].States, s)
+					filtered[token] = foo
+				} else {
+					foo := *run
+					foo.States = []VehicleState{s}
+					filtered[token] = foo
+				}
+			}
+		}
+	}
+	return filtered
 }

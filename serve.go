@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -19,10 +20,21 @@ func main() {
 	mutex := sync.RWMutex{}
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+
+		var time int
+
+		if _, ok := r.Form["after"]; ok {
+			time, _ = strconv.Atoi(r.Form["after"][0])
+		}
+
 		mutex.RLock()
-		result, err := json.Marshal(s.Runs)
-		if err != nil {
-			log.Println(err)
+
+		var result []byte
+		if time > 0 {
+			result, _ = json.Marshal(s.After(time))
+		} else {
+			result, _ = json.Marshal(s.Runs)
 		}
 		mutex.RUnlock()
 		w.Header().Set("Content-Type", "application/json")
@@ -55,7 +67,7 @@ func main() {
 	// do the initial thing
 	go tick(int(time.Now().Unix()))
 
-	http.HandleFunc("/", handler)
+	http.HandleFunc("/locations.json", handler)
 	log.Println("Serving on port 8080.")
 	http.ListenAndServe(":8080", nil)
 }

@@ -3,6 +3,7 @@ package state
 import (
 	"github.com/bdon/jklmnt/nextbus"
 	"github.com/bdon/jklmnt/state"
+	"log"
 	"testing"
 )
 
@@ -36,12 +37,13 @@ func TestOne(t *testing.T) {
 		LeadingVehicleId: ""}
 
 	testResponse.Reports = append(testResponse.Reports, report1)
-	stat.AddResponse(testResponse, 10000000)
+	stat.AddResponse(testResponse, 10000015)
 
 	if len(stat.Runs) != 1 {
 		t.Error("Runs should have 1 element")
 	}
-	if len(stat.Runs[0].States) != 1 {
+
+	if len(stat.Runs["1000_10000000"].States) != 1 {
 		t.Error("First run should have 1 state")
 	}
 
@@ -51,12 +53,12 @@ func TestOne(t *testing.T) {
 		LeadingVehicleId: ""}
 
 	testResponse2.Reports = append(testResponse2.Reports, report2)
-	stat.AddResponse(testResponse2, 10000001)
+	stat.AddResponse(testResponse2, 10000015)
 
 	if len(stat.Runs) != 1 {
 		t.Error("Runs should have 1 element")
 	}
-	if len(stat.Runs[0].States) != 1 {
+	if len(stat.Runs["1000_10000000"].States) != 1 {
 		t.Error("First run should have still 1 state if position has not changed")
 	}
 
@@ -66,12 +68,12 @@ func TestOne(t *testing.T) {
 		LeadingVehicleId: ""}
 
 	testResponse3.Reports = append(testResponse3.Reports, report3)
-	stat.AddResponse(testResponse3, 10000002)
+	stat.AddResponse(testResponse3, 10000015)
 
 	if len(stat.Runs) != 1 {
 		t.Error("Runs should have 1 element")
 	}
-	if len(stat.Runs[0].States) != 2 {
+	if len(stat.Runs["1000_10000000"].States) != 2 {
 		t.Error("First run should have 2 states if position has changed")
 	}
 }
@@ -153,5 +155,55 @@ func TestChangeDirection(t *testing.T) {
 
 	if len(stat.Runs) != 2 {
 		t.Error("Runs should have 2 elements, because direction changed")
+	}
+}
+
+func TestSimplify(t *testing.T) {
+	run := state.VehicleRun{VehicleId: "1", Dir: nextbus.Inbound}
+	run.States = []state.VehicleState{}
+
+	state1 := state.VehicleState{LatString: "0.01", LonString: "0.01"}
+	state2 := state.VehicleState{LatString: "0.02", LonString: "0.02"}
+	state3 := state.VehicleState{LatString: "0.03", LonString: "0.03"}
+	run.States = append(run.States, state1)
+	run.States = append(run.States, state2)
+	run.States = append(run.States, state3)
+
+	run.Simplify()
+	//if len(run.States) != 2 {
+	//  t.Errorf("States should have 2 elements after simplifying, has %d", len(run.States))
+	//}
+}
+
+func TestFilteredByTime(t *testing.T) {
+	stat := state.NewSystemState()
+
+	response := nextbus.Response{}
+	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
+		LonString: "-122.0", SecsSinceReport: 15,
+		LeadingVehicleId: ""}
+
+	response.Reports = append(response.Reports, report1)
+	stat.AddResponse(response, 10000015)
+
+	response2 := nextbus.Response{}
+	report2 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.1",
+		LonString: "-122.1", SecsSinceReport: 15,
+		LeadingVehicleId: ""}
+
+	response2.Reports = append(response2.Reports, report2)
+	stat.AddResponse(response2, 10000115)
+
+	filtered := stat.After(10000099)
+	for k, _ := range filtered {
+		log.Printf("key: %s", k)
+	}
+
+	if len(filtered["1000_10000000"].States) != 1 {
+		t.Error("Runs should have 1 element")
+	}
+
+	if len(stat.Runs["1000_10000000"].States) != 2 {
+		t.Error("Runs should not have been modified")
 	}
 }
