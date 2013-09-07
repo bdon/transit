@@ -1,6 +1,7 @@
 package 'nginx'
 package 'htop'
 package 'g++'
+package 'git'
 
 execute "install GEOS 3.3.8" do
    command "mkdir /tmp/geos && \
@@ -23,6 +24,13 @@ tar -C /usr/local -xzf go1.1.1.linux-amd64.tar.gz"
   not_if { File.exists?("/usr/local/go") }
 end
 
+cookbook_file "/home/bdon/.bash_profile" do
+  source "bash_profile"
+  mode 0600
+  owner "bdon"
+  group "bdon"
+end
+
 cookbook_file "/etc/profile.d/go.sh" do
   mode 0744
   source "go.sh"
@@ -32,8 +40,39 @@ cookbook_file "/etc/init/api.conf" do
   source "api.conf"
 end
 
-directory "/usr/local/serve" do
+directory "/home/bdon/go" do
+  recursive true
+  owner "bdon"
+  group "bdon"
+end
 
+directory "/home/bdon/go/src" do
+  recursive true
+  owner "bdon"
+  group "bdon"
+end
+
+directory "/home/bdon/go/src/github.com" do
+  recursive true
+  owner "bdon"
+  group "bdon"
+end
+
+directory "/home/bdon/go/src/github.com/bdon/jklmnt" do
+  recursive true
+  owner "bdon"
+  group "bdon"
+end
+
+directory "/var/serve" do
+  owner "bdon"
+  group "bdon"
+end
+
+directory "/var/serve/muni_gtfs" do
+  recursive true
+  owner "bdon"
+  group "bdon"
 end
 
 cookbook_file '/etc/nginx/nginx.conf' do
