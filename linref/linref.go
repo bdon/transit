@@ -17,7 +17,7 @@ type Referencer struct {
 func NewReferencer(shapeId string) Referencer {
 	ref := Referencer{}
 	// Fixme
-	file, err := os.Open("/Users/Bdon/workspace/gopath/src/github.com/bdon/jklmnt/muni_gtfs/shapes.txt")
+	file, err := os.Open("./muni_gtfs/shapes.txt")
 	if err != nil {
 		log.Fatal(err)
 		return ref
