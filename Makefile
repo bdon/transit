@@ -13,3 +13,7 @@ converge/prod:
 
 ssh/prod:
 	ssh bdon@transit
+
+sync/prod:
+	rsync -avz . bdon@transit:/home/bdon/go/src/github.com/bdon/jklmnt --exclude '.git'
+	rsync -avz muni_gtfs bdon@transit:/var/serve/
