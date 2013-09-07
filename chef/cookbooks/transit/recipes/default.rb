@@ -108,3 +108,12 @@ directory '/var/www/bdon.org' do
   mode 00755
   action :create
 end
+
+#dd if=/dev/zero of=/extraswap bs=1M count=512
+#mkswap /extraswap
+#..and add it to /etc/fstab:
+#
+#/extraswap         none            swap    sw                0       0
+#and then turn it on:
+#
+#swapon -a
