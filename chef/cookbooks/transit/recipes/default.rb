@@ -19,11 +19,12 @@ execute "install go" do
   command "mkdir /tmp/go &&
 cd /tmp/go &&
 wget https://go.googlecode.com/files/go1.1.1.linux-amd64.tar.gz &&
-tar -C /usr/local -xzf go1.1.linux-amd64.tar.gz"
+tar -C /usr/local -xzf go1.1.1.linux-amd64.tar.gz"
   not_if { File.exists?("/usr/local/go") }
 end
 
 cookbook_file "/etc/profile.d/go.sh" do
+  mode 0744
   source "go.sh"
 end
 
