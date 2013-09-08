@@ -45,7 +45,11 @@ func main() {
 	tick := func(unixtime int) {
 		log.Println("Fetching from NextBus...")
 		response := nextbus.Response{}
-		get, _ := http.Get("http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=sf-muni&r=N&t=0")
+		get, err := http.Get("http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=sf-muni&r=N&t=0")
+		if err != nil {
+			log.Println(err)
+			return
+		}
 		defer get.Body.Close()
 		str, _ := ioutil.ReadAll(get.Body)
 		xml.Unmarshal(str, &response)
