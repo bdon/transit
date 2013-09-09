@@ -70,6 +70,9 @@ func (s *SystemState) AddResponse(foo nextbus.Response, unixtime int) {
 		if report.LeadingVehicleId != "" {
 			continue
 		}
+		if report.DirTag == "" {
+			continue
+		}
 
 		index := s.Referencer.Reference(report.Lat(), report.Lon())
 		// cull data on first and last stops
