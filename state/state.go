@@ -88,7 +88,6 @@ func (s *SystemState) AddResponse(foo nextbus.Response, unixtime int) {
 				// create a new Run
 				newRun := VehicleRun{VehicleId: report.VehicleId, Dir: report.Dir()}
 				newRun.States = append(newRun.States, newState)
-				//s.Runs = append(s.Runs, &newRun)
 				s.Runs[newToken(report.VehicleId, unixtime-report.SecsSinceReport)] = &newRun
 				s.CurrentRuns[newRun.VehicleId] = &newRun
 
@@ -98,7 +97,6 @@ func (s *SystemState) AddResponse(foo nextbus.Response, unixtime int) {
 		} else {
 			newRun := VehicleRun{VehicleId: report.VehicleId, Dir: report.Dir()}
 			newRun.States = append(newRun.States, newState)
-			//s.Runs = append(s.Runs, &newRun)
 			s.Runs[newToken(report.VehicleId, unixtime-report.SecsSinceReport)] = &newRun
 			s.CurrentRuns[newRun.VehicleId] = &newRun
 		}
@@ -110,7 +108,7 @@ func (s *SystemState) After(time int) map[string]VehicleRun {
 
 	for token, run := range s.Runs {
 		for _, s := range run.States {
-			if s.TimeAdded > time {
+			if s.TimeAdded >= time {
 				if _, ok := filtered[token]; ok {
 					foo := filtered[token]
 					foo.States = append(filtered[token].States, s)
