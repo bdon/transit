@@ -203,3 +203,34 @@ func TestFilteredByTime(t *testing.T) {
 		t.Error("Runs should not have been modified")
 	}
 }
+
+// delete runs that started more than 12 hours ago
+func TestDeleteOlderThan(t *testing.T) {
+	stat := state.NewSystemState()
+
+	response := nextbus.Response{}
+	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
+		LonString: "-122.0", SecsSinceReport: 15,
+		LeadingVehicleId: ""}
+
+	response.Reports = append(response.Reports, report1)
+	stat.AddResponse(response, 10000015)
+
+	response2 := nextbus.Response{}
+	report2 := nextbus.VehicleReport{VehicleId: "1001", DirTag: "IB", LatString: "37.1",
+		LonString: "-122.1", SecsSinceReport: 15,
+		LeadingVehicleId: ""}
+
+	response2.Reports = append(response2.Reports, report2)
+	stat.AddResponse(response2, 10000115)
+
+	stat.DeleteOlderThan(60*60, 10000000+60*61)
+	if len(stat.Runs) != 1 {
+		t.Error("Runs should only have one element")
+	}
+
+	// also clears out pointers (plz don't crash)
+	if len(stat.CurrentRuns) != 1 {
+		t.Error("CurrentRuns should only have one element")
+	}
+}

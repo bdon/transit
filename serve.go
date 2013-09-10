@@ -17,6 +17,7 @@ import (
 func main() {
 	s := state.NewSystemState()
 	ticker := time.NewTicker(10 * time.Second)
+	cleanupTicker := time.NewTicker(60 * time.Second)
 	mutex := sync.RWMutex{}
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
@@ -65,6 +66,19 @@ func main() {
 			select {
 			case t := <-ticker.C:
 				tick(int(t.Unix()))
+			}
+		}
+	}()
+
+	go func() {
+		for {
+			select {
+			case t := <-cleanupTicker.C:
+				log.Println("Deleting runs older than 12 hours.")
+				mutex.Lock()
+				s.DeleteOlderThan(60*60*12, int(t.Unix()))
+				mutex.Unlock()
+				log.Println("Done cleaning up.")
 			}
 		}
 	}()

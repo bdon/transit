@@ -21,6 +21,7 @@ type VehicleState struct {
 // One inbound or outbound run of a vehicle
 type VehicleRun struct {
 	VehicleId string            `json:"vehicle_id"`
+	StartTime int               `json:"-"`
 	Dir       nextbus.Direction `json:"dir"`
 	States    []VehicleState    `json:"states"`
 }
@@ -89,18 +90,20 @@ func (s *SystemState) AddResponse(foo nextbus.Response, unixtime int) {
 
 			if newState.Time-lastState.Time > 900 || report.Dir() != c.Dir {
 				// create a new Run
-				newRun := VehicleRun{VehicleId: report.VehicleId, Dir: report.Dir()}
+				startTime := unixtime - report.SecsSinceReport
+				newRun := VehicleRun{VehicleId: report.VehicleId, Dir: report.Dir(), StartTime: startTime}
 				newRun.States = append(newRun.States, newState)
-				s.Runs[newToken(report.VehicleId, unixtime-report.SecsSinceReport)] = &newRun
+				s.Runs[newToken(report.VehicleId, startTime)] = &newRun
 				s.CurrentRuns[newRun.VehicleId] = &newRun
 
 			} else if lastState.LatString != newState.LatString || lastState.LonString != newState.LonString {
 				c.States = append(c.States, newState)
 			}
 		} else {
-			newRun := VehicleRun{VehicleId: report.VehicleId, Dir: report.Dir()}
+			startTime := unixtime - report.SecsSinceReport
+			newRun := VehicleRun{VehicleId: report.VehicleId, Dir: report.Dir(), StartTime: startTime}
 			newRun.States = append(newRun.States, newState)
-			s.Runs[newToken(report.VehicleId, unixtime-report.SecsSinceReport)] = &newRun
+			s.Runs[newToken(report.VehicleId, startTime)] = &newRun
 			s.CurrentRuns[newRun.VehicleId] = &newRun
 		}
 	}
@@ -125,4 +128,25 @@ func (s *SystemState) After(time int) map[string]VehicleRun {
 		}
 	}
 	return filtered
+}
+
+func (s *SystemState) DeleteOlderThan(duration int, currentTime int) {
+	// replace runs with a filtered list
+	replacementList := map[string]*VehicleRun{}
+	for key, run := range s.Runs {
+		if run.StartTime > currentTime-duration {
+			replacementList[key] = run
+		}
+	}
+
+	s.Runs = replacementList
+
+	replacementCurrent := map[string]*VehicleRun{}
+	for key, run := range s.CurrentRuns {
+		if run.StartTime > currentTime-duration {
+			replacementCurrent[key] = run
+		}
+	}
+
+	s.CurrentRuns = replacementCurrent
 }
