@@ -1,52 +1,30 @@
 package linref
 
 import (
-	"encoding/csv"
-	"fmt"
-	"github.com/paulsmith/gogeos/geos"
-	"io"
-	"log"
-	"os"
-	"strconv"
+	"github.com/bdon/go.gtfs"
+	"github.com/paulmach/go.geo"
 )
 
 type Referencer struct {
-	Path *geos.Geometry
+	Path *geo.Path
 }
 
 func NewReferencer(shapeId string) Referencer {
 	ref := Referencer{}
+
 	// Fixme
-	file, err := os.Open("./muni_gtfs/shapes.txt")
-	if err != nil {
-		log.Fatal(err)
-		return ref
+	feed := gtfs.Load("muni_gtfs")
+	route := feed.RouteByShortName("N")
+	coords := route.Shapes()[0].Coords
+	path := geo.NewPath()
+	for _, c := range coords {
+		path.Push(geo.NewPoint(c.Lon, c.Lat))
 	}
-	defer file.Close()
-	reader := csv.NewReader(file)
-	reader.TrailingComma = true
-	coords := []geos.Coord{}
-	for {
-		record, err := reader.Read()
-		if err == io.EOF {
-			break
-		} else if err != nil {
-			fmt.Println("Error:", err)
-			return ref
-		}
-		if record[0] == shapeId {
-			lon, _ := strconv.ParseFloat(record[1], 64)
-			lat, _ := strconv.ParseFloat(record[2], 64)
-			coords = append(coords, geos.NewCoord(lat, lon))
-		}
-	}
-	path, _ := geos.NewLineString(coords...)
 	ref.Path = path
 	return ref
 }
 
 func (r Referencer) Reference(lat float64, lon float64) float64 {
-	coord := geos.NewCoord(lat, lon)
-	point, _ := geos.NewPoint(coord)
+	point := geo.NewPoint(lon, lat)
 	return r.Path.ProjectNormalized(point)
 }
