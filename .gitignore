@@ -2,3 +2,4 @@
 *.swo
 .vagrant
 .DS_Store
+serve
