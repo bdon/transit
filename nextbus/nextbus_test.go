@@ -1,7 +1,7 @@
 package nextbus
 
 import (
-	"github.com/bdon/jklmnt/nextbus"
+	"github.com/bdon/transit_timelines/nextbus"
 	"testing"
 )
 

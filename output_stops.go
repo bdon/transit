@@ -4,7 +4,7 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
-	"github.com/bdon/jklmnt/linref"
+	"github.com/bdon/transit_timelines/linref"
 	"io"
 	"os"
 	"strconv"

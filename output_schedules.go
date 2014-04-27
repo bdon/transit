@@ -8,7 +8,7 @@ import (
   "io"
   "strconv"
   "strings"
-	"github.com/bdon/jklmnt/linref"
+	"github.com/bdon/transit_timelines/linref"
 )
 
 type TripStop struct {

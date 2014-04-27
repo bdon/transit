@@ -1,8 +1,8 @@
 package state
 
 import (
-	"github.com/bdon/jklmnt/nextbus"
-	"github.com/bdon/jklmnt/state"
+	"github.com/bdon/transit_timelines/nextbus"
+	"github.com/bdon/transit_timelines/state"
 	"testing"
 )
 

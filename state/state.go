@@ -2,8 +2,8 @@ package state
 
 import (
 	"fmt"
-	"github.com/bdon/jklmnt/linref"
-	"github.com/bdon/jklmnt/nextbus"
+	"github.com/bdon/transit_timelines/linref"
+	"github.com/bdon/transit_timelines/nextbus"
 	"strconv"
 	"strings"
 )
