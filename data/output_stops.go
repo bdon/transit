@@ -7,8 +7,9 @@ import (
 	"io"
 	"os"
 	"strconv"
-	"strings"
+  "strings"
   "github.com/bdon/transit_timelines"
+  "github.com/bdon/go.gtfs"
 )
 
 type StopRepr struct {
@@ -55,11 +56,11 @@ func main() {
 		}
 		if record[0] == tripId {
 			if firstTime == 0 {
-				firstTime = hstoi(record[1])
+				firstTime = gtfs.Hmstoi(record[1])
 				stopMap[record[3]] = 0
 			} else {
 				// Store the integer value of time since trip started
-				stopMap[record[3]] = hstoi(record[1]) - firstTime
+				stopMap[record[3]] = gtfs.Hmstoi(record[1]) - firstTime
 			}
 		}
 	}
@@ -143,11 +144,3 @@ func main() {
 	fmt.Printf(string(marshalled))
 }
 
-func hstoi(str string) int {
-	components := strings.Split(str, ":")
-	hour, _ := strconv.Atoi(components[0])
-	min, _ := strconv.Atoi(components[1])
-	sec, _ := strconv.Atoi(components[2])
-	retval := hour*60*60 + min*60 + sec
-	return retval
-}

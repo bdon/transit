@@ -7,7 +7,7 @@ import (
   "fmt"
   "io"
   "strconv"
-  "strings"
+  "github.com/bdon/go.gtfs"
 	"github.com/bdon/transit_timelines"
 )
 
@@ -118,7 +118,7 @@ func populateTrips(trips []Trip, serviceId string, directionId string, stopList 
           currentTrip.Stops = []TripStop{}
           sentinel = true
         }
-        currentTrip.Stops = append(currentTrip.Stops, TripStop{Time:hstoi(record[1]),Index:stopIndexes[record[3]]})
+        currentTrip.Stops = append(currentTrip.Stops, TripStop{Time:gtfs.Hmstoi(record[1]),Index:stopIndexes[record[3]]})
       }
     }
 	}
@@ -126,11 +126,3 @@ func populateTrips(trips []Trip, serviceId string, directionId string, stopList 
   return trips
 }
 
-func hstoi(str string) int {
-	components := strings.Split(str, ":")
-	hour, _ := strconv.Atoi(components[0])
-	min, _ := strconv.Atoi(components[1])
-	sec, _ := strconv.Atoi(components[2])
-	retval := hour*60*60 + min*60 + sec
-	return retval
-}
