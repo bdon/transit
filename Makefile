@@ -17,3 +17,6 @@ ssh/prod:
 sync/prod:
 	rsync -avz . bdon@transit:/home/bdon/go/src/github.com/bdon/jklmnt --exclude '.git'
 	rsync -avz muni_gtfs bdon@transit:/var/serve/
+
+release:
+	cd main && gox -output="serve" -osarch="linux/amd64"
