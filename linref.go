@@ -9,6 +9,7 @@ type Referencer struct {
 	Path *geo.Path
 }
 
+// TODO this should take a geo.Path
 func NewReferencer(shapeId string) Referencer {
 	ref := Referencer{}
 

@@ -6,3 +6,4 @@
 * write historical data/rotate logs
 * add Boston MBTA
 * add more lines/buses
+* configure CORS
