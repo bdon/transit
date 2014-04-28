@@ -4,7 +4,6 @@
 * figure out pre-generated data (make it api call?)
 * cross compile to linux
 * line simplification
-* move frontend into here
 * write state to disk so we can recover
 * write historical data/rotate logs
 * add Boston MBTA
