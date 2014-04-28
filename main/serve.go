@@ -4,8 +4,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
-	"github.com/bdon/transit_timelines/nextbus"
-	"github.com/bdon/transit_timelines/state"
+	"github.com/bdon/transit_timelines"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -15,7 +14,7 @@ import (
 )
 
 func main() {
-	s := state.NewSystemState()
+	s := transit_timelines.NewSystemState()
 	ticker := time.NewTicker(10 * time.Second)
 	cleanupTicker := time.NewTicker(60 * time.Second)
 	mutex := sync.RWMutex{}
@@ -45,7 +44,7 @@ func main() {
 
 	tick := func(unixtime int) {
 		log.Println("Fetching from NextBus...")
-		response := nextbus.Response{}
+		response := transit_timelines.Response{}
 		get, err := http.Get("http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=sf-muni&r=N&t=0")
 		if err != nil {
 			log.Println(err)

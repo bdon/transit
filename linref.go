@@ -1,4 +1,4 @@
-package linref
+package transit_timelines
 
 import (
 	"github.com/bdon/go.gtfs"

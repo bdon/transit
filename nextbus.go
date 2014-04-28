@@ -1,4 +1,4 @@
-package nextbus
+package transit_timelines
 
 import (
 	"encoding/xml"

@@ -3,9 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bdon/transit_timelines/nextbus"
-	"github.com/bdon/transit_timelines/state"
 	"path/filepath"
+  "github.com/bdon/transit_timelines"
 	"strconv"
 	"time"
 )
@@ -27,7 +26,7 @@ func main() {
 
 	// now we only have files for 8/26-8/27
 
-	stat := state.NewSystemState()
+	stat := NewSystemState()
 	for _, entry := range relevantFiles {
 		unixstamp := filepathToTime(entry)
 		resp := nextbus.ResponseFromFile(entry, int(unixstamp))

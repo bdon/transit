@@ -1,9 +1,7 @@
-package state
+package transit_timelines
 
 import (
 	"fmt"
-	"github.com/bdon/transit_timelines/linref"
-	"github.com/bdon/transit_timelines/nextbus"
 	"strconv"
 	"strings"
 )
@@ -22,7 +20,7 @@ type VehicleState struct {
 type VehicleRun struct {
 	VehicleId string            `json:"vehicle_id"`
 	StartTime int               `json:"-"`
-	Dir       nextbus.Direction `json:"dir"`
+	Dir       Direction `json:"dir"`
 	States    []VehicleState    `json:"states"`
 }
 
@@ -35,14 +33,14 @@ type SystemState struct {
 
 	//Bookkeeping for vehicle ID to current run.
 	CurrentRuns map[string]*VehicleRun
-	Referencer  linref.Referencer
+	Referencer  Referencer
 }
 
 func NewSystemState() *SystemState {
 	retval := SystemState{}
 	retval.Runs = map[string]*VehicleRun{}
 	retval.CurrentRuns = make(map[string]*VehicleRun)
-	retval.Referencer = linref.NewReferencer("102909")
+	retval.Referencer = NewReferencer("102909")
 	return &retval
 }
 
@@ -66,7 +64,7 @@ func newToken(vehicleId string, timestamp int) string {
 }
 
 // Must be called in chronological order
-func (s *SystemState) AddResponse(foo nextbus.Response, unixtime int) {
+func (s *SystemState) AddResponse(foo Response, unixtime int) {
 	for _, report := range foo.Reports {
 		if report.LeadingVehicleId != "" {
 			continue
