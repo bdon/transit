@@ -4,11 +4,11 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
-	"github.com/bdon/transit_timelines/linref"
 	"io"
 	"os"
 	"strconv"
 	"strings"
+  "github.com/bdon/transit_timelines"
 )
 
 type StopRepr struct {
@@ -66,7 +66,7 @@ func main() {
 	//fmt.Printf("stop ids: %s\n", stopMap)
 
 	// create a linear referencer
-	nReferencer := linref.NewReferencer("102909")
+	nReferencer := transit_timelines.NewReferencer("102909")
 
 	// create an output data structure
 	output := []StopRepr{}

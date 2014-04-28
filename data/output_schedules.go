@@ -8,7 +8,7 @@ import (
   "io"
   "strconv"
   "strings"
-	"github.com/bdon/transit_timelines/linref"
+	"github.com/bdon/transit_timelines"
 )
 
 type TripStop struct {
@@ -43,7 +43,7 @@ func main() {
   for _, r := range rawStopList {
     stopList[r] = true
   }
-	nReferencer := linref.NewReferencer("102909")
+	nReferencer := transit_timelines.NewReferencer("102909")
 
   stopsFile, _ := os.Open("muni_gtfs/stops.txt")
 	defer stopsFile.Close()

@@ -26,10 +26,10 @@ func main() {
 
 	// now we only have files for 8/26-8/27
 
-	stat := NewSystemState()
+	stat := transit_timelines.NewSystemState()
 	for _, entry := range relevantFiles {
 		unixstamp := filepathToTime(entry)
-		resp := nextbus.ResponseFromFile(entry, int(unixstamp))
+		resp := transit_timelines.ResponseFromFile(entry, int(unixstamp))
 		stat.AddResponse(resp, int(unixstamp))
 	}
 
