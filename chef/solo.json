@@ -1,4 +1,0 @@
-{
-    "run_list": [ "recipe[transit::default]","recipe[tiles::default]" ]
-}
-
