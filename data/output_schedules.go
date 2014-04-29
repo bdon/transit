@@ -22,6 +22,12 @@ type Trip struct {
   Dir string `json:"dir"`
 }
 
+// Given a Route (by short name)
+// we want to choose a characteristic Trip
+// how do we know which one this is?
+// * the one with the most stops
+// or the one with the largest Shape?
+
 // route 1093
 
 // we only care about these stops (OB/IB)

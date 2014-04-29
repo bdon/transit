@@ -188,7 +188,7 @@ function endsWithFlattenedData(flattened) {
 }
 
 function getPastData() {
-  d3.json("http://transit.suburbancubicle.com/locations.json", function(response) {
+  d3.json("http://localhost:8080/locations.json", function(response) {
 
     var flattened = [];
     for(var key in response) {
@@ -212,7 +212,7 @@ function getPastData() {
 }
 
 function getDataSince(timestamp) {
-  d3.json("http://transit.suburbancubicle.com/locations.json?after=" + Math.floor(timestamp/1000), function(response) {
+  d3.json("http://localhost:8080/locations.json?after=" + Math.floor(timestamp/1000), function(response) {
     // delta join.
     for (var run in response) {
       var match = data.filter(function(d) { return d.key == run})
