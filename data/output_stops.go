@@ -1,13 +1,8 @@
 package main
 
 import (
-	"encoding/csv"
 	"encoding/json"
 	"fmt"
-	"io"
-	"os"
-	"strconv"
-  "strings"
   "github.com/bdon/transit_timelines"
   "github.com/bdon/go.gtfs"
 )
@@ -15,132 +10,19 @@ import (
 type StopRepr struct {
 	Index     float64 `json:"index"`
 	Name      string  `json:"name"`
-	MyName    string  `json:"my_name"`
-	Lat       float64 `json:"lat"`
-	Lon       float64 `json:"lon"`
-	DeltaTime int     `json:"delta_time"`
 }
 
 func main() {
-	// Find the first trip for a shape
-	tripsFile, _ := os.Open("muni_gtfs/trips.txt")
-	defer tripsFile.Close()
-	reader := csv.NewReader(tripsFile)
-	reader.TrailingComma = true
-	var tripId string
-
-	for {
-		record, err := reader.Read()
-		if err == io.EOF {
-			fmt.Println("No Record Found")
-			break
-		}
-		if record[6] == "102909" {
-			tripId = record[2]
-			break
-		}
-	}
-	//fmt.Printf("trip id: %s\n", tripId)
-
-	// Create a map of stop ids for that trip
-	stopTimesFile, _ := os.Open("muni_gtfs/stop_times.txt")
-	defer stopTimesFile.Close()
-	stopTimesReader := csv.NewReader(stopTimesFile)
-	stopTimesReader.TrailingComma = true
-	stopMap := make(map[string]int)
-	firstTime := 0
-	for {
-		record, err := stopTimesReader.Read()
-		if err == io.EOF {
-			break
-		}
-		if record[0] == tripId {
-			if firstTime == 0 {
-				firstTime = gtfs.Hmstoi(record[1])
-				stopMap[record[3]] = 0
-			} else {
-				// Store the integer value of time since trip started
-				stopMap[record[3]] = gtfs.Hmstoi(record[1]) - firstTime
-			}
-		}
-	}
-	//fmt.Printf("stop ids: %s\n", stopMap)
-
-	// create a linear referencer
-	nReferencer := transit_timelines.NewReferencer("102909")
-
-	// create an output data structure
+  feed := gtfs.Load("muni_gtfs")
+  route := feed.RouteByShortName("N")
+	referencer := transit_timelines.NewReferencer(route.LongestShape().Coords)
 	output := []StopRepr{}
 
-	myNames := make(map[string]string)
-	myNames["King St & 4th St"] = "King & 4th"
-	myNames["King St & 2th St"] = "King & 2nd"
-	myNames["The Embarcadero & Brannan St"] = "Brannan"
-	//myNames["The Embarcadero & Harrison St"] = "Harrison"
-	myNames["The Embarcadero & Folsom St"] = "Folsom"
-	myNames["Metro Embarcadero Station"] = "Embarcadero"
-	myNames["Metro Montgomery Station/Outbound"] = "Montgomery"
-	myNames["Metro Powell Station/Outbound"] = "Powell"
-	myNames["Metro Civic Center Station/Outbd"] = "Civic Center"
-	myNames["Van Ness Station Outbound"] = "Van Ness"
-	myNames["Duboce Ave & Church St"] = "Duboce & Church"
-	myNames["Duboce St/Noe St/Duboce Park"] = "Duboce & Noe"
-	myNames["Carl St & Cole St"] = "Carl & Cole"
-	myNames["Carl St & Stanyan St"] = "Carl & Stanyan"
-	//myNames["Carl St & Hillway Ave"] = "Carl & Hillway"
-	myNames["Irving St & 2nd Ave"] = "Irving & 2nd"
-	//myNames["Irving St & 4th Ave"] = "Irving & 4th"
-	//myNames["Irving St & 7th Ave"] = "Irving & 7th"
-	//myNames["Irving St & 9th Ave"] = "Irving & 9th"
-	myNames["Judah St & 9th Ave"] = "Judah & 9th"
-	//myNames["Judah St & Funston Ave"] = "Judah & Funston"
-	//myNames["Judah St & 16th Ave"] = "Judah & 16th"
-	myNames["Judah St & 19th Ave"] = "Judah & 19th"
-	//myNames["Judah St & 23rd Ave"] = "Judah & 23rd"
-	//myNames["Judah St & 25th Ave"] = "Judah & 25th"
-	//myNames["Judah St & 28th Ave"] = "Judah & 28th"
-	//myNames["Judah St & 31st Ave"] = "Judah & 31st"
-	//myNames["Judah St & 34th Ave"] = "Judah & 34th"
-	myNames["Judah St & Sunset Blvd"] = "Judah & Sunset"
-	//myNames["Judah St & 40th Ave"] = "Judah & 40th"
-	//myNames["Judah St & 43rd Ave"] = "Judah & 43rd"
-	//myNames["Judah St & 46th Ave"] = "Judah & 46th"
-	myNames["Judah/La Playa/Ocean Beach"] = "Ocean Beach"
-
-	// print all stops given a list of stop IDs
-	stopsFile, _ := os.Open("muni_gtfs/stops.txt")
-	defer stopsFile.Close()
-	stopsReader := csv.NewReader(stopsFile)
-	stopsReader.TrailingComma = true
-	oceanBeachSeen := false
-	for {
-		record, err := stopsReader.Read()
-		if err == io.EOF {
-			break
-		}
-
-		if _, ok := stopMap[record[0]]; ok {
-			newStop := StopRepr{}
-			stop_lat, _ := strconv.ParseFloat(record[3], 64)
-			stop_lon, _ := strconv.ParseFloat(record[4], 64)
-			index := nReferencer.Reference(stop_lat, stop_lon)
-			newStop.Lat = stop_lat
-			newStop.Lon = stop_lon
-			newStop.Index = index
-			newStop.Name = strings.TrimSpace(record[1])
-			newStop.MyName = myNames[strings.TrimSpace(record[1])]
-			newStop.DeltaTime = stopMap[record[0]]
-			if newStop.MyName == "Ocean Beach" {
-				if oceanBeachSeen {
-					continue
-				}
-				oceanBeachSeen = true
-			}
-			output = append(output, newStop)
-		}
-	}
+  for _, stop := range route.Stops() {
+	  index := referencer.Reference(stop.Coord.Lat, stop.Coord.Lon)
+    output = append(output, StopRepr{Index:index,Name:stop.Name})
+  }
 
 	marshalled, _ := json.Marshal(output)
 	fmt.Printf(string(marshalled))
 }
-

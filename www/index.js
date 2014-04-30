@@ -281,7 +281,6 @@ d3.json("schedule_1.json", function(trips) {
 });
 
 d3.json("njudah_stops.json", function(stops) {
-  stops.sort( function(a,b) { return a.delta_time - b.delta_time; });
 
   vis.append("g").attr("transform","translate(64,23)").selectAll(".stop").data(stops).enter().append("text")
       .attr("class", "stop")

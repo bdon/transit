@@ -2,6 +2,7 @@ package transit_timelines
 
 import (
 	"fmt"
+	"github.com/bdon/go.gtfs"
 	"strconv"
 	"strings"
 )
@@ -18,10 +19,10 @@ type VehicleState struct {
 
 // One inbound or outbound run of a vehicle
 type VehicleRun struct {
-	VehicleId string            `json:"vehicle_id"`
-	StartTime int               `json:"-"`
-	Dir       Direction `json:"dir"`
-	States    []VehicleState    `json:"states"`
+	VehicleId string         `json:"vehicle_id"`
+	StartTime int            `json:"-"`
+	Dir       Direction      `json:"dir"`
+	States    []VehicleState `json:"states"`
 }
 
 // The entire state of the system is a list of vehicle runs.
@@ -40,7 +41,11 @@ func NewSystemState() *SystemState {
 	retval := SystemState{}
 	retval.Runs = map[string]*VehicleRun{}
 	retval.CurrentRuns = make(map[string]*VehicleRun)
-	retval.Referencer = NewReferencer("102909")
+
+	feed := gtfs.Load("muni_gtfs")
+	route := feed.RouteByShortName("N")
+	coords := route.LongestShape().Coords
+	retval.Referencer = NewReferencer(coords)
 	return &retval
 }
 

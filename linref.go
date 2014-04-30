@@ -9,14 +9,11 @@ type Referencer struct {
 	Path *geo.Path
 }
 
-// TODO this should take a geo.Path
-func NewReferencer(shapeId string) Referencer {
+// TODO this should take a set of Coords
+func NewReferencer(coords []gtfs.Coord) Referencer {
 	ref := Referencer{}
 
 	// Fixme
-	feed := gtfs.Load("muni_gtfs")
-	route := feed.RouteByShortName("N")
-	coords := route.Shapes()[0].Coords
 	path := geo.NewPath()
 	for _, c := range coords {
 		path.Push(geo.NewPoint(c.Lon, c.Lat))
