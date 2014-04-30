@@ -9,11 +9,8 @@ type Referencer struct {
 	Path *geo.Path
 }
 
-// TODO this should take a set of Coords
 func NewReferencer(coords []gtfs.Coord) Referencer {
 	ref := Referencer{}
-
-	// Fixme
 	path := geo.NewPath()
 	for _, c := range coords {
 		path.Push(geo.NewPoint(c.Lon, c.Lat))
