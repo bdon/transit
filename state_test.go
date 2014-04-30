@@ -2,6 +2,7 @@ package transit_timelines
 
 import (
 	"testing"
+  "github.com/bdon/go.nextbus"
 )
 
 func TestEmpty(t *testing.T) {
@@ -15,8 +16,8 @@ func TestEmpty(t *testing.T) {
 func TestLeadingVehicle(t *testing.T) {
 	stat := NewSystemState()
 
-	testResponse := Response{}
-	report1 := VehicleReport{LeadingVehicleId: "something"}
+	testResponse := nextbus.Response{}
+	report1 := nextbus.VehicleReport{LeadingVehicleId: "something"}
 	testResponse.Reports = append(testResponse.Reports, report1)
 	stat.AddResponse(testResponse, 10000000)
 
@@ -28,8 +29,8 @@ func TestLeadingVehicle(t *testing.T) {
 func TestOne(t *testing.T) {
 	stat := NewSystemState()
 
-	testResponse := Response{}
-	report1 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
+	testResponse := nextbus.Response{}
+	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
 		LeadingVehicleId: ""}
 
@@ -44,8 +45,8 @@ func TestOne(t *testing.T) {
 		t.Error("First run should have 1 state")
 	}
 
-	testResponse2 := Response{}
-	report2 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
+	testResponse2 := nextbus.Response{}
+	report2 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
 		LeadingVehicleId: ""}
 
@@ -59,8 +60,8 @@ func TestOne(t *testing.T) {
 		t.Error("First run should have still 1 state if position has not changed")
 	}
 
-	testResponse3 := Response{}
-	report3 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.1",
+	testResponse3 := nextbus.Response{}
+	report3 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.1",
 		LonString: "-122.1", SecsSinceReport: 15,
 		LeadingVehicleId: ""}
 
@@ -78,16 +79,16 @@ func TestOne(t *testing.T) {
 func TestTwo(t *testing.T) {
 	stat := NewSystemState()
 
-	testResponse := Response{}
-	report1 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
+	testResponse := nextbus.Response{}
+	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
 		LeadingVehicleId: ""}
 
 	testResponse.Reports = append(testResponse.Reports, report1)
 	stat.AddResponse(testResponse, 10000000)
 
-	testResponse2 := Response{}
-	report2 := VehicleReport{VehicleId: "1001", DirTag: "IB", LatString: "37.0",
+	testResponse2 := nextbus.Response{}
+	report2 := nextbus.VehicleReport{VehicleId: "1001", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
 		LeadingVehicleId: ""}
 
@@ -102,8 +103,8 @@ func TestTwo(t *testing.T) {
 func TestIgnoreFifteenMinutes(t *testing.T) {
 	stat := NewSystemState()
 
-	response := Response{}
-	report1 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
+	response := nextbus.Response{}
+	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
 		LeadingVehicleId: ""}
 
@@ -114,8 +115,8 @@ func TestIgnoreFifteenMinutes(t *testing.T) {
 		t.Error("Runs should have 1 element")
 	}
 
-	laterResponse := Response{}
-	laterReport := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.1",
+	laterResponse := nextbus.Response{}
+	laterReport := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.1",
 		LonString: "-122.1", SecsSinceReport: 15,
 		LeadingVehicleId: ""}
 
@@ -130,8 +131,8 @@ func TestIgnoreFifteenMinutes(t *testing.T) {
 func TestChangeDirection(t *testing.T) {
 	stat := NewSystemState()
 
-	response := Response{}
-	report1 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
+	response := nextbus.Response{}
+	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
 		LeadingVehicleId: ""}
 
@@ -142,8 +143,8 @@ func TestChangeDirection(t *testing.T) {
 		t.Error("Runs should have 1 element")
 	}
 
-	laterResponse := Response{}
-	laterReport := VehicleReport{VehicleId: "1000", DirTag: "OB", LatString: "37.1",
+	laterResponse := nextbus.Response{}
+	laterReport := nextbus.VehicleReport{VehicleId: "1000", DirTag: "OB", LatString: "37.1",
 		LonString: "-122.1", SecsSinceReport: 15,
 		LeadingVehicleId: ""}
 
@@ -156,7 +157,7 @@ func TestChangeDirection(t *testing.T) {
 }
 
 func TestSimplify(t *testing.T) {
-	run := VehicleRun{VehicleId: "1", Dir: Inbound}
+	run := VehicleRun{VehicleId: "1", Dir: nextbus.Inbound}
 	run.States = []VehicleState{}
 
 	state1 := VehicleState{LatString: "0.01", LonString: "0.01"}
@@ -175,16 +176,16 @@ func TestSimplify(t *testing.T) {
 func TestFilteredByTime(t *testing.T) {
 	stat := NewSystemState()
 
-	response := Response{}
-	report1 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
+	response := nextbus.Response{}
+	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
 		LeadingVehicleId: ""}
 
 	response.Reports = append(response.Reports, report1)
 	stat.AddResponse(response, 10000015)
 
-	response2 := Response{}
-	report2 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.1",
+	response2 := nextbus.Response{}
+	report2 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.1",
 		LonString: "-122.1", SecsSinceReport: 15,
 		LeadingVehicleId: ""}
 
@@ -206,16 +207,16 @@ func TestFilteredByTime(t *testing.T) {
 func TestDeleteOlderThan(t *testing.T) {
 	stat := NewSystemState()
 
-	response := Response{}
-	report1 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
+	response := nextbus.Response{}
+	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
 		LeadingVehicleId: ""}
 
 	response.Reports = append(response.Reports, report1)
 	stat.AddResponse(response, 10000015)
 
-	response2 := Response{}
-	report2 := VehicleReport{VehicleId: "1001", DirTag: "IB", LatString: "37.1",
+	response2 := nextbus.Response{}
+	report2 := nextbus.VehicleReport{VehicleId: "1001", DirTag: "IB", LatString: "37.1",
 		LonString: "-122.1", SecsSinceReport: 15,
 		LeadingVehicleId: ""}
 

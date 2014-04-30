@@ -3,6 +3,7 @@ package transit_timelines
 import (
 	"fmt"
 	"github.com/bdon/go.gtfs"
+	"github.com/bdon/go.nextbus"
 	"strconv"
 	"strings"
 )
@@ -21,7 +22,7 @@ type VehicleState struct {
 type VehicleRun struct {
 	VehicleId string         `json:"vehicle_id"`
 	StartTime int            `json:"-"`
-	Dir       Direction      `json:"dir"`
+	Dir       nextbus.Direction      `json:"dir"`
 	States    []VehicleState `json:"states"`
 }
 
@@ -69,7 +70,7 @@ func newToken(vehicleId string, timestamp int) string {
 }
 
 // Must be called in chronological order
-func (s *SystemState) AddResponse(foo Response, unixtime int) {
+func (s *SystemState) AddResponse(foo nextbus.Response, unixtime int) {
 	for _, report := range foo.Reports {
 		if report.LeadingVehicleId != "" {
 			continue

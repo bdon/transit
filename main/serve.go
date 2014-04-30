@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/bdon/transit_timelines"
+	"github.com/bdon/go.nextbus"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -12,6 +13,10 @@ import (
 	"sync"
 	"time"
 )
+
+// takes as an argument a directory containing uncompressed GTFS files
+// ttimeline feeds/ --compile : outputs stops/schedules based on all GTFS feeds.
+//  serve these compiled files through NGINX.
 
 func main() {
 	s := transit_timelines.NewSystemState()
@@ -44,7 +49,7 @@ func main() {
 
 	tick := func(unixtime int) {
 		log.Println("Fetching from NextBus...")
-		response := transit_timelines.Response{}
+		response := nextbus.Response{}
 		get, err := http.Get("http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=sf-muni&r=N&t=0")
 		if err != nil {
 			log.Println(err)
