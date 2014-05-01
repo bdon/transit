@@ -25,6 +25,9 @@ var tickerWheel = d3.select("#tickerSvg").append("path")
   .attr("transform", "translate(10,10)")
   .attr("d", wheel);
 
+var static_endpoint = "http://localhost:8081/static/";
+var live_endpoint = "http://localhost:8080";
+
 var data = [];
 var ends = [];
 var guides = [];
@@ -188,7 +191,7 @@ function endsWithFlattenedData(flattened) {
 }
 
 function getPastData() {
-  d3.json("http://localhost:8080/locations.json", function(response) {
+  d3.json(live_endpoint + "/locations.json", function(response) {
 
     var flattened = [];
     for(var key in response) {
@@ -280,19 +283,18 @@ d3.json("schedule_1.json", function(trips) {
   d3.selectAll(".outbound").classed("hidden",!this.checked);
 });
 
-d3.json("njudah_stops.json", function(stops) {
-
+d3.json(static_endpoint + "/stops/1093.json", function(stops) {
   vis.append("g").attr("transform","translate(64,23)").selectAll(".stop").data(stops).enter().append("text")
       .attr("class", "stop")
       .attr("text-anchor", "end")
       .attr("y", function(d) { return stopsScale(d.index) })
-      .text(function(d) { return d.my_name });
+      .text(function(d) { return d.name });
 
   vis.append("g").attr("transform","translate(866,23)").selectAll(".stop").data(stops).enter().append("text")
       .attr("class", "stop")
       .attr("text-anchor", "begin")
       .attr("y", function(d) { return stopsScale(d.index) })
-      .text(function(d) { return d.my_name });
+      .text(function(d) { return d.name });
 
   clippedMid.append("g").selectAll(".rule").data(stops).enter().append("line")
       .attr("class", "rule")
