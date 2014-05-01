@@ -22,34 +22,23 @@ type Trip struct {
   Dir string `json:"dir"`
 }
 
-// Given a Route (by short name)
-// we want to choose a characteristic Trip
-// how do we know which one this is?
-// * the one with the most stops
-// or the one with the largest Shape?
-
-// route 1093
-
-// we only care about these stops (OB/IB)
-// Ocean Beach 7219 / 5223
-// Judah/Sunset 5224 / 5225
-// Judah/19th 5199 / 5200
-// Carl/Hillway 3912 / 3913
-// Duboce/Church 4447 / 4448
-// VanNess 6996 / 5419
-// Embarcadero 7217 / 6992
-// King/4th  5240 / 5239
-
 func main() {
 
+  // create set of stop IDs
   rawStopList := []string{"7219","5223","5224","5225","5199","5200","3912","3913",
                   "4447","4448","6996","5419","7217","6992","5240","5239"}
   stopList := map[string]bool{}
+
+  // mapping of stop IDs to index
   stopIndexes := map[string]float64{}
   for _, r := range rawStopList {
     stopList[r] = true
   }
-	nReferencer := transit_timelines.NewReferencer("102909")
+
+	feed := gtfs.Load("muni_gtfs")
+	route := feed.RouteByShortName("N")
+	coords := route.LongestShape().Coords
+	nReferencer := transit_timelines.NewReferencer(coords)
 
   stopsFile, _ := os.Open("muni_gtfs/stops.txt")
 	defer stopsFile.Close()
@@ -71,6 +60,7 @@ func main() {
   }
 
   // done initializing stops.
+  // emit 1 file for every Route
 
   trips := []Trip{}
 

@@ -6,19 +6,55 @@ import (
 	"fmt"
 	"github.com/bdon/transit_timelines"
 	"github.com/bdon/go.nextbus"
+  "github.com/bdon/go.gtfs"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
 	"sync"
 	"time"
+  "flag"
 )
+
+type StopRepr struct {
+	Index     float64 `json:"index"`
+	Name      string  `json:"name"`
+}
 
 // takes as an argument a directory containing uncompressed GTFS files
 // ttimeline feeds/ --compile : outputs stops/schedules based on all GTFS feeds.
 //  serve these compiled files through NGINX.
 
+var emitFiles bool
+func init() {
+	flag.BoolVar(&emitFiles, "emitFiles", false, "emit files")
+}
+
 func main() {
+  flag.Parse()
+  if emitFiles {
+    emitStops()
+  } else {
+    webserver()
+  }
+}
+
+func emitStops() {
+  feed := gtfs.Load("muni_gtfs")
+  route := feed.RouteByShortName("N")
+	referencer := transit_timelines.NewReferencer(route.LongestShape().Coords)
+	output := []StopRepr{}
+
+  for _, stop := range route.Stops() {
+	  index := referencer.Reference(stop.Coord.Lat, stop.Coord.Lon)
+    output = append(output, StopRepr{Index:index,Name:stop.Name})
+  }
+
+	marshalled, _ := json.Marshal(output)
+	fmt.Printf(string(marshalled))
+}
+
+func webserver() {
 	s := transit_timelines.NewSystemState()
 	ticker := time.NewTicker(10 * time.Second)
 	cleanupTicker := time.NewTicker(60 * time.Second)
@@ -50,6 +86,7 @@ func main() {
 	tick := func(unixtime int) {
 		log.Println("Fetching from NextBus...")
 		response := nextbus.Response{}
+    //Accept-Encoding: gzip, deflate
 		get, err := http.Get("http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=sf-muni&r=N&t=0")
 		if err != nil {
 			log.Println(err)

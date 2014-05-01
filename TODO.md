@@ -7,4 +7,4 @@
 * add Boston MBTA
 * add more lines/buses
 * configure CORS
-* truncate index and lat/lon floats
+* truncate index and lat/lon floats - use an integer

@@ -1,8 +1,8 @@
 package transit_timelines
 
 import (
+	"github.com/bdon/go.nextbus"
 	"testing"
-  "github.com/bdon/go.nextbus"
 )
 
 func TestEmpty(t *testing.T) {

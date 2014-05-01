@@ -20,10 +20,10 @@ type VehicleState struct {
 
 // One inbound or outbound run of a vehicle
 type VehicleRun struct {
-	VehicleId string         `json:"vehicle_id"`
-	StartTime int            `json:"-"`
-	Dir       nextbus.Direction      `json:"dir"`
-	States    []VehicleState `json:"states"`
+	VehicleId string            `json:"vehicle_id"`
+	StartTime int               `json:"-"`
+	Dir       nextbus.Direction `json:"dir"`
+	States    []VehicleState    `json:"states"`
 }
 
 // The entire state of the system is a list of vehicle runs.
@@ -58,10 +58,6 @@ func (s VehicleState) Lat() float64 {
 func (s VehicleState) Lon() float64 {
 	f, _ := strconv.ParseFloat(s.LonString, 64)
 	return f
-}
-
-// simplify needs to act on arbitrary objects
-func (r *VehicleRun) Simplify() {
 }
 
 func newToken(vehicleId string, timestamp int) string {
