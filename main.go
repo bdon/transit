@@ -17,11 +17,12 @@ import (
 	"time"
 )
 
-// takes as an argument a directory containing uncompressed GTFS files
-//  --emitFiles DIR
+//  -emitFiles DIR
 //  outputs stops/schedules based on all GTFS feeds into directory DIR
 //  serve these compiled files through NGINX.
-//  --port PORT
+//  -port PORT
+// -gtfs DIR
+// reads GTFS data from DIR
 
 var emitFiles bool
 

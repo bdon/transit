@@ -38,6 +38,11 @@ type RouteState struct {
 	Referencer  Referencer
 }
 
+type AgencyState struct {
+  RouteStates map[string]*RouteState
+  Feed *gtfs.Feed
+}
+
 func NewRouteState() *RouteState {
 	retval := RouteState{}
 	retval.Runs = map[string]*VehicleRun{}
