@@ -15,7 +15,7 @@ var stopsScale = d3.scale.linear().domain([0.0,1.0]).range([5,540]);
 var axis = d3.svg.axis().scale(timeScale).orient("top")
 var toggles = d3.select("#toggles");
 
-var static_endpoint = "http://localhost:8081/static/";
+var static_endpoint = "http://localhost:8081/static";
 var live_endpoint = "http://localhost:8080";
 
 var data = [];
@@ -205,7 +205,7 @@ function getPastData() {
 }
 
 function getDataSince(timestamp) {
-  d3.json("http://localhost:8080/locations.json?after=" + Math.floor(timestamp/1000), function(response) {
+  d3.json(live_endpoint + "/locations.json?after=" + Math.floor(timestamp/1000), function(response) {
     // delta join.
     for (var run in response) {
       var match = data.filter(function(d) { return d.key == run})
