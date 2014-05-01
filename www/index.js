@@ -14,6 +14,16 @@ var timeScale = d3.time.scale().range([0,790]);
 var stopsScale = d3.scale.linear().domain([0.0,1.0]).range([5,540]);
 var axis = d3.svg.axis().scale(timeScale).orient("top")
 var toggles = d3.select("#toggles");
+var ticker = d3.select("#ticker");
+var wheel = d3.svg.arc()
+      .outerRadius(10)
+      .startAngle(function(d) { return d <= 10 ? 2*Math.PI * (1 - 0.1 * d) : 0; })
+      .endAngle(function(d) { return d > 10 ? 2*Math.PI * (1 - 0.1 * d) : 0; })
+var tickerWheel = d3.select("#tickerSvg").append("path")
+  .attr("id","tickerWheel")
+  .datum(10)
+  .attr("transform", "translate(10,10)")
+  .attr("d", wheel);
 
 var static_endpoint = "http://localhost:8081/static/";
 var live_endpoint = "http://localhost:8080";
@@ -224,6 +234,27 @@ function getDataSince(timestamp) {
 
 getPastData();
 var timestamp = new Date().getTime();
+var timeTilUpdate = 19;
+
+setInterval(function() {
+  d3.select("#tickerWheel").datum(timeTilUpdate)
+    .attr("d", wheel);
+  if (timeTilUpdate % 10 == 0) {
+    ticker.text("Updating...");
+  } else {
+    ticker.text("Updating in " + timeTilUpdate % 10 + "...");
+  }
+
+  if (timeTilUpdate % 10 == 0) {
+    getDataSince(timestamp);
+    timestamp = new Date().getTime();
+  }
+
+  if (timeTilUpdate <= 0) {
+    timeTilUpdate = 20;
+  }
+  timeTilUpdate--;
+}, 1 * 1000)
 
 d3.json("schedule_1.json", function(trips) {
   var min = d3.min(trips, function(trip) {
