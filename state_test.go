@@ -167,7 +167,6 @@ func TestSimplify(t *testing.T) {
 	run.States = append(run.States, state2)
 	run.States = append(run.States, state3)
 
-	run.Simplify()
 	//if len(run.States) != 2 {
 	//  t.Errorf("States should have 2 elements after simplifying, has %d", len(run.States))
 	//}

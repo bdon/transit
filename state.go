@@ -43,7 +43,7 @@ func NewSystemState() *SystemState {
 	retval.Runs = map[string]*VehicleRun{}
 	retval.CurrentRuns = make(map[string]*VehicleRun)
 
-	feed := gtfs.Load("muni_gtfs")
+	feed := gtfs.Load("muni_gtfs", false)
 	route := feed.RouteByShortName("N")
 	coords := route.LongestShape().Coords
 	retval.Referencer = NewReferencer(coords)

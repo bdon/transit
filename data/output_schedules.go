@@ -35,7 +35,7 @@ func main() {
     stopList[r] = true
   }
 
-	feed := gtfs.Load("muni_gtfs")
+	feed := gtfs.Load("muni_gtfs", true)
 	route := feed.RouteByShortName("N")
 	coords := route.LongestShape().Coords
 	nReferencer := transit_timelines.NewReferencer(coords)

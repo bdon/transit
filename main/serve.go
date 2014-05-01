@@ -14,6 +14,8 @@ import (
 	"sync"
 	"time"
   "flag"
+  "path"
+  "os"
 )
 
 type StopRepr struct {
@@ -40,18 +42,34 @@ func main() {
 }
 
 func emitStops() {
-  feed := gtfs.Load("muni_gtfs")
-  route := feed.RouteByShortName("N")
-	referencer := transit_timelines.NewReferencer(route.LongestShape().Coords)
-	output := []StopRepr{}
+  feed := gtfs.Load("muni_gtfs", true)
 
-  for _, stop := range route.Stops() {
-	  index := referencer.Reference(stop.Coord.Lat, stop.Coord.Lon)
-    output = append(output, StopRepr{Index:index,Name:stop.Name})
+  for _, route := range feed.Routes {
+    foo := fmt.Sprintf("%s.json", route.Id)
+    _ = os.Mkdir(path.Join("static","stops"),755)
+    filename := path.Join("static","stops",foo)
+    fmt.Println("Writing ", filename)
+    file, err := os.Create(filename)
+    if err != nil {
+      log.Fatal(err)
+    }
+    defer file.Close()
+
+    // TODO: handle missing shape
+    shape := route.LongestShape()
+    if shape == nil {
+      continue
+    }
+    referencer := transit_timelines.NewReferencer(shape.Coords)
+
+    output := []StopRepr{}
+    for _, stop := range route.Stops() {
+      index := referencer.Reference(stop.Coord.Lat, stop.Coord.Lon)
+      output = append(output, StopRepr{Index:index,Name:stop.Name})
+    }
+    marshalled, _ := json.Marshal(output)
+    file.WriteString(string(marshalled))
   }
-
-	marshalled, _ := json.Marshal(output)
-	fmt.Printf(string(marshalled))
 }
 
 func webserver() {
