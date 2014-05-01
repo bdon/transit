@@ -18,11 +18,6 @@ import (
   "os"
 )
 
-type StopRepr struct {
-	Index     float64 `json:"index"`
-	Name      string  `json:"name"`
-}
-
 // takes as an argument a directory containing uncompressed GTFS files
 // ttimeline feeds/ --compile : outputs stops/schedules based on all GTFS feeds.
 //  serve these compiled files through NGINX.
@@ -35,10 +30,15 @@ func init() {
 func main() {
   flag.Parse()
   if emitFiles {
-    emitStops()
+    emitSchedules()
   } else {
     webserver()
   }
+}
+
+type StopRepr struct {
+	Index     float64 `json:"index"`
+	Name      string  `json:"name"`
 }
 
 func emitStops() {
@@ -46,7 +46,7 @@ func emitStops() {
 
   for _, route := range feed.Routes {
     foo := fmt.Sprintf("%s.json", route.Id)
-    _ = os.Mkdir(path.Join("static","stops"),755)
+    _ = os.Mkdir(path.Join("static","stops"),0755)
     filename := path.Join("static","stops",foo)
     fmt.Println("Writing ", filename)
     file, err := os.Create(filename)
@@ -66,6 +66,54 @@ func emitStops() {
     for _, stop := range route.Stops() {
       index := referencer.Reference(stop.Coord.Lat, stop.Coord.Lon)
       output = append(output, StopRepr{Index:index,Name:stop.Name})
+    }
+    marshalled, _ := json.Marshal(output)
+    file.WriteString(string(marshalled))
+  }
+}
+
+
+type StopTimeRepr struct {
+  Time int `json:"time"`
+  Index float64 `json:"index"`
+}
+
+type TripRepr struct {
+  TripId string `json:"trip_id"`
+  StopTimes []StopTimeRepr `json:"stops"`
+  Dir string `json:"dir"`
+}
+
+func emitSchedules() {
+	feed := gtfs.Load("muni_gtfs", true)
+
+  for _, route := range feed.Routes {
+    foo := fmt.Sprintf("%s.json", route.Id)
+    _ = os.Mkdir(path.Join("static","schedules"),0755)
+    filename := path.Join("static","schedules",foo)
+    fmt.Println("Writing ", filename)
+    file, err := os.Create(filename)
+    if err != nil {
+      log.Fatal(err)
+    }
+    defer file.Close()
+
+    // TODO: handle missing shape
+    shape := route.LongestShape()
+    if shape == nil {
+      continue
+    }
+    referencer := transit_timelines.NewReferencer(shape.Coords)
+
+    output := []TripRepr{}
+    for _, trip := range route.Trips {
+      tripRepr := TripRepr{TripId:trip.Id}
+      for _, stoptime := range trip.StopTimes {
+        index := referencer.Reference(stoptime.Stop.Coord.Lat, stoptime.Stop.Coord.Lon)
+        newStopTime := StopTimeRepr{Time:0,Index:index}
+        tripRepr.StopTimes = append(tripRepr.StopTimes, newStopTime)
+      }
+      output = append(output, tripRepr)
     }
     marshalled, _ := json.Marshal(output)
     file.WriteString(string(marshalled))
