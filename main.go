@@ -18,8 +18,10 @@ import (
 )
 
 // takes as an argument a directory containing uncompressed GTFS files
-// ttimeline feeds/ --compile : outputs stops/schedules based on all GTFS feeds.
+//  --emitFiles DIR
+//  outputs stops/schedules based on all GTFS feeds into directory DIR
 //  serve these compiled files through NGINX.
+//  --port PORT
 
 var emitFiles bool
 
@@ -125,6 +127,11 @@ func webserver() {
 	cleanupTicker := time.NewTicker(60 * time.Second)
 	mutex := sync.RWMutex{}
 
+	healthHandler := func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintf(w, "Hello there.")
+  }
+
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 
@@ -193,6 +200,7 @@ func webserver() {
 	go tick(int(time.Now().Unix()))
 
 	http.HandleFunc("/locations.json", handler)
+	http.HandleFunc("/", healthHandler)
 	log.Println("Serving on port 8080.")
 	http.ListenAndServe(":8080", nil)
 }

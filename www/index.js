@@ -15,6 +15,8 @@ var stopsScale = d3.scale.linear().domain([0,1000]).range([5,540]);
 var axis = d3.svg.axis().scale(timeScale).orient("top")
 var toggles = d3.select("#toggles");
 
+var gtfs_route_id = "1093";
+var nextbus_route = "N";
 var static_endpoint = "http://localhost:8081/static";
 var live_endpoint = "http://localhost:8080";
 
@@ -238,7 +240,7 @@ setInterval(function() {
   timeTilUpdate--;
 }, 1 * 1000)
 
-d3.json(static_endpoint + "/schedules/1093.json", function(trips) {
+d3.json(static_endpoint + "/schedules/" + gtfs_route_id + ".json", function(trips) {
   var min = d3.min(trips, function(trip) {
     return d3.min(trip.stops, function(stop) { return stop.time })
   })
@@ -265,7 +267,7 @@ d3.json(static_endpoint + "/schedules/1093.json", function(trips) {
   d3.selectAll(".outbound").classed("hidden",!this.checked);
 });
 
-d3.json(static_endpoint + "/stops/1093.json", function(stops) {
+d3.json(static_endpoint + "/stops/" + gtfs_route_id + ".json", function(stops) {
   vis.append("g").attr("transform","translate(64,23)").selectAll(".stop").data(stops).enter().append("text")
       .attr("class", "stop")
       .attr("text-anchor", "end")
