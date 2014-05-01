@@ -1,4 +1,4 @@
-package transit_timelines
+package main
 
 import (
 	"github.com/bdon/go.nextbus"
