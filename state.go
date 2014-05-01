@@ -29,7 +29,7 @@ type VehicleRun struct {
 // The entire state of the system is a list of vehicle runs.
 // It also has bookkeeping so it knows how to add an observation to the state.
 // And synchronization primitives.
-type SystemState struct {
+type RouteState struct {
 	// has an identifier which is vehicleid+timestamp
 	Runs map[string]*VehicleRun
 
@@ -38,8 +38,8 @@ type SystemState struct {
 	Referencer  Referencer
 }
 
-func NewSystemState() *SystemState {
-	retval := SystemState{}
+func NewRouteState() *RouteState {
+	retval := RouteState{}
 	retval.Runs = map[string]*VehicleRun{}
 	retval.CurrentRuns = make(map[string]*VehicleRun)
 
@@ -66,7 +66,7 @@ func newToken(vehicleId string, timestamp int) string {
 }
 
 // Must be called in chronological order
-func (s *SystemState) AddResponse(foo nextbus.Response, unixtime int) {
+func (s *RouteState) AddResponse(foo nextbus.Response, unixtime int) {
 	for _, report := range foo.Reports {
 		if report.LeadingVehicleId != "" {
 			continue
@@ -109,7 +109,7 @@ func (s *SystemState) AddResponse(foo nextbus.Response, unixtime int) {
 	}
 }
 
-func (s *SystemState) After(time int) map[string]VehicleRun {
+func (s *RouteState) After(time int) map[string]VehicleRun {
 	filtered := map[string]VehicleRun{}
 
 	for token, run := range s.Runs {
@@ -130,7 +130,7 @@ func (s *SystemState) After(time int) map[string]VehicleRun {
 	return filtered
 }
 
-func (s *SystemState) DeleteOlderThan(duration int, currentTime int) {
+func (s *RouteState) DeleteOlderThan(duration int, currentTime int) {
 	// replace runs with a filtered list
 	replacementList := map[string]*VehicleRun{}
 	for key, run := range s.Runs {

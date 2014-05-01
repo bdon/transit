@@ -122,7 +122,7 @@ func emitSchedules(feed gtfs.Feed) {
 }
 
 func webserver() {
-	s := NewSystemState()
+	s := NewRouteState()
 	ticker := time.NewTicker(10 * time.Second)
 	cleanupTicker := time.NewTicker(60 * time.Second)
 	mutex := sync.RWMutex{}
@@ -130,7 +130,7 @@ func webserver() {
 	healthHandler := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintf(w, "Hello there.")
-  }
+	}
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()

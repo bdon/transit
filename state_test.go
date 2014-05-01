@@ -6,7 +6,7 @@ import (
 )
 
 func TestEmpty(t *testing.T) {
-	stat := NewSystemState()
+	stat := NewRouteState()
 
 	if len(stat.Runs) != 0 {
 		t.Error("Runs should be empty")
@@ -14,7 +14,7 @@ func TestEmpty(t *testing.T) {
 }
 
 func TestLeadingVehicle(t *testing.T) {
-	stat := NewSystemState()
+	stat := NewRouteState()
 
 	testResponse := nextbus.Response{}
 	report1 := nextbus.VehicleReport{LeadingVehicleId: "something"}
@@ -27,7 +27,7 @@ func TestLeadingVehicle(t *testing.T) {
 }
 
 func TestOne(t *testing.T) {
-	stat := NewSystemState()
+	stat := NewRouteState()
 
 	testResponse := nextbus.Response{}
 	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
@@ -77,7 +77,7 @@ func TestOne(t *testing.T) {
 }
 
 func TestTwo(t *testing.T) {
-	stat := NewSystemState()
+	stat := NewRouteState()
 
 	testResponse := nextbus.Response{}
 	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
@@ -101,7 +101,7 @@ func TestTwo(t *testing.T) {
 }
 
 func TestIgnoreFifteenMinutes(t *testing.T) {
-	stat := NewSystemState()
+	stat := NewRouteState()
 
 	response := nextbus.Response{}
 	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
@@ -129,7 +129,7 @@ func TestIgnoreFifteenMinutes(t *testing.T) {
 }
 
 func TestChangeDirection(t *testing.T) {
-	stat := NewSystemState()
+	stat := NewRouteState()
 
 	response := nextbus.Response{}
 	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
@@ -173,7 +173,7 @@ func TestSimplify(t *testing.T) {
 }
 
 func TestFilteredByTime(t *testing.T) {
-	stat := NewSystemState()
+	stat := NewRouteState()
 
 	response := nextbus.Response{}
 	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
@@ -204,7 +204,7 @@ func TestFilteredByTime(t *testing.T) {
 
 // delete runs that started more than 12 hours ago
 func TestDeleteOlderThan(t *testing.T) {
-	stat := NewSystemState()
+	stat := NewRouteState()
 
 	response := nextbus.Response{}
 	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
