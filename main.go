@@ -39,13 +39,13 @@ func main() {
 }
 
 type StopRepr struct {
-	Index float64 `json:"index"`
-	Name  string  `json:"name"`
+	Index int    `json:"index"`
+	Name  string `json:"name"`
 }
 
 type StopTimeRepr struct {
-	Time  int     `json:"time"`
-	Index float64 `json:"index"`
+	Time  int `json:"time"`
+	Index int `json:"index"`
 }
 
 type TripRepr struct {

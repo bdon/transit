@@ -19,7 +19,7 @@ func NewReferencer(coords []gtfs.Coord) Referencer {
 	return ref
 }
 
-func (r Referencer) Reference(lat float64, lon float64) float64 {
+func (r Referencer) Reference(lat float64, lon float64) int {
 	point := geo.NewPoint(lon, lat)
-	return r.Path.ProjectNormalized(point)
+	return int(r.Path.ProjectNormalized(point)*1000 + 0.5)
 }

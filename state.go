@@ -10,9 +10,9 @@ import (
 
 // The instantaneous state of a vehicle as returned by NextBus
 type VehicleState struct {
-	Time      int     `json:"time"`
-	Index     float64 `json:"index"`
-	TimeAdded int     `json:"-"`
+	Time      int `json:"time"`
+	Index     int `json:"index"`
+	TimeAdded int `json:"-"`
 
 	LatString string `json:"-"`
 	LonString string `json:"-"`

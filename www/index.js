@@ -11,7 +11,7 @@ var vis = svg.append("svg:g")
 
 var lastTime;
 var timeScale = d3.time.scale().range([0,790]);
-var stopsScale = d3.scale.linear().domain([0.0,1.0]).range([5,540]);
+var stopsScale = d3.scale.linear().domain([0,1000]).range([5,540]);
 var axis = d3.svg.axis().scale(timeScale).orient("top")
 var toggles = d3.select("#toggles");
 
