@@ -238,7 +238,7 @@ setInterval(function() {
   timeTilUpdate--;
 }, 1 * 1000)
 
-d3.json("schedule_1.json", function(trips) {
+d3.json(static_endpoint + "/schedules/1093.json", function(trips) {
   var min = d3.min(trips, function(trip) {
     return d3.min(trip.stops, function(stop) { return stop.time })
   })
