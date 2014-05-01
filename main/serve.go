@@ -30,7 +30,9 @@ func init() {
 func main() {
   flag.Parse()
   if emitFiles {
-    emitSchedules()
+    feed := gtfs.Load("muni_gtfs", true)
+    emitStops(feed)
+    emitSchedules(feed)
   } else {
     webserver()
   }
@@ -40,38 +42,6 @@ type StopRepr struct {
 	Index     float64 `json:"index"`
 	Name      string  `json:"name"`
 }
-
-func emitStops() {
-  feed := gtfs.Load("muni_gtfs", true)
-
-  for _, route := range feed.Routes {
-    foo := fmt.Sprintf("%s.json", route.Id)
-    _ = os.Mkdir(path.Join("static","stops"),0755)
-    filename := path.Join("static","stops",foo)
-    fmt.Println("Writing ", filename)
-    file, err := os.Create(filename)
-    if err != nil {
-      log.Fatal(err)
-    }
-    defer file.Close()
-
-    // TODO: handle missing shape
-    shape := route.LongestShape()
-    if shape == nil {
-      continue
-    }
-    referencer := transit_timelines.NewReferencer(shape.Coords)
-
-    output := []StopRepr{}
-    for _, stop := range route.Stops() {
-      index := referencer.Reference(stop.Coord.Lat, stop.Coord.Lon)
-      output = append(output, StopRepr{Index:index,Name:stop.Name})
-    }
-    marshalled, _ := json.Marshal(output)
-    file.WriteString(string(marshalled))
-  }
-}
-
 
 type StopTimeRepr struct {
   Time int `json:"time"`
@@ -84,30 +54,59 @@ type TripRepr struct {
   Dir string `json:"dir"`
 }
 
-func emitSchedules() {
-	feed := gtfs.Load("muni_gtfs", true)
-
+func perRoute(feed gtfs.Feed, dirname string, f func(*gtfs.Route)(string,bool)) {
   for _, route := range feed.Routes {
     foo := fmt.Sprintf("%s.json", route.Id)
-    _ = os.Mkdir(path.Join("static","schedules"),0755)
-    filename := path.Join("static","schedules",foo)
+    _ = os.Mkdir(path.Join("static",dirname),0755)
+    filename := path.Join("static",dirname,foo)
     fmt.Println("Writing ", filename)
     file, err := os.Create(filename)
     if err != nil {
       log.Fatal(err)
     }
     defer file.Close()
+    str, ok := f(route)
+    if ok {
+      file.WriteString(str)
+    }
+  }
+}
 
+func emitStops(feed gtfs.Feed) {
+  perRoute(feed, "stops", func(route *gtfs.Route)(string,bool) {
     // TODO: handle missing shape
     shape := route.LongestShape()
     if shape == nil {
-      continue
+      return "", false
+    }
+    referencer := transit_timelines.NewReferencer(shape.Coords)
+
+    output := []StopRepr{}
+    for _, stop := range route.Stops() {
+      index := referencer.Reference(stop.Coord.Lat, stop.Coord.Lon)
+      output = append(output, StopRepr{Index:index,Name:stop.Name})
+    }
+    marshalled, _ := json.Marshal(output)
+    return string(marshalled), true
+  })
+}
+
+func emitSchedules(feed gtfs.Feed) {
+  perRoute(feed, "schedules", func(route *gtfs.Route)(string,bool) {
+    // TODO: handle missing shape
+    shape := route.LongestShape()
+    if shape == nil {
+      return "", false
     }
     referencer := transit_timelines.NewReferencer(shape.Coords)
 
     output := []TripRepr{}
     for _, trip := range route.Trips {
-      tripRepr := TripRepr{TripId:trip.Id}
+      // TODO: we're only caring about weekdays for now
+      if trip.Service != "1" {
+        continue
+      }
+      tripRepr := TripRepr{TripId:trip.Id,Dir:trip.Direction}
       for _, stoptime := range trip.StopTimes {
         index := referencer.Reference(stoptime.Stop.Coord.Lat, stoptime.Stop.Coord.Lon)
         newStopTime := StopTimeRepr{Time:0,Index:index}
@@ -116,8 +115,8 @@ func emitSchedules() {
       output = append(output, tripRepr)
     }
     marshalled, _ := json.Marshal(output)
-    file.WriteString(string(marshalled))
-  }
+    return string(marshalled), true
+  })
 }
 
 func webserver() {
