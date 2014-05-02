@@ -123,7 +123,8 @@ func emitSchedules(feed gtfs.Feed) {
 }
 
 func webserver() {
-	s := NewRouteState()
+	feed := gtfs.Load("muni_gtfs", false)
+	agencyState := NewAgencyState(feed)
 	ticker := time.NewTicker(10 * time.Second)
 	cleanupTicker := time.NewTicker(60 * time.Second)
 	mutex := sync.RWMutex{}
@@ -137,18 +138,23 @@ func webserver() {
 		r.ParseForm()
 
 		var time int
+		var route string
 
 		if _, ok := r.Form["after"]; ok {
 			time, _ = strconv.Atoi(r.Form["after"][0])
+		}
+
+		if _, ok := r.Form["route"]; ok {
+			route = r.Form["route"][0]
 		}
 
 		mutex.RLock()
 
 		var result []byte
 		if time > 0 {
-			result, _ = json.Marshal(s.After(time))
+			result, _ = json.Marshal(agencyState.RouteStates[route].After(time))
 		} else {
-			result, _ = json.Marshal(s.Runs)
+			result, _ = json.Marshal(agencyState.RouteStates[route].Runs)
 		}
 		mutex.RUnlock()
 		w.Header().Set("Content-Type", "application/json")
@@ -170,7 +176,7 @@ func webserver() {
 		xml.Unmarshal(str, &response)
 
 		mutex.Lock()
-		s.AddResponse(response, unixtime)
+		agencyState.AddResponse(response, unixtime)
 		mutex.Unlock()
 		log.Println("Done Fetching.")
 	}
@@ -190,7 +196,7 @@ func webserver() {
 			case t := <-cleanupTicker.C:
 				log.Println("Deleting runs older than 12 hours.")
 				mutex.Lock()
-				s.DeleteOlderThan(60*60*12, int(t.Unix()))
+				agencyState.DeleteOlderThan(60*60*12, int(t.Unix()))
 				mutex.Unlock()
 				log.Println("Done cleaning up.")
 			}

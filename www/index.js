@@ -15,8 +15,10 @@ var stopsScale = d3.scale.linear().domain([0,1000]).range([5,540]);
 var axis = d3.svg.axis().scale(timeScale).orient("top")
 var toggles = d3.select("#toggles");
 
-var gtfs_route_id = "1093";
-var nextbus_route = "N";
+var gtfs_route_id = "1198";
+var nextbus_route = "L";
+//var gtfs_route_id = "1198";
+//var nextbus_route = "L";
 var static_endpoint = "http://localhost:8081/static";
 var live_endpoint = "http://localhost:8080";
 
@@ -183,7 +185,7 @@ function endsWithFlattenedData(flattened) {
 }
 
 function getPastData() {
-  d3.json(live_endpoint + "/locations.json", function(response) {
+  d3.json(live_endpoint + "/locations.json?route=" + nextbus_route, function(response) {
 
     var flattened = [];
     for(var key in response) {
@@ -207,7 +209,7 @@ function getPastData() {
 }
 
 function getDataSince(timestamp) {
-  d3.json(live_endpoint + "/locations.json?after=" + Math.floor(timestamp/1000), function(response) {
+  d3.json(live_endpoint + "/locations.json?route=" + nextbus_route + "&after=" + Math.floor(timestamp/1000), function(response) {
     // delta join.
     for (var run in response) {
       var match = data.filter(function(d) { return d.key == run})

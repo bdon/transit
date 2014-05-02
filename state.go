@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/bdon/go.gtfs"
 	"github.com/bdon/go.nextbus"
+	"log"
 	"strconv"
 	"strings"
 )
@@ -40,19 +41,31 @@ type RouteState struct {
 
 type AgencyState struct {
 	RouteStates map[string]*RouteState
-	Feed        *gtfs.Feed
+	Feed        gtfs.Feed
 }
 
-func NewRouteState() *RouteState {
+func NewAgencyState(feed gtfs.Feed) *AgencyState {
+	retval := AgencyState{Feed: feed}
+	retval.RouteStates = make(map[string]*RouteState)
+	return &retval
+}
+
+func (a AgencyState) NewRouteState(routeTag string) (*RouteState, bool) {
 	retval := RouteState{}
 	retval.Runs = map[string]*VehicleRun{}
 	retval.CurrentRuns = make(map[string]*VehicleRun)
 
-	feed := gtfs.Load("muni_gtfs", false)
-	route := feed.RouteByShortName("N")
-	coords := route.LongestShape().Coords
+	log.Printf("looking up %s", routeTag)
+	route := a.Feed.RouteByShortName(routeTag)
+	longestShape := route.LongestShape()
+	if longestShape == nil {
+		log.Printf("Couldn't find %s", routeTag)
+		return nil, false
+	}
+
+	coords := longestShape.Coords
 	retval.Referencer = NewReferencer(coords)
-	return &retval
+	return &retval, true
 }
 
 func (s VehicleState) Lat() float64 {
@@ -71,10 +84,17 @@ func newToken(vehicleId string, timestamp int) string {
 }
 
 // Must be called in chronological order
-func (s *RouteState) AddResponse(foo nextbus.Response, unixtime int) {
+func (a *AgencyState) AddResponse(foo nextbus.Response, unixtime int) {
 	for _, report := range foo.Reports {
-		if report.RouteTag != "N" {
-			continue
+		routeTag := report.RouteTag
+		s, ok := a.RouteStates[routeTag]
+		if !ok {
+			s, ok = a.NewRouteState(routeTag)
+			if !ok {
+				log.Printf("BAILING OUT")
+				continue
+			}
+			a.RouteStates[routeTag] = s
 		}
 
 		if report.LeadingVehicleId != "" {
@@ -83,7 +103,13 @@ func (s *RouteState) AddResponse(foo nextbus.Response, unixtime int) {
 		if report.DirTag == "" {
 			continue
 		}
+		if report.LatString == "" || report.LonString == "" {
+			continue
+		}
 
+		if s == nil {
+			continue
+		}
 		index := s.Referencer.Reference(report.Lat(), report.Lon())
 		newState := VehicleState{Index: index, Time: unixtime - report.SecsSinceReport,
 			LatString: report.LatString, LonString: report.LonString,
@@ -135,23 +161,27 @@ func (s *RouteState) After(time int) map[string]VehicleRun {
 	return filtered
 }
 
-func (s *RouteState) DeleteOlderThan(duration int, currentTime int) {
+func (a *AgencyState) DeleteOlderThan(duration int, currentTime int) {
 	// replace runs with a filtered list
-	replacementList := map[string]*VehicleRun{}
-	for key, run := range s.Runs {
-		if run.StartTime > currentTime-duration {
-			replacementList[key] = run
+
+	for _, s := range a.RouteStates {
+		replacementList := map[string]*VehicleRun{}
+		for key, run := range s.Runs {
+			if run.StartTime > currentTime-duration {
+				replacementList[key] = run
+			}
 		}
-	}
 
-	s.Runs = replacementList
+		s.Runs = replacementList
 
-	replacementCurrent := map[string]*VehicleRun{}
-	for key, run := range s.CurrentRuns {
-		if run.StartTime > currentTime-duration {
-			replacementCurrent[key] = run
+		replacementCurrent := map[string]*VehicleRun{}
+		for key, run := range s.CurrentRuns {
+			if run.StartTime > currentTime-duration {
+				replacementCurrent[key] = run
+			}
 		}
-	}
 
-	s.CurrentRuns = replacementCurrent
+		s.CurrentRuns = replacementCurrent
+
+	}
 }
