@@ -39,8 +39,8 @@ type RouteState struct {
 }
 
 type AgencyState struct {
-  RouteStates map[string]*RouteState
-  Feed *gtfs.Feed
+	RouteStates map[string]*RouteState
+	Feed        *gtfs.Feed
 }
 
 func NewRouteState() *RouteState {
@@ -73,6 +73,10 @@ func newToken(vehicleId string, timestamp int) string {
 // Must be called in chronological order
 func (s *RouteState) AddResponse(foo nextbus.Response, unixtime int) {
 	for _, report := range foo.Reports {
+		if report.RouteTag != "N" {
+			continue
+		}
+
 		if report.LeadingVehicleId != "" {
 			continue
 		}
@@ -81,10 +85,6 @@ func (s *RouteState) AddResponse(foo nextbus.Response, unixtime int) {
 		}
 
 		index := s.Referencer.Reference(report.Lat(), report.Lon())
-		// cull data on first and last stops
-		//if index > 0.9975 || index < 0.0268 {
-		//  continue
-		//}
 		newState := VehicleState{Index: index, Time: unixtime - report.SecsSinceReport,
 			LatString: report.LatString, LonString: report.LonString,
 			TimeAdded: unixtime}

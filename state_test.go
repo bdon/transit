@@ -32,7 +32,7 @@ func TestOne(t *testing.T) {
 	testResponse := nextbus.Response{}
 	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
-		LeadingVehicleId: ""}
+		LeadingVehicleId: "", RouteTag: "N"}
 
 	testResponse.Reports = append(testResponse.Reports, report1)
 	stat.AddResponse(testResponse, 10000015)
@@ -48,7 +48,7 @@ func TestOne(t *testing.T) {
 	testResponse2 := nextbus.Response{}
 	report2 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
-		LeadingVehicleId: ""}
+		LeadingVehicleId: "", RouteTag: "N"}
 
 	testResponse2.Reports = append(testResponse2.Reports, report2)
 	stat.AddResponse(testResponse2, 10000015)
@@ -63,7 +63,7 @@ func TestOne(t *testing.T) {
 	testResponse3 := nextbus.Response{}
 	report3 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.1",
 		LonString: "-122.1", SecsSinceReport: 15,
-		LeadingVehicleId: ""}
+		LeadingVehicleId: "", RouteTag: "N"}
 
 	testResponse3.Reports = append(testResponse3.Reports, report3)
 	stat.AddResponse(testResponse3, 10000015)
@@ -82,7 +82,7 @@ func TestTwo(t *testing.T) {
 	testResponse := nextbus.Response{}
 	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
-		LeadingVehicleId: ""}
+		LeadingVehicleId: "", RouteTag: "N"}
 
 	testResponse.Reports = append(testResponse.Reports, report1)
 	stat.AddResponse(testResponse, 10000000)
@@ -90,7 +90,7 @@ func TestTwo(t *testing.T) {
 	testResponse2 := nextbus.Response{}
 	report2 := nextbus.VehicleReport{VehicleId: "1001", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
-		LeadingVehicleId: ""}
+		LeadingVehicleId: "", RouteTag: "N"}
 
 	testResponse2.Reports = append(testResponse2.Reports, report2)
 	stat.AddResponse(testResponse2, 10000001)
@@ -106,7 +106,7 @@ func TestIgnoreFifteenMinutes(t *testing.T) {
 	response := nextbus.Response{}
 	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
-		LeadingVehicleId: ""}
+		LeadingVehicleId: "", RouteTag: "N"}
 
 	response.Reports = append(response.Reports, report1)
 	stat.AddResponse(response, 10000000)
@@ -118,7 +118,7 @@ func TestIgnoreFifteenMinutes(t *testing.T) {
 	laterResponse := nextbus.Response{}
 	laterReport := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.1",
 		LonString: "-122.1", SecsSinceReport: 15,
-		LeadingVehicleId: ""}
+		LeadingVehicleId: "", RouteTag: "N"}
 
 	laterResponse.Reports = append(laterResponse.Reports, laterReport)
 	stat.AddResponse(laterResponse, 10001000)
@@ -134,7 +134,7 @@ func TestChangeDirection(t *testing.T) {
 	response := nextbus.Response{}
 	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
-		LeadingVehicleId: ""}
+		LeadingVehicleId: "", RouteTag: "N"}
 
 	response.Reports = append(response.Reports, report1)
 	stat.AddResponse(response, 10000000)
@@ -146,7 +146,7 @@ func TestChangeDirection(t *testing.T) {
 	laterResponse := nextbus.Response{}
 	laterReport := nextbus.VehicleReport{VehicleId: "1000", DirTag: "OB", LatString: "37.1",
 		LonString: "-122.1", SecsSinceReport: 15,
-		LeadingVehicleId: ""}
+		LeadingVehicleId: "", RouteTag: "N"}
 
 	laterResponse.Reports = append(laterResponse.Reports, laterReport)
 	stat.AddResponse(laterResponse, 10000001)
@@ -178,7 +178,7 @@ func TestFilteredByTime(t *testing.T) {
 	response := nextbus.Response{}
 	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
-		LeadingVehicleId: ""}
+		LeadingVehicleId: "", RouteTag: "N"}
 
 	response.Reports = append(response.Reports, report1)
 	stat.AddResponse(response, 10000015)
@@ -186,7 +186,7 @@ func TestFilteredByTime(t *testing.T) {
 	response2 := nextbus.Response{}
 	report2 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.1",
 		LonString: "-122.1", SecsSinceReport: 15,
-		LeadingVehicleId: ""}
+		LeadingVehicleId: "", RouteTag: "N"}
 
 	response2.Reports = append(response2.Reports, report2)
 	stat.AddResponse(response2, 10000115)
@@ -209,7 +209,7 @@ func TestDeleteOlderThan(t *testing.T) {
 	response := nextbus.Response{}
 	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
-		LeadingVehicleId: ""}
+		LeadingVehicleId: "", RouteTag: "N"}
 
 	response.Reports = append(response.Reports, report1)
 	stat.AddResponse(response, 10000015)
@@ -217,7 +217,7 @@ func TestDeleteOlderThan(t *testing.T) {
 	response2 := nextbus.Response{}
 	report2 := nextbus.VehicleReport{VehicleId: "1001", DirTag: "IB", LatString: "37.1",
 		LonString: "-122.1", SecsSinceReport: 15,
-		LeadingVehicleId: ""}
+		LeadingVehicleId: "", RouteTag: "N"}
 
 	response2.Reports = append(response2.Reports, report2)
 	stat.AddResponse(response2, 10000115)

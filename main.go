@@ -160,7 +160,7 @@ func webserver() {
 		log.Println("Fetching from NextBus...")
 		response := nextbus.Response{}
 		//Accept-Encoding: gzip, deflate
-		get, err := http.Get("http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=sf-muni&r=N&t=0")
+		get, err := http.Get("http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=sf-muni&t=0")
 		if err != nil {
 			log.Println(err)
 			return
