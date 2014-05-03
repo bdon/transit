@@ -9,5 +9,8 @@ e.g.
 * line simplification
 * configure CORS
 * add another agency
+* error logging
 
 "However, Muni maps abbreviate the cable car route names to PM, PH and C,[7] and they are given route numbers 59, 60, and 61, respectively, for use in Muni internal operations"
+
+emit history on a per-route basis
