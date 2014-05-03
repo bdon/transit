@@ -89,4 +89,3 @@ func EmitSchedules(feed gtfs.Feed) {
 		return string(marshalled), true
 	})
 }
-

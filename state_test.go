@@ -1,12 +1,15 @@
 package main
 
 import (
+	"github.com/bdon/go.gtfs"
 	"github.com/bdon/go.nextbus"
 	"testing"
 )
 
 func TestEmpty(t *testing.T) {
-	stat := NewRouteState()
+	feed := gtfs.Load("muni_gtfs", false)
+	a := NewAgencyState(feed)
+	stat, _ := a.NewRouteState("N")
 
 	if len(stat.Runs) != 0 {
 		t.Error("Runs should be empty")
@@ -14,20 +17,22 @@ func TestEmpty(t *testing.T) {
 }
 
 func TestLeadingVehicle(t *testing.T) {
-	stat := NewRouteState()
+	feed := gtfs.Load("muni_gtfs", false)
+	a := NewAgencyState(feed)
 
 	testResponse := nextbus.Response{}
-	report1 := nextbus.VehicleReport{LeadingVehicleId: "something"}
+	report1 := nextbus.VehicleReport{LeadingVehicleId: "something", RouteTag: "N"}
 	testResponse.Reports = append(testResponse.Reports, report1)
-	stat.AddResponse(testResponse, 10000000)
+	a.AddResponse(testResponse, 10000000)
 
-	if len(stat.Runs) != 0 {
+	if len(a.RouteStates["N"].Runs) != 0 {
 		t.Error("state should ignore reports with vehicle IDs")
 	}
 }
 
 func TestOne(t *testing.T) {
-	stat := NewRouteState()
+	feed := gtfs.Load("muni_gtfs", false)
+	a := NewAgencyState(feed)
 
 	testResponse := nextbus.Response{}
 	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
@@ -35,13 +40,13 @@ func TestOne(t *testing.T) {
 		LeadingVehicleId: "", RouteTag: "N"}
 
 	testResponse.Reports = append(testResponse.Reports, report1)
-	stat.AddResponse(testResponse, 10000015)
+	a.AddResponse(testResponse, 10000015)
 
-	if len(stat.Runs) != 1 {
+	if len(a.RouteStates["N"].Runs) != 1 {
 		t.Error("Runs should have 1 element")
 	}
 
-	if len(stat.Runs["1000_10000000"].States) != 1 {
+	if len(a.RouteStates["N"].Runs["1000_10000000"].States) != 1 {
 		t.Error("First run should have 1 state")
 	}
 
@@ -51,12 +56,12 @@ func TestOne(t *testing.T) {
 		LeadingVehicleId: "", RouteTag: "N"}
 
 	testResponse2.Reports = append(testResponse2.Reports, report2)
-	stat.AddResponse(testResponse2, 10000015)
+	a.AddResponse(testResponse2, 10000015)
 
-	if len(stat.Runs) != 1 {
+	if len(a.RouteStates["N"].Runs) != 1 {
 		t.Error("Runs should have 1 element")
 	}
-	if len(stat.Runs["1000_10000000"].States) != 1 {
+	if len(a.RouteStates["N"].Runs["1000_10000000"].States) != 1 {
 		t.Error("First run should have still 1 state if position has not changed")
 	}
 
@@ -66,18 +71,19 @@ func TestOne(t *testing.T) {
 		LeadingVehicleId: "", RouteTag: "N"}
 
 	testResponse3.Reports = append(testResponse3.Reports, report3)
-	stat.AddResponse(testResponse3, 10000015)
+	a.AddResponse(testResponse3, 10000015)
 
-	if len(stat.Runs) != 1 {
+	if len(a.RouteStates["N"].Runs) != 1 {
 		t.Error("Runs should have 1 element")
 	}
-	if len(stat.Runs["1000_10000000"].States) != 2 {
+	if len(a.RouteStates["N"].Runs["1000_10000000"].States) != 2 {
 		t.Error("First run should have 2 states if position has changed")
 	}
 }
 
 func TestTwo(t *testing.T) {
-	stat := NewRouteState()
+	feed := gtfs.Load("muni_gtfs", false)
+	a := NewAgencyState(feed)
 
 	testResponse := nextbus.Response{}
 	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
@@ -85,7 +91,7 @@ func TestTwo(t *testing.T) {
 		LeadingVehicleId: "", RouteTag: "N"}
 
 	testResponse.Reports = append(testResponse.Reports, report1)
-	stat.AddResponse(testResponse, 10000000)
+	a.AddResponse(testResponse, 10000000)
 
 	testResponse2 := nextbus.Response{}
 	report2 := nextbus.VehicleReport{VehicleId: "1001", DirTag: "IB", LatString: "37.0",
@@ -93,15 +99,16 @@ func TestTwo(t *testing.T) {
 		LeadingVehicleId: "", RouteTag: "N"}
 
 	testResponse2.Reports = append(testResponse2.Reports, report2)
-	stat.AddResponse(testResponse2, 10000001)
+	a.AddResponse(testResponse2, 10000001)
 
-	if len(stat.Runs) != 2 {
+	if len(a.RouteStates["N"].Runs) != 2 {
 		t.Error("Runs should have 2 elements")
 	}
 }
 
 func TestIgnoreFifteenMinutes(t *testing.T) {
-	stat := NewRouteState()
+	feed := gtfs.Load("muni_gtfs", false)
+	a := NewAgencyState(feed)
 
 	response := nextbus.Response{}
 	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
@@ -109,9 +116,9 @@ func TestIgnoreFifteenMinutes(t *testing.T) {
 		LeadingVehicleId: "", RouteTag: "N"}
 
 	response.Reports = append(response.Reports, report1)
-	stat.AddResponse(response, 10000000)
+	a.AddResponse(response, 10000000)
 
-	if len(stat.Runs) != 1 {
+	if len(a.RouteStates["N"].Runs) != 1 {
 		t.Error("Runs should have 1 element")
 	}
 
@@ -121,15 +128,16 @@ func TestIgnoreFifteenMinutes(t *testing.T) {
 		LeadingVehicleId: "", RouteTag: "N"}
 
 	laterResponse.Reports = append(laterResponse.Reports, laterReport)
-	stat.AddResponse(laterResponse, 10001000)
+	a.AddResponse(laterResponse, 10001000)
 
-	if len(stat.Runs) != 2 {
+	if len(a.RouteStates["N"].Runs) != 2 {
 		t.Error("Runs should have 2 elements, because too much time passed")
 	}
 }
 
 func TestChangeDirection(t *testing.T) {
-	stat := NewRouteState()
+	feed := gtfs.Load("muni_gtfs", false)
+	a := NewAgencyState(feed)
 
 	response := nextbus.Response{}
 	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
@@ -137,9 +145,9 @@ func TestChangeDirection(t *testing.T) {
 		LeadingVehicleId: "", RouteTag: "N"}
 
 	response.Reports = append(response.Reports, report1)
-	stat.AddResponse(response, 10000000)
+	a.AddResponse(response, 10000000)
 
-	if len(stat.Runs) != 1 {
+	if len(a.RouteStates["N"].Runs) != 1 {
 		t.Error("Runs should have 1 element")
 	}
 
@@ -149,9 +157,9 @@ func TestChangeDirection(t *testing.T) {
 		LeadingVehicleId: "", RouteTag: "N"}
 
 	laterResponse.Reports = append(laterResponse.Reports, laterReport)
-	stat.AddResponse(laterResponse, 10000001)
+	a.AddResponse(laterResponse, 10000001)
 
-	if len(stat.Runs) != 2 {
+	if len(a.RouteStates["N"].Runs) != 2 {
 		t.Error("Runs should have 2 elements, because direction changed")
 	}
 }
@@ -173,7 +181,8 @@ func TestSimplify(t *testing.T) {
 }
 
 func TestFilteredByTime(t *testing.T) {
-	stat := NewRouteState()
+	feed := gtfs.Load("muni_gtfs", false)
+	a := NewAgencyState(feed)
 
 	response := nextbus.Response{}
 	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
@@ -181,7 +190,7 @@ func TestFilteredByTime(t *testing.T) {
 		LeadingVehicleId: "", RouteTag: "N"}
 
 	response.Reports = append(response.Reports, report1)
-	stat.AddResponse(response, 10000015)
+	a.AddResponse(response, 10000015)
 
 	response2 := nextbus.Response{}
 	report2 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.1",
@@ -189,22 +198,23 @@ func TestFilteredByTime(t *testing.T) {
 		LeadingVehicleId: "", RouteTag: "N"}
 
 	response2.Reports = append(response2.Reports, report2)
-	stat.AddResponse(response2, 10000115)
+	a.AddResponse(response2, 10000115)
 
-	filtered := stat.After(10000099)
+	filtered := a.RouteStates["N"].After(10000099)
 
 	if len(filtered["1000_10000000"].States) != 1 {
 		t.Error("Runs should have 1 element")
 	}
 
-	if len(stat.Runs["1000_10000000"].States) != 2 {
+	if len(a.RouteStates["N"].Runs["1000_10000000"].States) != 2 {
 		t.Error("Runs should not have been modified")
 	}
 }
 
 // delete runs that started more than 12 hours ago
 func TestDeleteOlderThan(t *testing.T) {
-	stat := NewRouteState()
+	feed := gtfs.Load("muni_gtfs", false)
+	a := NewAgencyState(feed)
 
 	response := nextbus.Response{}
 	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
@@ -212,7 +222,7 @@ func TestDeleteOlderThan(t *testing.T) {
 		LeadingVehicleId: "", RouteTag: "N"}
 
 	response.Reports = append(response.Reports, report1)
-	stat.AddResponse(response, 10000015)
+	a.AddResponse(response, 10000015)
 
 	response2 := nextbus.Response{}
 	report2 := nextbus.VehicleReport{VehicleId: "1001", DirTag: "IB", LatString: "37.1",
@@ -220,15 +230,15 @@ func TestDeleteOlderThan(t *testing.T) {
 		LeadingVehicleId: "", RouteTag: "N"}
 
 	response2.Reports = append(response2.Reports, report2)
-	stat.AddResponse(response2, 10000115)
+	a.AddResponse(response2, 10000115)
 
-	stat.DeleteOlderThan(60*60, 10000000+60*61)
-	if len(stat.Runs) != 1 {
+	a.DeleteOlderThan(60*60, 10000000+60*61)
+	if len(a.RouteStates["N"].Runs) != 1 {
 		t.Error("Runs should only have one element")
 	}
 
 	// also clears out pointers (plz don't crash)
-	if len(stat.CurrentRuns) != 1 {
+	if len(a.RouteStates["N"].CurrentRuns) != 1 {
 		t.Error("CurrentRuns should only have one element")
 	}
 }

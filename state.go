@@ -1,12 +1,20 @@
 package main
 
 import (
+	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"github.com/bdon/go.gtfs"
 	"github.com/bdon/go.nextbus"
+	"io/ioutil"
 	"log"
+	"net/http"
+	"os"
+	"path"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 )
 
 // The instantaneous state of a vehicle as returned by NextBus
@@ -42,10 +50,13 @@ type RouteState struct {
 type AgencyState struct {
 	RouteStates map[string]*RouteState
 	Feed        gtfs.Feed
+
+	Mutex  sync.RWMutex
+	ticker *time.Ticker
 }
 
 func NewAgencyState(feed gtfs.Feed) *AgencyState {
-	retval := AgencyState{Feed: feed}
+	retval := AgencyState{Feed: feed, Mutex: sync.RWMutex{}}
 	retval.RouteStates = make(map[string]*RouteState)
 	return &retval
 }
@@ -161,6 +172,41 @@ func (s *RouteState) After(time int) map[string]VehicleRun {
 	return filtered
 }
 
+func (a *AgencyState) Start() {
+
+	a.ticker = time.NewTicker(10 * time.Second)
+
+	tick := func(unixtime int) {
+		log.Println("Fetching from NextBus...")
+		response := nextbus.Response{}
+		//Accept-Encoding: gzip, deflate
+		get, err := http.Get("http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=sf-muni&t=0")
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		defer get.Body.Close()
+		str, _ := ioutil.ReadAll(get.Body)
+		xml.Unmarshal(str, &response)
+
+		a.Mutex.Lock()
+		a.AddResponse(response, unixtime)
+		a.Mutex.Unlock()
+		log.Println("Done Fetching.")
+	}
+
+	go func() {
+		for {
+			select {
+			case t := <-a.ticker.C:
+				tick(int(t.Unix()))
+			}
+		}
+	}()
+
+	go tick(int(time.Now().Unix()))
+}
+
 func (a *AgencyState) DeleteOlderThan(duration int, currentTime int) {
 	// replace runs with a filtered list
 
@@ -182,6 +228,28 @@ func (a *AgencyState) DeleteOlderThan(duration int, currentTime int) {
 		}
 
 		s.CurrentRuns = replacementCurrent
-
 	}
+}
+
+func (a *AgencyState) Load(path string) {
+
+}
+
+func (a *AgencyState) Dump() {
+	//Mkdirp in history/year/month/day
+	fmt.Println("DUMP")
+	os.Mkdir("history", 0755)
+	os.Mkdir("history/sf-muni", 0755)
+	os.Mkdir("history/sf-muni/2014", 0755)
+	os.Mkdir("history/sf-muni/2014/05", 0755)
+	os.Mkdir("history/sf-muni/2014/05/03", 0755)
+
+	a.Mutex.RLock()
+	for k, s := range a.RouteStates {
+		filename := fmt.Sprintf("%s.json", k)
+		file, _ := os.Create(path.Join("history/sf-muni/2014/05/03", filename))
+		result, _ := json.Marshal(s.Runs)
+		file.WriteString(string(result))
+	}
+	a.Mutex.RUnlock()
 }

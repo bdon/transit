@@ -3,6 +3,9 @@ package main
 import (
 	"flag"
 	"github.com/bdon/go.gtfs"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 var emitFiles bool
@@ -18,7 +21,21 @@ func main() {
 		EmitStops(feed)
 		EmitSchedules(feed)
 	} else {
-		Webserver()
+		feed := gtfs.Load("muni_gtfs", false)
+
+		agencyState := NewAgencyState(feed)
+
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, os.Interrupt)
+		signal.Notify(c, syscall.SIGTERM)
+
+		go func() {
+			<-c
+			agencyState.Dump()
+			os.Exit(0)
+		}()
+
+		agencyState.Start()
+		Webserver(agencyState)
 	}
 }
-
