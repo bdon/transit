@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-func Webserver(agencyState *AgencyState) {
+func Webserver(agencyState *AgencyState, allowAll bool) {
 
 	healthHandler := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -39,7 +39,9 @@ func Webserver(agencyState *AgencyState) {
 		}
 		agencyState.Mutex.RUnlock()
 		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		if allowAll {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+		}
 		fmt.Fprintf(w, string(result))
 	}
 

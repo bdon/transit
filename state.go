@@ -108,7 +108,6 @@ func (a *AgencyState) AddResponse(foo nextbus.Response, unixtime int) {
 		if !ok {
 			s, ok = a.NewRouteState(routeTag)
 			if !ok {
-				log.Printf("BAILING OUT")
 				continue
 			}
 			a.RouteStates[routeTag] = s
