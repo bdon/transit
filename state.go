@@ -48,9 +48,9 @@ type RouteState struct {
 	Runs map[string]*VehicleRun
 
 	//Bookkeeping for vehicle ID to current run.
-	CurrentRuns map[string]*VehicleRun
-	Referencer  Referencer
-	Id          string
+	CurrentRuns map[string]*VehicleRun `json:"-"`
+	Referencer  Referencer             `json:"-"`
+	Id          string                 `json:"id"`
 }
 
 // since maps are not threadsafe -
@@ -74,8 +74,6 @@ func (a AgencyState) NewRouteState(routeTag string) (*RouteState, bool) {
 	retval := RouteState{Id: routeTag}
 	retval.Runs = map[string]*VehicleRun{}
 	retval.CurrentRuns = make(map[string]*VehicleRun)
-
-	log.Printf("looking up %s", routeTag)
 	route := a.Feed.RouteByShortName(routeTag)
 	longestShape := route.LongestShape()
 	if longestShape == nil {
@@ -245,6 +243,24 @@ func (a *AgencyState) Restore(p string) {
 		desc, _ := ioutil.ReadFile(f)
 		r := RouteState{}
 		json.Unmarshal(desc, &r)
+
+		route := a.Feed.RouteByShortName(r.Id)
+		longestShape := route.LongestShape()
+		if longestShape == nil {
+			log.Printf("Couldn't find %s", r.Id)
+			continue
+		}
+		coords := longestShape.Coords
+		r.Referencer = NewReferencer(coords)
 		a.RouteStates[r.Id] = &r
+
+		r.CurrentRuns = make(map[string]*VehicleRun)
+		// stitch together the current runs
+		for _, x := range r.Runs {
+			if r.CurrentRuns[x.VehicleId] == nil ||
+				r.CurrentRuns[x.VehicleId].StartTime < x.StartTime {
+				r.CurrentRuns[x.VehicleId] = x
+			}
+		}
 	}
 }

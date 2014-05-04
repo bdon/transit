@@ -1,15 +1,7 @@
-* write state to disk so we can recover
-* write historical data/rotate logs
-e.g.
-  for days that are < today.
-  static/history/2014/05/01/N/state.json
-* how do i find the route name etc?
+* rotate logs on day boundary - timezones are scary
+* error logging
+* how do i find the route name etc?, PM, PH, C cable cars
 * switch to Canvas
-* line simplification
+* line simplification - cut out points that are less than 1 minute apart? or distance?
 * configure CORS
 * add another agency
-* timezones are scary
-* error logging
-
-"However, Muni maps abbreviate the cable car route names to PM, PH and C,[7] and they are given route numbers 59, 60, and 61, respectively, for use in Muni internal operations"
-

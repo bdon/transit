@@ -234,12 +234,14 @@ func TestSaveAndRestore(t *testing.T) {
 		t.Error("Runs should have one element")
 	}
 
-	// also clears out pointers (plz don't crash)
-	if len(b.RouteStates["N"].CurrentRuns) != 1 {
-		t.Error("CurrentRuns should only have one element")
+	if (b.RouteStates["N"].Referencer == Referencer{}) {
+		t.Error("State should have referencer")
+	}
+
+	var curRunN *VehicleRun
+	curRunN = b.RouteStates["N"].CurrentRuns["1000"]
+
+	if curRunN != b.RouteStates["N"].Runs["1000_10000000"] {
+		t.Error("CurrentRuns should contain a pointer to the first elem")
 	}
 }
-
-// test that currentRuns is restored
-// test that synchronization primitives added
-// test that Shape is added from feed
