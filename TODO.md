@@ -1,5 +1,6 @@
 * rotate logs on day boundary - timezones are scary
 * how do i find the route name etc?, PM, PH, C cable cars
+* agency ids and nextbus agencys dont match
 
 * error logging
 * configure CORS

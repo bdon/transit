@@ -1,3 +1,4 @@
 release:
-	cd main && gox -output="serve" -osarch="linux/amd64"
+	gox -output="bin/transit_timelines" -osarch="linux/amd64"
+
 
