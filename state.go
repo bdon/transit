@@ -10,7 +10,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -218,26 +217,36 @@ func (a *AgencyState) Start() {
 func (a *AgencyState) Persist(p string) {
 	//Mkdirp in history/year/month/day
 	fmt.Println("DUMP")
-	os.Mkdir(path.Join(p, "sf-muni"), 0755)
-	os.Mkdir(path.Join(p, "sf-muni/2014"), 0755)
-	os.Mkdir(path.Join(p, "sf-muni/2014/05"), 0755)
-	os.Mkdir(path.Join(p, "sf-muni/2014/05/03"), 0755)
+	os.Mkdir(filepath.Join(p, "sf-muni"), 0755)
+	os.Mkdir(filepath.Join(p, "sf-muni/2014"), 0755)
+	os.Mkdir(filepath.Join(p, "sf-muni/2014/05"), 0755)
+	os.Mkdir(filepath.Join(p, "sf-muni/2014/05/03"), 0755)
 
 	a.Mutex.RLock()
 	for k, s := range a.RouteStates {
 		filename := fmt.Sprintf("%s.json", k)
-		file, _ := os.Create(path.Join(p, "/sf-muni/2014/05/03", filename))
+		fullpath := filepath.Join(p, "sf-muni/2014/05/03", filename)
+		file, err := os.Create(fullpath)
+		if err != nil {
+			log.Printf("Error: %s", err)
+		}
+		defer file.Close()
 		result, _ := json.Marshal(s)
-		file.WriteString(string(result))
+		_, err = file.WriteString(string(result))
+		if err != nil {
+			log.Printf("Error: %s", err)
+		}
 	}
 	a.Mutex.RUnlock()
+	fmt.Println("Done dumping")
 }
 
+// TODO should probably have a Mutex here.
 func (a *AgencyState) Restore(p string) {
 	fmt.Println("RESTORE")
 	// glob all files and return one agency state.
 	// need to create current routes
-	files, _ := filepath.Glob(path.Join(p, "sf-muni/2014/05/03/*.json"))
+	files, _ := filepath.Glob(filepath.Join(p, "sf-muni/2014/05/03/*.json"))
 
 	for _, f := range files {
 		desc, _ := ioutil.ReadFile(f)

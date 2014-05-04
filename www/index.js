@@ -15,8 +15,8 @@ var stopsScale = d3.scale.linear().domain([0,1000]).range([5,540]);
 var axis = d3.svg.axis().scale(timeScale).orient("top")
 var toggles = d3.select("#toggles");
 
-var gtfs_route_id = "1198";
-var nextbus_route = "L";
+var gtfs_route_id = "1093";
+var nextbus_route = "N";
 //var gtfs_route_id = "1198";
 //var nextbus_route = "L";
 var static_endpoint = "http://localhost:8081/static";

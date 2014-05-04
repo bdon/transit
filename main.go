@@ -24,6 +24,7 @@ func main() {
 		feed := gtfs.Load("muni_gtfs", false)
 
 		agencyState := NewAgencyState(feed)
+		agencyState.Restore("static/history")
 
 		c := make(chan os.Signal, 1)
 		signal.Notify(c, os.Interrupt)
@@ -31,7 +32,7 @@ func main() {
 
 		go func() {
 			<-c
-			agencyState.Persist("/history")
+			agencyState.Persist("static/history")
 			os.Exit(0)
 		}()
 
