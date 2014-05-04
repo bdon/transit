@@ -31,7 +31,7 @@ func main() {
 
 		go func() {
 			<-c
-			agencyState.Dump()
+			agencyState.Persist("/history")
 			os.Exit(0)
 		}()
 

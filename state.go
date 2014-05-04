@@ -11,18 +11,23 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 )
 
-// The instantaneous state of a vehicle as returned by NextBus
+// The instantaneous state of a vehicle.
 type VehicleState struct {
-	Time      int `json:"time"`
-	Index     int `json:"index"`
+	Time  int `json:"time"`
+	Index int `json:"index"`
+
+	// Used to filter for diff updates.
 	TimeAdded int `json:"-"`
 
+	// Compare strings instead of floats
+	// Why? I don't know. Is float comparison reliable?
 	LatString string `json:"-"`
 	LonString string `json:"-"`
 }
@@ -32,21 +37,25 @@ type VehicleRun struct {
 	VehicleId string            `json:"vehicle_id"`
 	StartTime int               `json:"-"`
 	Dir       nextbus.Direction `json:"dir"`
-	States    []VehicleState    `json:"states"`
+
+	States []VehicleState `json:"states"`
 }
 
 // The entire state of the system is a list of vehicle runs.
 // It also has bookkeeping so it knows how to add an observation to the state.
-// And synchronization primitives.
 type RouteState struct {
-	// has an identifier which is vehicleid+timestamp
+	// Identifier is vehicleid_timestamp, where timestamp is when run first appeared
 	Runs map[string]*VehicleRun
 
 	//Bookkeeping for vehicle ID to current run.
 	CurrentRuns map[string]*VehicleRun
 	Referencer  Referencer
+	Id          string
 }
 
+// since maps are not threadsafe -
+// a Mutex needs to be held when writing in a new nextbus response.
+// This is at the Agency level.
 type AgencyState struct {
 	RouteStates map[string]*RouteState
 	Feed        gtfs.Feed
@@ -62,7 +71,7 @@ func NewAgencyState(feed gtfs.Feed) *AgencyState {
 }
 
 func (a AgencyState) NewRouteState(routeTag string) (*RouteState, bool) {
-	retval := RouteState{}
+	retval := RouteState{Id: routeTag}
 	retval.Runs = map[string]*VehicleRun{}
 	retval.CurrentRuns = make(map[string]*VehicleRun)
 
@@ -126,7 +135,8 @@ func (a *AgencyState) AddResponse(foo nextbus.Response, unixtime int) {
 			LatString: report.LatString, LonString: report.LonString,
 			TimeAdded: unixtime}
 
-		c := s.CurrentRuns[report.VehicleId]
+		c, ok := s.CurrentRuns[report.VehicleId]
+
 		if c != nil {
 			lastState := c.States[len(c.States)-1]
 
@@ -207,49 +217,34 @@ func (a *AgencyState) Start() {
 	go tick(int(time.Now().Unix()))
 }
 
-func (a *AgencyState) DeleteOlderThan(duration int, currentTime int) {
-	// replace runs with a filtered list
-
-	for _, s := range a.RouteStates {
-		replacementList := map[string]*VehicleRun{}
-		for key, run := range s.Runs {
-			if run.StartTime > currentTime-duration {
-				replacementList[key] = run
-			}
-		}
-
-		s.Runs = replacementList
-
-		replacementCurrent := map[string]*VehicleRun{}
-		for key, run := range s.CurrentRuns {
-			if run.StartTime > currentTime-duration {
-				replacementCurrent[key] = run
-			}
-		}
-
-		s.CurrentRuns = replacementCurrent
-	}
-}
-
-func (a *AgencyState) Load(path string) {
-
-}
-
-func (a *AgencyState) Dump() {
+func (a *AgencyState) Persist(p string) {
 	//Mkdirp in history/year/month/day
 	fmt.Println("DUMP")
-	os.Mkdir("history", 0755)
-	os.Mkdir("history/sf-muni", 0755)
-	os.Mkdir("history/sf-muni/2014", 0755)
-	os.Mkdir("history/sf-muni/2014/05", 0755)
-	os.Mkdir("history/sf-muni/2014/05/03", 0755)
+	os.Mkdir(path.Join(p, "sf-muni"), 0755)
+	os.Mkdir(path.Join(p, "sf-muni/2014"), 0755)
+	os.Mkdir(path.Join(p, "sf-muni/2014/05"), 0755)
+	os.Mkdir(path.Join(p, "sf-muni/2014/05/03"), 0755)
 
 	a.Mutex.RLock()
 	for k, s := range a.RouteStates {
 		filename := fmt.Sprintf("%s.json", k)
-		file, _ := os.Create(path.Join("history/sf-muni/2014/05/03", filename))
-		result, _ := json.Marshal(s.Runs)
+		file, _ := os.Create(path.Join(p, "/sf-muni/2014/05/03", filename))
+		result, _ := json.Marshal(s)
 		file.WriteString(string(result))
 	}
 	a.Mutex.RUnlock()
+}
+
+func (a *AgencyState) Restore(p string) {
+	fmt.Println("RESTORE")
+	// glob all files and return one agency state.
+	// need to create current routes
+	files, _ := filepath.Glob(path.Join(p, "sf-muni/2014/05/03/*.json"))
+
+	for _, f := range files {
+		desc, _ := ioutil.ReadFile(f)
+		r := RouteState{}
+		json.Unmarshal(desc, &r)
+		a.RouteStates[r.Id] = &r
+	}
 }

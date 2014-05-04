@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/bdon/go.gtfs"
 	"github.com/bdon/go.nextbus"
+	"io/ioutil"
+	"os"
 	"testing"
 )
 
@@ -211,11 +213,12 @@ func TestFilteredByTime(t *testing.T) {
 	}
 }
 
-// delete runs that started more than 12 hours ago
-func TestDeleteOlderThan(t *testing.T) {
+func TestSaveAndRestore(t *testing.T) {
+	// lets write it into a temporary directory
+	tmpdir, _ := ioutil.TempDir("", "test")
+	defer os.Remove(tmpdir)
 	feed := gtfs.Load("muni_gtfs", false)
 	a := NewAgencyState(feed)
-
 	response := nextbus.Response{}
 	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
@@ -223,22 +226,20 @@ func TestDeleteOlderThan(t *testing.T) {
 
 	response.Reports = append(response.Reports, report1)
 	a.AddResponse(response, 10000015)
+	a.Persist(tmpdir)
+	b := NewAgencyState(feed)
+	b.Restore(tmpdir)
 
-	response2 := nextbus.Response{}
-	report2 := nextbus.VehicleReport{VehicleId: "1001", DirTag: "IB", LatString: "37.1",
-		LonString: "-122.1", SecsSinceReport: 15,
-		LeadingVehicleId: "", RouteTag: "N"}
-
-	response2.Reports = append(response2.Reports, report2)
-	a.AddResponse(response2, 10000115)
-
-	a.DeleteOlderThan(60*60, 10000000+60*61)
-	if len(a.RouteStates["N"].Runs) != 1 {
-		t.Error("Runs should only have one element")
+	if len(b.RouteStates["N"].Runs) != 1 {
+		t.Error("Runs should have one element")
 	}
 
 	// also clears out pointers (plz don't crash)
-	if len(a.RouteStates["N"].CurrentRuns) != 1 {
+	if len(b.RouteStates["N"].CurrentRuns) != 1 {
 		t.Error("CurrentRuns should only have one element")
 	}
 }
+
+// test that currentRuns is restored
+// test that synchronization primitives added
+// test that Shape is added from feed
