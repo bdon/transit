@@ -13,7 +13,6 @@ var lastTime;
 var timeScale = d3.time.scale().range([0,1020]);
 var stopsScale = d3.scale.linear().domain([0,1000]).range([5,h-20]);
 var axis = d3.svg.axis().scale(timeScale).orient("top")
-var toggles = d3.select("#toggles");
 
 var gtfs_route_id = "1093";
 var nextbus_route = "N";
@@ -28,29 +27,6 @@ var line = d3.svg.line()
   .x(function(d) { return timeScale(d.time*1000) })
   .y(function(d) { return stopsScale(d.index) })
   .interpolate("linear");
-
-toggles.append("input")
-  .attr("id","inbound")
-  .attr("type", "checkbox")
-  .attr("checked",true)
-  .on("click", function() {
-    d3.selectAll(".inbound").classed("hidden",!this.checked);
-  });
-
-toggles.append("label")
-  .attr("for", "inbound")
-  .text("Inbound");
-
-toggles.append("input")
-  .attr("id","outbound")
-  .attr("type", "checkbox")
-  .on("click", function() {
-    d3.selectAll(".outbound").classed("hidden",!this.checked);
-  });
-
-toggles.append("label")
-  .attr("for", "outbound")
-  .text("Outbound");
 
 function vehicleSymbolTransform(d) {
   var x1 = timeScale(d.one.time*1000);
@@ -81,6 +57,16 @@ function drawAnimated() {
 var zoom = d3.behavior.zoom()
     .scaleExtent([0.1,0.5])
     .on("zoom", drawUnanimated);
+
+var inbound = true;
+var switchG = vis.append("g").attr("transform","translate(1040,0)");
+switchG.append("rect").attr("width",100).attr("height",20).style("fill","#aaa")
+  .on("click", function(d) {
+    d3.selectAll(".inbound").classed("hidden",!inbound);
+    d3.selectAll(".outbound").classed("hidden",inbound);
+    inbound = !inbound;
+  });
+switchG.append("text").text("Switch").attr("y",15);
 
 var mainChartWAxis = vis.append("g").attr("transform","translate(0,0)")
 mainChartWAxis.append("g")
@@ -120,7 +106,7 @@ function subDraw () {
   clippedFore.selectAll(".vehicleSymbol").data(ends, function(d) { return d.key }).enter()
     .append("polygon")
     .attr("class", "vehicleSymbol")
-    .attr("points", "0,5 10,0 0,-5")
+    .attr("points", "0,4 8,0 0,-4")
     .classed("inbound", function(d) { return d.dir == 0 })
     .classed("outbound", function(d) { return d.dir == 1 })
 
