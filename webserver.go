@@ -33,10 +33,23 @@ func Webserver(agencyState *AgencyState, allowAll bool) {
 
 		var result []byte
 		if time > 0 {
-			result, _ = json.Marshal(agencyState.RouteStates[route].After(time))
-		} else {
-			result, _ = json.Marshal(agencyState.RouteStates[route].Runs)
-		}
+      runs, ok := agencyState.RunsAfter(route, time)
+      if ok {
+        result, _ = json.Marshal(runs)
+      } else {
+        http.Error(w, "BAD REQUEST", http.StatusBadGateway)
+        return
+      }
+    } else {
+      runs, ok := agencyState.Runs(route)
+      if ok {
+        result, _ = json.Marshal(runs)
+      } else {
+        http.Error(w, "BAD REQUEST", http.StatusBadGateway)
+        return
+      }
+    }
+
 		agencyState.Mutex.RUnlock()
 		w.Header().Set("Content-Type", "application/json")
 		if allowAll {

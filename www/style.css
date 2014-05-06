@@ -1,5 +1,5 @@
 .muni {
-  background-color: #01529a;
+  background-color: #eee;
 }
 
 body {
@@ -9,23 +9,18 @@ body {
 .axis path,
 .axis line {
   fill: none;
-  stroke: white;
+  stroke: black;
   shape-rendering: crispEdges;
 }
 
 .axis text {
-  fill: white;
+  fill: black;
   font-size: 10px;
 }
 
 .stop {
-  fill: white;
+  fill: black;
   font-size: 10px;
-}
-
-.rule {
-  stroke: #0060b5;
-  shape-rendering: crispEdges;
 }
 
 .pane {
@@ -34,35 +29,8 @@ body {
   pointer-events: all;
 }
 
-.flavortext {
-  font-size: 14px;
-  margin-top: 20px;
-}
-
-.theheader {
-  width: 970px;
-  background-color: #01529a;
-}
-
-.theheader2 {
-  padding-top: 10px;
-  padding-bottom: 6px;
-}
-
-.thetitle {
-  color: white;
-  font-size: 24px;
-}
-
-.thedate {
-  margin-left: 20px;
-  margin-right: 20px;
-  color: white;
-  font-size: 16px;
-}
-
 #toggles label {
-  color: white;
+  color: black;
   display: inline;
 }
 
@@ -84,8 +52,6 @@ svg *::-webkit-selection {
     background:transparent;
 }
 
-/* toggles */
-
 path {
   fill: none;
 }
@@ -94,81 +60,17 @@ path {
   display: none;
 }
 
-.guideHidden {
-  display: none
-}
-
 .vehiclePath {
-  stroke-width: 1.5;
-  stroke: white;
-}
-
-.vehiclePathIx {
-  stroke-width: 10;
-  stroke: white;
-  stroke-opacity: 0.0;
-}
-
-#legendPath {
-  stroke-width: 6;
-  stroke-dasharray: 1,2;
-  stroke: #389cf5;
-}
-
-#legendText {
-  font-size: 12px;
-  fill: #389cf5;
+  stroke-width: 1.1;
+  stroke: black;
 }
 
 .vehicleSymbol {
-  fill: white;
+  fill: black;
   stroke-width: 0px;
-}
-
-.idealVehicleSymbol {
-  stroke-width: 0px;
-  fill: #389cf5;
-}
-
-.scheduleText {
-  fill: #389cf5;
-  font-size: 11px;
-}
-
-polygon.visible .idealVehicleSymbol {
-  fill: #389cf5;
-}
-
-.hovering {
-  stroke-width: 3px;
-}
-
-#ticker {
-  font-size: 13px;
-  color: white;
-}
-
-#tickerWheel {
-  fill: white;
-}
-
-#legend {
-  margin-left: 80px;
-}
-
-#tickerSvg {
-  margin-left: 40px;
 }
 
 .guide {
-  stroke: #389cf5;
-  stroke-width: 1.2px;
-}
-
-.blueDottedLines {
-  color: #389cf5;
-}
-
-.social {
-  margin-bottom: 10px;
+  stroke: #aaa;
+  stroke-width: 1.1px;
 }

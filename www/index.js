@@ -1,6 +1,6 @@
-var m = [20, 20, 20, 20],
-    w = 970 - m[1] - m[3],
-    h = 600 - m[0] - m[2];
+var m = [16, 16, 16, 16],
+    w = 1200 - m[1] - m[3],
+    h = 200 - m[0] - m[2];
 
 var svg = d3.select("#chart").append("svg:svg")
     .attr("class", "muni")
@@ -10,15 +10,13 @@ var vis = svg.append("svg:g")
     .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
 var lastTime;
-var timeScale = d3.time.scale().range([0,790]);
-var stopsScale = d3.scale.linear().domain([0,1000]).range([5,540]);
+var timeScale = d3.time.scale().range([0,1020]);
+var stopsScale = d3.scale.linear().domain([0,1000]).range([5,h-20]);
 var axis = d3.svg.axis().scale(timeScale).orient("top")
 var toggles = d3.select("#toggles");
 
 var gtfs_route_id = "1093";
 var nextbus_route = "N";
-//var gtfs_route_id = "1198";
-//var nextbus_route = "L";
 var static_endpoint = "http://localhost:8081/static";
 var live_endpoint = "http://localhost:8080";
 
@@ -54,18 +52,6 @@ toggles.append("label")
   .attr("for", "outbound")
   .text("Outbound");
 
-toggles.append("input")
-  .attr("id","showSchedule")
-  .attr("type", "checkbox")
-  .attr("checked",true)
-  .on("click", function() {
-    d3.selectAll(".guide").classed("guideHidden",!this.checked);
-  });
-
-toggles.append("label")
-  .attr("for", "showSchedule")
-  .text("Show Schedule");
-
 function vehicleSymbolTransform(d) {
   var x1 = timeScale(d.one.time*1000);
   var y1 = stopsScale(d.one.index);
@@ -78,7 +64,7 @@ function vehicleSymbolTransform(d) {
 function drawUnanimated() {
   subDraw();
   vis.selectAll(".vehicleSymbol")
-    .style("fill", "white")
+    .style("fill", "black")
     .attr("transform", vehicleSymbolTransform);
 }
 
@@ -88,15 +74,15 @@ function drawAnimated() {
     .style("fill", "#96ff30")
     .transition()
     .duration(1000)
-    .style("fill", "white")
+    .style("fill", "black")
     .attr("transform", vehicleSymbolTransform);
 }
 
 var zoom = d3.behavior.zoom()
-    .scaleExtent([0.5,2.0])
+    .scaleExtent([0.1,0.5])
     .on("zoom", drawUnanimated);
 
-var mainChartWAxis = vis.append("g").attr("transform","translate(70,0)")
+var mainChartWAxis = vis.append("g").attr("transform","translate(0,0)")
 mainChartWAxis.append("g")
   .attr("transform", "translate(0,10)")
   .attr("class", "time axis")
@@ -106,12 +92,12 @@ var mainChart = mainChartWAxis.append("g").attr("transform","translate(0,20)")
 mainChart.append("clipPath")
   .attr("id", "clip")
   .append("rect")
-    .attr("width","790")
+    .attr("width","1020")
     .attr("height","550");
 
 mainChart.append("rect")
   .attr("class", "pane")
-  .attr("width","790")
+  .attr("width","1020")
   .attr("height","550")
   .call(zoom);
 
@@ -131,26 +117,6 @@ function subDraw () {
     .classed("inbound", function(d) { return d.run.dir == 0 })
     .classed("outbound", function(d) { return d.run.dir == 1 })
 
-  clippedFore.selectAll(".vehiclePathIx").data(data, function(d) { return d.key }).enter()
-    .append("path")
-    .attr("class","vehiclePathIx")
-    .classed("inbound", function(d) { return d.run.dir == 0 })
-    .classed("outbound", function(d) { return d.run.dir == 1 })
-    .on("mouseover", function(d) {
-      tooltip.attr("x", d3.mouse(this)[0]+10)
-        .attr("y", d3.mouse(this)[1])
-        .text("Vehicle #" + d.run.vehicle_id)
-        .style("fill", "white")
-        .style("opacity", "1.0")
-        .style("font-size", "10px")
-
-        d3.select("#vp_" + d.key).classed("hovering",true);
-    })
-    .on("mouseout", function(d) {
-      d3.select("#vp_" + d.key).classed("hovering",false);
-      tooltip.style("opacity", "0")
-    })
-
   clippedFore.selectAll(".vehicleSymbol").data(ends, function(d) { return d.key }).enter()
     .append("polygon")
     .attr("class", "vehicleSymbol")
@@ -161,7 +127,6 @@ function subDraw () {
   vis.selectAll(".time.axis").call(axis);
 
   vis.selectAll(".vehiclePath").attr("d", function(d) { return line(d.run.states); })
-  vis.selectAll(".vehiclePathIx").attr("d", function(d) { return line(d.run.states); })
   vis.selectAll(".guide").attr("d", function(d) { return line(d.stops) });
 }
 
@@ -201,6 +166,8 @@ function getPastData() {
     lastTime = (max + 60 * 15) * 1000;
     timeScale.domain([(lastTime/1000 - 60 * 60) * 1000, lastTime]);
     zoom.x(timeScale);
+    zoom.scale(0.15);
+    zoom.translate([700,0]);
 
     ends = endsWithFlattenedData(data);
     drawUnanimated();
@@ -228,16 +195,13 @@ function getDataSince(timestamp) {
 
 getPastData();
 var timestamp = new Date().getTime();
-var timeTilUpdate = 19;
+var timeTilUpdate = 9;
 
 setInterval(function() {
-  if (timeTilUpdate % 10 == 0) {
+  if (timeTilUpdate <= 0) {
     getDataSince(timestamp);
     timestamp = new Date().getTime();
-  }
-
-  if (timeTilUpdate <= 0) {
-    timeTilUpdate = 20;
+    timeTilUpdate = 10;
   }
   timeTilUpdate--;
 }, 1 * 1000)
@@ -270,25 +234,11 @@ d3.json(static_endpoint + "/schedules/" + gtfs_route_id + ".json", function(trip
 });
 
 d3.json(static_endpoint + "/stops/" + gtfs_route_id + ".json", function(stops) {
-  vis.append("g").attr("transform","translate(64,23)").selectAll(".stop").data(stops).enter().append("text")
-      .attr("class", "stop")
-      .attr("text-anchor", "end")
-      .attr("y", function(d) { return stopsScale(d.index) })
-      .text(function(d) { return d.name });
-
-  vis.append("g").attr("transform","translate(866,23)").selectAll(".stop").data(stops).enter().append("text")
+  vis.append("g").attr("transform","translate(1024,23)").selectAll(".stop").data(stops).enter().append("text")
       .attr("class", "stop")
       .attr("text-anchor", "begin")
       .attr("y", function(d) { return stopsScale(d.index) })
       .text(function(d) { return d.name });
-
-  clippedMid.append("g").selectAll(".rule").data(stops).enter().append("line")
-      .attr("class", "rule")
-      .attr("y1", function(d) { return stopsScale(d.index) })
-      .attr("y2", function(d) { return stopsScale(d.index) })
-      .attr("x1", "0")
-      .attr("x2", "790");
-
   drawUnanimated();
 });
 

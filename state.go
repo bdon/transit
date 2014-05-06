@@ -178,6 +178,22 @@ func (s *RouteState) After(time int) map[string]VehicleRun {
 	return filtered
 }
 
+func (a *AgencyState) Runs(routeTag string) (map[string]*VehicleRun, bool) {
+  s, ok := a.RouteStates[routeTag]
+  if ok {
+    return s.Runs, true
+  }
+  return make(map[string]*VehicleRun), false
+}
+
+func (a *AgencyState) RunsAfter(routeTag string, unixtime int) (map[string]VehicleRun, bool) {
+  s, ok := a.RouteStates[routeTag]
+  if ok {
+    return s.After(unixtime), true
+  }
+  return make(map[string]VehicleRun), false
+}
+
 func (a *AgencyState) Start() {
 
 	a.ticker = time.NewTicker(10 * time.Second)
