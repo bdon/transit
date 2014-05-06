@@ -17,3 +17,4 @@
 Frontend:
 * show hash state in URL
 * fix arrows coming from nowhere
+* store stopid -> latlong to show on map?

@@ -1,27 +1,23 @@
-var m = [16, 16, 16, 16],
-    w = 1200 - m[1] - m[3],
-    h = 200 - m[0] - m[2];
+var static_endpoint = "http://localhost:8081/static";
+var live_endpoint = "http://localhost:8080";
 
 var svg = d3.select("#chart").append("svg:svg")
     .attr("class", "muni")
-    .attr("width", w + m[1] + m[3])
-    .attr("height", h + m[0] + m[2])
+    .attr("width", 1200)
+    .attr("height", 200)
 var vis = svg.append("svg:g")
-    .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+    .attr("transform", "translate(16,16)");
 
 var lastTime;
 var timeScale = d3.time.scale().range([0,1020]);
-var stopsScale = d3.scale.linear().domain([0,1000]).range([5,h-20]);
+var stopsScale = d3.scale.linear().domain([0,1000]).range([0,150]);
 var axis = d3.svg.axis().scale(timeScale).orient("top")
 
 var gtfs_route_id = "1093";
 var nextbus_route = "N";
-var static_endpoint = "http://localhost:8081/static";
-var live_endpoint = "http://localhost:8080";
 
 var data = [];
 var ends = [];
-var guides = [];
 
 var line = d3.svg.line()
   .x(function(d) { return timeScale(d.time*1000) })
@@ -224,3 +220,24 @@ d3.json(static_endpoint + "/stops/" + gtfs_route_id + ".json", function(stops) {
   drawUnanimated();
 });
 
+function timelineChart() {
+  var gtfsRoute, nextbusRoute;
+  function my() {
+    console.log("BLAH");
+  }
+
+  my.nextbusRoute = function(value) {
+    nextbusRoute = value;
+    return my;
+  }
+
+  my.gtfsRoute = function(value) {
+    gtfsRoute = value;
+    return my;
+  }
+
+  return my;
+}
+
+nChart = timelineChart().nextbusRoute("N").gtfsRoute("1093");
+d3.select("#chart").call(nChart);
