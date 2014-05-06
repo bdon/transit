@@ -21,5 +21,5 @@ func NewReferencer(coords []gtfs.Coord) Referencer {
 
 func (r Referencer) Reference(lat float64, lon float64) int {
 	point := geo.NewPoint(lon, lat)
-	return int(r.Path.ProjectNormalized(point)*1000 + 0.5)
+	return int(r.Path.Project(point)*1000 + 0.5)
 }
