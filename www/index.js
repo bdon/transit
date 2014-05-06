@@ -90,10 +90,7 @@ mainChart.append("rect")
 var clipped = mainChart.append("g")
   .attr("clip-path", "url(#clip)")
 var clippedBack = clipped.append("g");
-var clippedMid = clipped.append("g");
 var clippedFore = clipped.append("g");
-var tooltip = clippedFore.append("text")
-    .attr("class", "vehicleTooltip")
 
 function subDraw () {
   clippedFore.selectAll(".vehiclePath").data(data, function(d) { return d.key }).enter()
@@ -111,7 +108,6 @@ function subDraw () {
     .classed("outbound", function(d) { return d.dir == 1 })
 
   vis.selectAll(".time.axis").call(axis);
-
   vis.selectAll(".vehiclePath").attr("d", function(d) { return line(d.run.states); })
   vis.selectAll(".guide").attr("d", function(d) { return line(d.stops) });
 }
