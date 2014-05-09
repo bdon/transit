@@ -18,3 +18,8 @@ Frontend:
 * show hash state in URL
 * fix arrows coming from nowhere
 * store stopid -> latlong to show on map?
+
+* add reset.css
+* how do we define "inbound" - shape order?
+* Indexes should be culled to last scheduled stop.
+* nest all under one svg element - link time axis
