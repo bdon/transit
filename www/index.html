@@ -4,14 +4,63 @@
       <link rel="stylesheet" href="style.css"/>
   </head>
   <body>
-    <div id="chart">
-    </div>
-    
-    <div id="chartlist">
-
+    <div class="container">
+      <h3>Agency: SFMTA</h3>
+      <div id="chooser">
+      </div>
+      <div id="chart">
+      </div>
+      <div id="chartlist">
+      </div>
     </div>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-    <script src="index.js"/></script>
+    <script src="src/index.js"/></script>
+    <script>
+      d3.json("http://localhost:8081/static/routes.json",function(data) {
+        d3.select("#chooser").selectAll(".rollsign").data(data).enter()
+          .append("div").attr("class","rollsign").text(function(d) { return d.short_name })
+          .on("click", function() {
+            var displayed = d3.select(this).classed("displayed");
+            d3.select(this).classed("displayed",!displayed); 
+          });
+      });
+      
+      // main stuff
+
+      var tt = ttMain("a","b");
+      d3.select("#chartlist").append("div")
+        .attr("class","aChart").datum({"nextbus_route":"N","gtfs_route":"1093"});
+
+      d3.select("#chartlist").append("div")
+        .attr("class","bChart").datum({"nextbus_route":"J","gtfs_route":"1094"});
+
+      d3.select("#chartlist").append("div")
+        .attr("class","tChart").datum({"nextbus_route":"27","gtfs_route":"8692"});
+
+      nChart = timelineChart(tt.zoom(),tt.timeScale());
+      jChart = timelineChart(tt.zoom(),tt.timeScale());
+      tChart = timelineChart(tt.zoom(),tt.timeScale());
+      tt.addChart(nChart);
+      tt.addChart(jChart);
+      tt.addChart(tChart);
+
+      d3.selectAll(".aChart").call(nChart);
+      d3.selectAll(".bChart").call(jChart);
+      d3.selectAll(".tChart").call(tChart);
+
+      // global timers
+      var timestamp = new Date().getTime();
+      var timeTilUpdate = 9;
+
+      setInterval(function() {
+        if (timeTilUpdate <= 0) {
+          nChart.update(timestamp);
+          timestamp = new Date().getTime();
+          timeTilUpdate = 10;
+        }
+        timeTilUpdate--;
+      }, 1 * 1000)
+    </script>
   </body>
 </html>
 

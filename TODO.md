@@ -3,6 +3,8 @@
 * place to list all available routes.
 * agency ids and nextbus agencys dont match
 
+* fetch timeout
+
 * error logging
 * configure CORS
 * combine schedules and stops
@@ -22,4 +24,4 @@ Frontend:
 * add reset.css
 * how do we define "inbound" - shape order?
 * Indexes should be culled to last scheduled stop.
-* nest all under one svg element - link time axis
+* only show arrows for currently live routes

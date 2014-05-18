@@ -1,9 +1,38 @@
+
+
 .muni {
   background-color: #eee;
 }
 
 body {
   font-family: sans-serif;
+}
+
+.rollsign {
+  width: 50px;
+  height: 20px;
+  margin:2px;
+  background-color: #ddd;
+  float: left;
+  overflow: hidden;
+  text-overflow: clip;
+  text-align: center;
+  font-size: 12px;
+}
+
+.rollsign:hover {
+  background-color: magenta;
+}
+
+.rollsign.displayed {
+  background-color: cyan;
+}
+
+.container {
+  width:80%;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #eee;
 }
 
 .axis path,

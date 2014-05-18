@@ -1,9 +1,50 @@
 var STATIC_ENDPOINT = "http://localhost:8081/static";
 var LIVE_ENDPOINT = "http://localhost:8080";
 
-function timelineChart() {
-  var lastTime;
+// The main object for the page.
+// Controls timers, scales, lines.
+function ttMain(staticEndpoint, liveEndpoint) {
+
+  var charts = [];
+  function drawAllCharts() {
+    for (var i in charts) { charts[i].d(); }
+  }
+
+  var staticE = staticEndpoint;
+  var liveE = liveEndpoint;
   var timeScale = d3.time.scale().range([0,1020]);
+  var zoom = d3.behavior.zoom().scaleExtent([0.1,1.5]).on("zoom", drawAllCharts);
+
+  d = new Date();
+  var prevMidnight = d.setHours(0,0,0,0);
+
+  d = new Date();
+  var nextMidnight = d.setHours(24,0,0,0);
+
+  timeScale.domain([prevMidnight, nextMidnight]);
+  zoom.x(timeScale);
+  zoom.scale(1);
+
+  var my = {};
+
+  my.zoom = function() {
+    if(!arguments.length) return zoom;
+  }
+
+  my.timeScale = function() {
+    if(!arguments.length) return timeScale;
+  }
+
+  my.addChart = function(c) {
+    charts.push(c); 
+  }
+  
+  return my;
+}
+
+function timelineChart(z,ts) {
+  var lastTime;
+  var timeScale = ts;
   var stopsScale = d3.scale.linear().domain([0,1000]).range([0,150]);
   var axis = d3.svg.axis().scale(timeScale).orient("top")
   var data = [];
@@ -12,9 +53,7 @@ function timelineChart() {
     .x(function(d) { return timeScale(d.time*1000) })
     .y(function(d) { return stopsScale(d.index) })
     .interpolate("linear");
-  var zoom = d3.behavior.zoom()
-      .scaleExtent([0.1,0.5])
-      .on("zoom", drawUnanimated);
+  var zoom = z;
   var inbound = true;
 
   // ???
@@ -155,6 +194,8 @@ function timelineChart() {
       .attr("transform", vehicleSymbolTransform);
   }
 
+  my.d = drawUnanimated;
+
   function endsWithFlattenedData(flattened) {
     var ends = [];
     for (l in flattened) {
@@ -189,10 +230,6 @@ function timelineChart() {
       })
 
       lastTime = (max + 60 * 15) * 1000;
-      timeScale.domain([(lastTime/1000 - 60 * 60) * 1000, lastTime]);
-      zoom.x(timeScale);
-      zoom.scale(0.15);
-      zoom.translate([700,0]);
 
       ends = endsWithFlattenedData(data);
       drawUnanimated();
@@ -227,34 +264,3 @@ function timelineChart() {
 }
 
 
-// main stuff
-
-d3.select("#chartlist").append("div")
-  .attr("class","aChart").datum({"nextbus_route":"N","gtfs_route":"1093"});
-
-d3.select("#chartlist").append("div")
-  .attr("class","bChart").datum({"nextbus_route":"J","gtfs_route":"1094"});
-
-d3.select("#chartlist").append("div")
-  .attr("class","tChart").datum({"nextbus_route":"27","gtfs_route":"8692"});
-
-nChart = timelineChart();
-jChart = timelineChart();
-tChart = timelineChart();
-
-d3.selectAll(".aChart").call(nChart);
-d3.selectAll(".bChart").call(jChart);
-d3.selectAll(".tChart").call(tChart);
-
-// global timers
-var timestamp = new Date().getTime();
-var timeTilUpdate = 9;
-
-setInterval(function() {
-  if (timeTilUpdate <= 0) {
-    nChart.update(timestamp);
-    timestamp = new Date().getTime();
-    timeTilUpdate = 10;
-  }
-  timeTilUpdate--;
-}, 1 * 1000)

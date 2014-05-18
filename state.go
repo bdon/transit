@@ -102,6 +102,7 @@ func newToken(vehicleId string, timestamp int) string {
 
 // Must be called in chronological order
 func (a *AgencyState) AddResponse(foo nextbus.Response, unixtime int) {
+  log.Println("AddResponse")
 	for _, report := range foo.Reports {
 		routeTag := report.RouteTag
 		s, ok := a.RouteStates[routeTag]
@@ -211,6 +212,7 @@ func (a *AgencyState) Start() {
 		str, _ := ioutil.ReadAll(get.Body)
 		xml.Unmarshal(str, &response)
 
+    log.Println("Locking")
 		a.Mutex.Lock()
 		a.AddResponse(response, unixtime)
 		a.Mutex.Unlock()
