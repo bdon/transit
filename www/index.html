@@ -8,26 +8,31 @@
       <h3>Agency: SFMTA</h3>
       <div id="chooser">
       </div>
-      <div id="chart">
-      </div>
       <div id="chartlist">
       </div>
     </div>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="src/index.js"/></script>
     <script>
-      d3.json("http://localhost:8081/static/routes.json",function(data) {
-        d3.select("#chooser").selectAll(".rollsign").data(data).enter()
-          .append("div").attr("class","rollsign").text(function(d) { return d.short_name })
-          .on("click", function() {
-            var displayed = d3.select(this).classed("displayed");
-            d3.select(this).classed("displayed",!displayed); 
-          });
-      });
       
       // main stuff
 
       var tt = ttMain("a","b");
+
+      d3.json("http://localhost:8081/static/routes.json",function(data) {
+        d3.select("#chooser").selectAll(".rollsign").data(data).enter()
+          .append("div").attr("class","rollsign").text(function(d) { return d.short_name })
+          .on("click", function(d) {
+            var displayed = d3.select(this).classed("displayed");
+            if(!displayed) {
+              console.log(d);
+              //ttMain.addRoute(d);
+            }
+            d3.select(this).classed("displayed",!displayed); 
+            
+          });
+      });
+
       d3.select("#chartlist").append("div")
         .attr("class","aChart").datum({"nextbus_route":"N","gtfs_route":"1093"});
 

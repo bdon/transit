@@ -13,7 +13,7 @@ function ttMain(staticEndpoint, liveEndpoint) {
   var staticE = staticEndpoint;
   var liveE = liveEndpoint;
   var timeScale = d3.time.scale().range([0,1020]);
-  var zoom = d3.behavior.zoom().scaleExtent([0.1,1.5]).on("zoom", drawAllCharts);
+  var zoom = d3.behavior.zoom().scaleExtent([1,4]).on("zoom", drawAllCharts);
 
   d = new Date();
   var prevMidnight = d.setHours(0,0,0,0);
@@ -65,10 +65,14 @@ function timelineChart(z,ts) {
     selection.each(function(d, i) {
       nextbus_route = d.nextbus_route;
 
+      d3.select(this).append("div").attr("class","nextbus_route").text(nextbus_route);
+
       var svg = d3.select(this).append("svg:svg")
+        .attr("width","100%")
+        .attr("height","200px")
         .attr("class", "muni")
-        .attr("width", 1200)
-        .attr("height", 200)
+        .attr("viewBox","0 0 1200 200")
+        .attr("preserveAspectRatio","xMaxYMid slice");
       vis = svg.append("svg:g")
           .attr("transform", "translate(16,16)");
 
