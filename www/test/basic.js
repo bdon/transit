@@ -16,11 +16,14 @@ describe("Control.Attribution", function () {
 
    
   });
-
- 
-
-
 });
+
+// mock data
+[{}]
+
+// mock update data
+
+// request for multiple lines
 
 // it requests for static/ if the chosen date is not today
 // if requests for live endpoint if it is

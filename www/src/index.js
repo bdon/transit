@@ -43,7 +43,6 @@ function ttMain(staticEndpoint, liveEndpoint) {
 }
 
 function timelineChart(z,ts) {
-  var lastTime;
   var timeScale = ts;
   var stopsScale = d3.scale.linear().domain([0,1000]).range([0,150]);
   var axis = d3.svg.axis().scale(timeScale).orient("top")
@@ -172,7 +171,7 @@ function timelineChart(z,ts) {
     clippedFore.selectAll(".vehicleSymbol").data(ends, function(d) { return d.key }).enter()
       .append("polygon")
       .attr("class", "vehicleSymbol")
-      .attr("points", "0,4 8,0 0,-4")
+      .attr("points", "0,3 6,0 0,-3")
       .classed("inbound", function(d) { return d.dir == 0 })
       .classed("outbound", function(d) { return d.dir == 1 })
 
@@ -221,20 +220,11 @@ function timelineChart(z,ts) {
 
   function getPastData() {
     d3.json(LIVE_ENDPOINT + "/locations.json?route=" + nextbus_route, function(response) {
-
       var flattened = [];
       for(var key in response) {
         flattened.push({"run":response[key],"key":key});
       }
-
       data = flattened;
-
-      var max = d3.max(flattened, function(run) {
-        return d3.max(run.run.states, function(state) { return state.time })
-      })
-
-      lastTime = (max + 60 * 15) * 1000;
-
       ends = endsWithFlattenedData(data);
       drawUnanimated();
       vis.selectAll(".outbound").classed("hidden",inbound);
@@ -243,22 +233,22 @@ function timelineChart(z,ts) {
 
   function getDataSince(timestamp) {
     d3.json(LIVE_ENDPOINT + "/locations.json?route=" + nextbus_route + "&after=" + Math.floor(timestamp/1000), function(response) {
-      // delta join.
+      // for every run
       for (var run in response) {
         var match = data.filter(function(d) { return d.key == run})
+        
         if (match.length > 0) {
           for (var stat in response[run].states) {
             match[0].run.states.push(response[run].states[stat]);
           }
         } else {
-          data.push({"run":response[run].key,"run":response[run]});
+          data.push({"key":response[run].key,"run":response[run]});
         }
       }
       ends = endsWithFlattenedData(data);
       drawAnimated();
     });
   }
-
 
   my.update = function(timestamp) {
     getDataSince(timestamp);

@@ -25,7 +25,6 @@
           .on("click", function(d) {
             var displayed = d3.select(this).classed("displayed");
             if(!displayed) {
-              console.log(d);
               //ttMain.addRoute(d);
             }
             d3.select(this).classed("displayed",!displayed); 
@@ -54,13 +53,29 @@
       d3.selectAll(".tChart").call(tChart);
 
       // global timers
-      var timestamp = new Date().getTime();
+      var nTimestamp = new Date().getTime();
+      var jTimestamp = new Date().getTime();
+      var tTimestamp = new Date().getTime();
       var timeTilUpdate = 9;
 
       setInterval(function() {
-        if (timeTilUpdate <= 0) {
-          nChart.update(timestamp);
-          timestamp = new Date().getTime();
+        if(timeTilUpdate == 0) {
+          nChart.update(nTimestamp);
+          nTimestamp = new Date().getTime();
+          console.log("Update N");
+        }
+        if(timeTilUpdate == 3) {
+          jChart.update(jTimestamp);
+          jTimestamp = new Date().getTime();
+          console.log("Update J");
+        }
+        if(timeTilUpdate == 6) {
+          tChart.update(tTimestamp);
+          tTimestamp = new Date().getTime();
+          console.log("Update T");
+        }
+
+        if (timeTilUpdate == 0) {
           timeTilUpdate = 10;
         }
         timeTilUpdate--;
