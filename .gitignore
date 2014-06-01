@@ -5,3 +5,5 @@
 serve
 static
 transit_timelines
+bower_components
+node_modules
