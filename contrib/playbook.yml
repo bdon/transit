@@ -21,6 +21,11 @@
   - name: install upstart file
     copy: dest=/etc/init/api.conf src=templates/api.conf
 
+  # This will force the persist/restore code to start at a new date...
+  # may bleed over some of the next day's stuff into new day, but that's OK.
+  - name: restart the API process at 2AM every day
+    cron: hour=2 state=present job="service api restart"
+
 #dd if=/dev/zero of=/extraswap bs=1M count=512
 #mkswap /extraswap
 #..and add it to /etc/fstab:

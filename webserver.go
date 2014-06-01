@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-func Webserver(agencyState *AgencyState, allowAll bool) {
+func Webserver(agencyState *AgencyState) {
 
 	healthHandler := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -50,9 +50,8 @@ func Webserver(agencyState *AgencyState, allowAll bool) {
 
 		log.Println("READ UNLOCKED")
 		w.Header().Set("Content-Type", "application/json")
-		if allowAll {
-			w.Header().Set("Access-Control-Allow-Origin", "*")
-		}
+    // You should override this in nginx
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		fmt.Fprintf(w, string(result))
 	}
 

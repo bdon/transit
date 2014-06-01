@@ -10,12 +10,10 @@ import (
 
 var emitFiles bool
 var emitRoot bool
-var allowAll bool
 
 func init() {
 	flag.BoolVar(&emitFiles, "emitFiles", false, "emit files")
 	flag.BoolVar(&emitRoot, "emitRoot", false, "emit root")
-	flag.BoolVar(&allowAll, "allowAll", false, "allow all CORS origins")
 }
 
 func main() {
@@ -44,6 +42,6 @@ func main() {
 		}()
 
 		agencyState.Start()
-		Webserver(agencyState, allowAll)
+		Webserver(agencyState)
 	}
 }
