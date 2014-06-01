@@ -26,9 +26,9 @@ type TripRepr struct {
 }
 
 type RouteRepr struct {
-  Id string `json:"id"`
-  ShortName string `json:"short_name"`
-  LongName string `json:"long_name"`
+	Id        string `json:"id"`
+	ShortName string `json:"short_name"`
+	LongName  string `json:"long_name"`
 }
 
 func perRoute(feed gtfs.Feed, dirname string, f func(*gtfs.Route) (string, bool)) {
@@ -50,13 +50,13 @@ func perRoute(feed gtfs.Feed, dirname string, f func(*gtfs.Route) (string, bool)
 }
 
 func EmitRoot(feed gtfs.Feed) {
-  output := []RouteRepr{}
-  for _, route := range feed.Routes {
-    r := RouteRepr{Id:route.Id,ShortName:route.ShortName,LongName:route.LongName}
-    output = append(output,r)
-  }
-  marshalled, _ := json.Marshal(output)
- fmt.Printf(string(marshalled)) 
+	output := []RouteRepr{}
+	for _, route := range feed.Routes {
+		r := RouteRepr{Id: route.Id, ShortName: route.ShortName, LongName: route.LongName}
+		output = append(output, r)
+	}
+	marshalled, _ := json.Marshal(output)
+	fmt.Printf(string(marshalled))
 }
 
 func EmitStops(feed gtfs.Feed) {

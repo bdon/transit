@@ -5,7 +5,9 @@ import (
 	"github.com/bdon/go.nextbus"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
+	"time"
 )
 
 func TestEmpty(t *testing.T) {
@@ -243,5 +245,34 @@ func TestSaveAndRestore(t *testing.T) {
 
 	if curRunN != b.RouteStates["N"].Runs["1000_10000000"] {
 		t.Error("CurrentRuns should contain a pointer to the first elem")
+	}
+}
+
+func TestSaveAndRestoreTimeBoundary(t *testing.T) {
+	// if the vehicle reports are from a different day then today:
+	// flush them to their day
+	if false {
+		t.Error("")
+	}
+}
+
+func TestFilepathForTime(t *testing.T) {
+	path := "tmp_path"
+	tim, _ := time.Parse("Mon Jan 2 15:04:05 -0700 MST 2006", "Sat May 31 14:23:00 -0700 PST 2014")
+	p := FilepathForTime(path, tim)
+	if p != "tmp_path/2014/5/31" {
+		t.Error("Expected path")
+	}
+}
+
+func TestMkdirpForTime(t *testing.T) {
+	tmpdir, _ := ioutil.TempDir("", "test")
+	defer os.Remove(tmpdir)
+
+	tim, _ := time.Parse("Mon Jan 2 15:04:05 -0700 MST 2006", "Sat May 31 14:23:00 -0700 PST 2014")
+	MkdirpForTime(tmpdir, tim)
+	fileinfo, _ := os.Stat(filepath.Join(tmpdir, "2014/5/31"))
+	if fileinfo == nil || !fileinfo.IsDir() {
+		t.Error("Expected directory")
 	}
 }

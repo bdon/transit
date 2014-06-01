@@ -102,7 +102,7 @@ func newToken(vehicleId string, timestamp int) string {
 
 // Must be called in chronological order
 func (a *AgencyState) AddResponse(foo nextbus.Response, unixtime int) {
-  log.Println("AddResponse")
+	log.Println("AddResponse")
 	for _, report := range foo.Reports {
 		routeTag := report.RouteTag
 		s, ok := a.RouteStates[routeTag]
@@ -180,19 +180,19 @@ func (s *RouteState) After(time int) map[string]VehicleRun {
 }
 
 func (a *AgencyState) Runs(routeTag string) (map[string]*VehicleRun, bool) {
-  s, ok := a.RouteStates[routeTag]
-  if ok {
-    return s.Runs, true
-  }
-  return make(map[string]*VehicleRun), false
+	s, ok := a.RouteStates[routeTag]
+	if ok {
+		return s.Runs, true
+	}
+	return make(map[string]*VehicleRun), false
 }
 
 func (a *AgencyState) RunsAfter(routeTag string, unixtime int) (map[string]VehicleRun, bool) {
-  s, ok := a.RouteStates[routeTag]
-  if ok {
-    return s.After(unixtime), true
-  }
-  return make(map[string]VehicleRun), false
+	s, ok := a.RouteStates[routeTag]
+	if ok {
+		return s.After(unixtime), true
+	}
+	return make(map[string]VehicleRun), false
 }
 
 func (a *AgencyState) Start() {
@@ -212,7 +212,7 @@ func (a *AgencyState) Start() {
 		str, _ := ioutil.ReadAll(get.Body)
 		xml.Unmarshal(str, &response)
 
-    log.Println("Locking")
+		log.Println("Locking")
 		a.Mutex.Lock()
 		a.AddResponse(response, unixtime)
 		a.Mutex.Unlock()
@@ -232,17 +232,14 @@ func (a *AgencyState) Start() {
 }
 
 func (a *AgencyState) Persist(p string) {
-	//Mkdirp in history/year/month/day
 	fmt.Println("DUMP")
-	os.Mkdir(filepath.Join(p, "sf-muni"), 0755)
-	os.Mkdir(filepath.Join(p, "sf-muni/2014"), 0755)
-	os.Mkdir(filepath.Join(p, "sf-muni/2014/05"), 0755)
-	os.Mkdir(filepath.Join(p, "sf-muni/2014/05/03"), 0755)
+	t := time.Now()
+	MkdirpForTime(p, t)
 
 	a.Mutex.RLock()
 	for k, s := range a.RouteStates {
 		filename := fmt.Sprintf("%s.json", k)
-		fullpath := filepath.Join(p, "sf-muni/2014/05/03", filename)
+		fullpath := filepath.Join(FilepathForTime(p, t), filename)
 		file, err := os.Create(fullpath)
 		if err != nil {
 			log.Printf("Error: %s", err)
@@ -263,7 +260,10 @@ func (a *AgencyState) Restore(p string) {
 	fmt.Println("RESTORE")
 	// glob all files and return one agency state.
 	// need to create current routes
-	files, _ := filepath.Glob(filepath.Join(p, "sf-muni/2014/05/03/*.json"))
+
+	t := time.Now()
+	fp := FilepathForTime(p, t)
+	files, _ := filepath.Glob(filepath.Join(fp, "/*.json"))
 
 	for _, f := range files {
 		desc, _ := ioutil.ReadFile(f)
@@ -289,4 +289,21 @@ func (a *AgencyState) Restore(p string) {
 			}
 		}
 	}
+}
+
+func FilepathForTime(p string, t time.Time) string {
+	y := strconv.FormatInt(int64(t.Year()), 10)
+	m := strconv.FormatInt(int64(t.Month()), 10)
+	d := strconv.FormatInt(int64(t.Day()), 10)
+	return filepath.Join(p, "/", y, "/", m, "/", d)
+}
+
+func MkdirpForTime(p string, t time.Time) {
+	y := strconv.FormatInt(int64(t.Year()), 10)
+	m := strconv.FormatInt(int64(t.Month()), 10)
+	d := strconv.FormatInt(int64(t.Day()), 10)
+
+	os.Mkdir(filepath.Join(p, "/", y), 0755)
+	os.Mkdir(filepath.Join(p, "/", y, "/", m), 0755)
+	os.Mkdir(filepath.Join(p, "/", y, "/", m, "/", d), 0755)
 }

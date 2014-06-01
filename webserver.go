@@ -28,27 +28,27 @@ func Webserver(agencyState *AgencyState, allowAll bool) {
 		if _, ok := r.Form["route"]; ok {
 			route = r.Form["route"][0]
 		}
-    log.Println("READ LOCK")
+		log.Println("READ LOCK")
 
 		var result []byte
-    var runs interface{} //hack hack
-    var ok bool
+		var runs interface{} //hack hack
+		var ok bool
 		agencyState.Mutex.RLock()
 		if time > 0 {
-      runs, ok = agencyState.RunsAfter(route, time)
-    } else {
-      runs, ok = agencyState.Runs(route)
-    }
+			runs, ok = agencyState.RunsAfter(route, time)
+		} else {
+			runs, ok = agencyState.Runs(route)
+		}
 		agencyState.Mutex.RUnlock()
 
-    if ok {
-      result, _ = json.Marshal(runs)
-    } else {
-      http.Error(w, "BAD REQUEST", http.StatusBadGateway)
-      return
-    }
+		if ok {
+			result, _ = json.Marshal(runs)
+		} else {
+			http.Error(w, "BAD REQUEST", http.StatusBadGateway)
+			return
+		}
 
-    log.Println("READ UNLOCKED")
+		log.Println("READ UNLOCKED")
 		w.Header().Set("Content-Type", "application/json")
 		if allowAll {
 			w.Header().Set("Access-Control-Allow-Origin", "*")

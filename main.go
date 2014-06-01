@@ -24,7 +24,7 @@ func main() {
 		feed := gtfs.Load("muni_gtfs", true)
 		EmitStops(feed)
 		EmitSchedules(feed)
-  } else if emitRoot {
+	} else if emitRoot {
 		feed := gtfs.Load("muni_gtfs", false)
 		EmitRoot(feed)
 	} else {
