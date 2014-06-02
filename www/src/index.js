@@ -70,7 +70,7 @@ function timelineChart(p) {
       });
       
       nextbus_route = d.short_name;
-      d3.select(this).append("div").attr("class","nextbus_route").text(nextbus_route);
+      d3.select(this).append("div").attr("class","nextbus_route").text(nextbus_route + " " + d.long_name);
 
       var svg = d3.select(this).append("svg:svg")
         .attr("width","100%")
