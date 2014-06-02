@@ -232,7 +232,7 @@ func (a *AgencyState) Start() {
 }
 
 func (a *AgencyState) Persist(p string) {
-	fmt.Println("DUMP")
+	log.Println("DUMP")
 	t := time.Now()
 	MkdirpForTime(p, t)
 
@@ -252,12 +252,12 @@ func (a *AgencyState) Persist(p string) {
 		}
 	}
 	a.Mutex.RUnlock()
-	fmt.Println("Done dumping")
+	log.Println("Done dumping")
 }
 
 // TODO should probably have a Mutex here.
 func (a *AgencyState) Restore(p string) {
-	fmt.Println("RESTORE")
+	log.Println("RESTORE")
 	// glob all files and return one agency state.
 	// need to create current routes
 

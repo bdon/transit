@@ -50,7 +50,7 @@ func Webserver(agencyState *AgencyState) {
 
 		log.Println("READ UNLOCKED")
 		w.Header().Set("Content-Type", "application/json")
-    // You should override this in nginx
+		// You should override this in nginx
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		fmt.Fprintf(w, string(result))
 	}

@@ -16,15 +16,29 @@
     file: state=link src=/etc/nginx/sites-available/api dest=/etc/nginx/sites-enabled/api
   - name: restart nginx
     service: name=nginx pattern=/etc/init.d/nginx state=restarted enabled=yes
+  
+  - name: ensure transit user exists
+    user: name=transit
   - name: ensure api directory exists
-    file: path=/var/api/ state=directory mode=755 owner={{ansible_ssh_user}} group={{ansible_ssh_user}}
+    file: path=/var/api/ state=directory mode=755 owner=transit group=transit
+  - name: ensure static directory exists
+    file: path=/var/api/static state=directory mode=755 owner=transit group=transit
+  - name: ensure history directory exists
+    file: path=/var/api/static/history state=directory mode=755 owner=transit group=transit
   - name: install upstart file
     copy: dest=/etc/init/api.conf src=templates/api.conf
 
   # This will force the persist/restore code to start at a new date...
   # may bleed over some of the next day's stuff into new day, but that's OK.
   - name: restart the API process at 2AM every day
-    cron: hour=2 state=present job="service api restart"
+    cron: hour=2 state=present job="service api restart" name="restartapi"
+
+  - name: copy over muni_gtfs
+    copy: src=../muni_gtfs dest=/var/api owner=transit group=transit directory_mode=yes
+  - name: copy over linux64 binary
+    copy: src=../bin/transit_timelines dest=/var/api/transit_timelines owner=transit group=transit mode=744
+  - name: start the api service
+    service: name=api state=started enabled=yes
 
 #dd if=/dev/zero of=/extraswap bs=1M count=512
 #mkswap /extraswap

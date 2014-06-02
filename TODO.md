@@ -4,16 +4,13 @@
 * agency ids and nextbus agencys dont match
 
 * fetch timeout
-
 * error logging
-* configure CORS
 * combine schedules and stops
-
+* configure CORS
 * line simplification - cut out points that are less than 1 minute apart? or distance?
 * simplification should be idempotent
 
 * flesh out README
-
 * add another agency
 
 Frontend:
