@@ -14,72 +14,28 @@
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="src/index.js"/></script>
     <script>
-      
-      // main stuff
-
-      var tt = ttMain("a","b");
+      var p = Transit.Page();
 
       d3.json("http://localhost:8081/static/routes.json",function(data) {
         d3.select("#chooser").selectAll(".rollsign").data(data).enter()
           .append("div").attr("class","rollsign").text(function(d) { return d.short_name })
           .on("click", function(d) {
             var displayed = d3.select(this).classed("displayed");
-            if(!displayed) {
-              //ttMain.addRoute(d);
-            }
+            displayed ? p.removeRoute(d) : p.showRoute(d);
+
+            var cl = d3.select("#chartlist").selectAll(".route").data(p.routes(), function(d) { return d.id });
+            var enters = cl.enter().append("div").attr("class","route") //.text(function(d) { return d.long_name; });
+            enters.call(timelineChart(p.zoom(), p.timeScale(), p.dispatch()));
+            cl.exit().remove();
+
             d3.select(this).classed("displayed",!displayed); 
-            
           });
       });
 
-      d3.select("#chartlist").append("div")
-        .attr("class","aChart").datum({"nextbus_route":"N","gtfs_route":"1093"});
-
-      d3.select("#chartlist").append("div")
-        .attr("class","bChart").datum({"nextbus_route":"J","gtfs_route":"1094"});
-
-      d3.select("#chartlist").append("div")
-        .attr("class","tChart").datum({"nextbus_route":"27","gtfs_route":"8692"});
-
-      nChart = timelineChart(tt.zoom(),tt.timeScale());
-      jChart = timelineChart(tt.zoom(),tt.timeScale());
-      tChart = timelineChart(tt.zoom(),tt.timeScale());
-      tt.addChart(nChart);
-      tt.addChart(jChart);
-      tt.addChart(tChart);
-
-      d3.selectAll(".aChart").call(nChart);
-      d3.selectAll(".bChart").call(jChart);
-      d3.selectAll(".tChart").call(tChart);
-
-      // global timers
-      var nTimestamp = new Date().getTime();
-      var jTimestamp = new Date().getTime();
-      var tTimestamp = new Date().getTime();
-      var timeTilUpdate = 9;
-
       setInterval(function() {
-        if(timeTilUpdate == 0) {
-          nChart.update(nTimestamp);
-          nTimestamp = new Date().getTime();
-          console.log("Update N");
-        }
-        if(timeTilUpdate == 3) {
-          jChart.update(jTimestamp);
-          jTimestamp = new Date().getTime();
-          console.log("Update J");
-        }
-        if(timeTilUpdate == 6) {
-          tChart.update(tTimestamp);
-          tTimestamp = new Date().getTime();
-          console.log("Update T");
-        }
-
-        if (timeTilUpdate == 0) {
-          timeTilUpdate = 10;
-        }
-        timeTilUpdate--;
-      }, 1 * 1000)
+        console.log("Global update");
+        p.update();
+      }, 10 * 1000);
     </script>
   </body>
 </html>

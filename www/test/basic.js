@@ -1,20 +1,26 @@
 describe("Control.Attribution", function () {
 
-  var tt;
-	beforeEach(function () {
-	  tt = ttMain("http://static.example.com","http://live.example.com")
-	});
-
   it("should foo", function() {
     expect(true).to.eql(true)
   });
 
+  fixtures = {};
+  fixtures.N = {"id":"1093","short_name":"N","long_name":"Judah"}
+
   it("Can add a line", function() {
+    //tt.addLine({"routeName":"N","routeNum":"1093"});
+    var p = Transit.Page();
+    p.showRoute(fixtures.N);
+    p.showRoute(fixtures.N);
+    expect(p.routes()).to.eql([fixtures.N]);
+  });
 
-    tt.addLine({"routeName":"N","routeNum":"1093"});
-
-
-   
+  it("Can delete a line", function() {
+    var p = Transit.Page();
+    p.removeRoute(fixtures.N);
+    p.showRoute(fixtures.N);
+    p.removeRoute(fixtures.N);
+    expect(p.routes()).to.eql([]);
   });
 });
 

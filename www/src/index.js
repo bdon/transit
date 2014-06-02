@@ -1,48 +1,68 @@
+(function(exports) {
+  var Transit = exports.Transit = {};
+
+  Transit.Page = function() {
+    var my = {};
+    var routes = {};
+
+    var timeScale = d3.time.scale().range([0,1020]);
+
+    var dispatch = d3.dispatch("zoom","update");
+    var zoom = d3.behavior.zoom().scaleExtent([1,4]).on("zoom", function() { dispatch.zoom(); });
+
+    d = new Date();
+    var prevMidnight = d.setHours(0,0,0,0);
+
+    d = new Date();
+    var nextMidnight = d.setHours(24,0,0,0);
+
+    timeScale.domain([prevMidnight, nextMidnight]);
+    zoom.x(timeScale);
+    zoom.scale(1);
+
+    my.showRoute = function(route) {
+      console.log("Showing ", route);
+      routes[route.id] = route;
+    }
+
+    my.removeRoute = function(route) {
+      console.log("Removing ", route);
+
+      dispatch.on("." + route.id, null);
+      delete routes[route.id];
+    }
+
+    my.routes = function() {
+      vals = [];
+      for(var k in routes) vals.push(routes[k]);
+      return vals;
+    }
+
+    my.zoom = function() {
+      return zoom;
+    }
+
+    my.timeScale = function() {
+      return timeScale;
+    }
+
+    my.dispatch = function() {
+      return dispatch;
+    }
+
+    my.update = function() {
+      dispatch.update();
+    }
+
+    return my;
+  }
+
+})(this);
+
 var STATIC_ENDPOINT = "http://localhost:8081/static";
 var LIVE_ENDPOINT = "http://localhost:8080";
 
-// The main object for the page.
-// Controls timers, scales, lines.
-function ttMain(staticEndpoint, liveEndpoint) {
-
-  var charts = [];
-  function drawAllCharts() {
-    for (var i in charts) { charts[i].d(); }
-  }
-
-  var staticE = staticEndpoint;
-  var liveE = liveEndpoint;
-  var timeScale = d3.time.scale().range([0,1020]);
-  var zoom = d3.behavior.zoom().scaleExtent([1,4]).on("zoom", drawAllCharts);
-
-  d = new Date();
-  var prevMidnight = d.setHours(0,0,0,0);
-
-  d = new Date();
-  var nextMidnight = d.setHours(24,0,0,0);
-
-  timeScale.domain([prevMidnight, nextMidnight]);
-  zoom.x(timeScale);
-  zoom.scale(1);
-
-  var my = {};
-
-  my.zoom = function() {
-    if(!arguments.length) return zoom;
-  }
-
-  my.timeScale = function() {
-    if(!arguments.length) return timeScale;
-  }
-
-  my.addChart = function(c) {
-    charts.push(c); 
-  }
-  
-  return my;
-}
-
-function timelineChart(z,ts) {
+function timelineChart(z,ts,disp) {
   var timeScale = ts;
   var stopsScale = d3.scale.linear().domain([0,1000]).range([0,150]);
   var axis = d3.svg.axis().scale(timeScale).orient("top")
@@ -60,9 +80,19 @@ function timelineChart(z,ts) {
   var clippedFore;
   var nextbus_route;
 
+  var timestamp;
+  
   function my(selection) {
     selection.each(function(d, i) {
-      nextbus_route = d.nextbus_route;
+      console.log("Registering with the Page.")
+      disp.on("zoom." + d.id,drawUnanimated);
+      timestamp = new Date().getTime();
+      disp.on("update." + d.id, function() {
+        getDataSince(timestamp)
+        timestamp = new Date().getTime();
+      });
+      
+      nextbus_route = d.short_name;
 
       d3.select(this).append("div").attr("class","nextbus_route").text(nextbus_route);
 
@@ -108,7 +138,7 @@ function timelineChart(z,ts) {
       var clippedBack = clipped.append("g");
       clippedFore = clipped.append("g");
 
-      d3.json(STATIC_ENDPOINT + "/stops/" + d.gtfs_route + ".json", function(stops) {
+      d3.json(STATIC_ENDPOINT + "/stops/" + d.id + ".json", function(stops) {
         vis.append("g").attr("transform","translate(1024,23)").selectAll(".stop").data(stops).enter().append("text")
             .attr("class", "stop")
             .attr("text-anchor", "begin")
@@ -117,7 +147,7 @@ function timelineChart(z,ts) {
         drawUnanimated();
       });
 
-      d3.json(STATIC_ENDPOINT + "/schedules/" + d.gtfs_route + ".json", function(trips) {
+      d3.json(STATIC_ENDPOINT + "/schedules/" + d.id + ".json", function(trips) {
         var min = d3.min(trips, function(trip) {
           return d3.min(trip.stops, function(stop) { return stop.time })
         })
@@ -137,7 +167,6 @@ function timelineChart(z,ts) {
             trips[trip].stops[stop].time = trips[trip].stops[stop].time + midnightUnix;
           }
         }
-
         clippedBack.selectAll(".guide").data(trips).enter().append("path")
           .attr("class","guide")
           .classed("outbound", function(d) { return d.dir == "0" })
@@ -145,8 +174,8 @@ function timelineChart(z,ts) {
         vis.selectAll(".outbound").classed("hidden",inbound);
         drawUnanimated();
       });
+      getPastData();
     }); // /selection.each
-    getPastData();
   }
 
   // copied
@@ -181,6 +210,7 @@ function timelineChart(z,ts) {
   }
 
   function drawUnanimated() {
+    console.log("Draw Unanimated");
     subDraw();
     vis.selectAll(".vehicleSymbol")
       .style("fill", "black")
@@ -188,6 +218,7 @@ function timelineChart(z,ts) {
   }
 
   function drawAnimated() {
+    console.log("Draw Animated");
     subDraw();
     vis.selectAll(".vehicleSymbol")
       .style("fill", "#96ff30")
@@ -197,7 +228,6 @@ function timelineChart(z,ts) {
       .attr("transform", vehicleSymbolTransform);
   }
 
-  my.d = drawUnanimated;
 
   function endsWithFlattenedData(flattened) {
     var ends = [];
@@ -250,9 +280,6 @@ function timelineChart(z,ts) {
     });
   }
 
-  my.update = function(timestamp) {
-    getDataSince(timestamp);
-  }
 
   return my;
 }
