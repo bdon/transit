@@ -83,6 +83,7 @@ function timelineChart(z,ts,disp) {
   var timestamp;
   
   function my(selection) {
+    // this only handles a single one...
     selection.each(function(d, i) {
       console.log("Registering with the Page.")
       disp.on("zoom." + d.id,drawUnanimated);
