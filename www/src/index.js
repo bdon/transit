@@ -4,17 +4,11 @@
   Transit.Page = function(static_endpoint, live_endpoint) {
     var my = {};
     var routes = {};
-
     var timeScale = d3.time.scale().range([0,1020]);
-
     var dispatch = d3.dispatch("zoom","update");
     var zoom = d3.behavior.zoom().scaleExtent([1,4]).on("zoom", function() { dispatch.zoom(); });
-
-    d = new Date();
-    var prevMidnight = d.setHours(0,0,0,0);
-
-    d = new Date();
-    var nextMidnight = d.setHours(24,0,0,0);
+    var prevMidnight = (new Date()).setHours(0,0,0,0);
+    var nextMidnight = (new Date()).setHours(24,0,0,0);
 
     timeScale.domain([prevMidnight, nextMidnight]);
     zoom.x(timeScale);
@@ -27,7 +21,6 @@
 
     my.removeRoute = function(route) {
       console.log("Removing ", route);
-
       dispatch.on("." + route.id, null);
       delete routes[route.id];
     }
@@ -38,29 +31,12 @@
       return vals;
     }
 
-    my.zoom = function() {
-      return zoom;
-    }
-
-    my.timeScale = function() {
-      return timeScale;
-    }
-
-    my.dispatch = function() {
-      return dispatch;
-    }
-
-    my.update = function() {
-      dispatch.update();
-    }
-
-    my.static_endpoint = function() {
-      return static_endpoint;
-    }
-
-    my.live_endpoint = function() {
-      return live_endpoint;
-    }
+    my.zoom = function() { return zoom; }
+    my.timeScale = function() { return timeScale; }
+    my.dispatch = function() { return dispatch; }
+    my.update = function() { dispatch.update(); }
+    my.static_endpoint = function() { return static_endpoint; }
+    my.live_endpoint = function() { return live_endpoint; }
 
     return my;
   }
