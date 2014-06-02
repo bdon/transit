@@ -53,12 +53,9 @@ function timelineChart(p) {
     .y(function(d) { return stopsScale(d.index) })
     .interpolate("linear");
   var inbound = true;
-
-  // ???
   var vis;
   var clippedFore;
   var nextbus_route;
-
   var timestamp;
   
   function my(selection) {
@@ -73,7 +70,6 @@ function timelineChart(p) {
       });
       
       nextbus_route = d.short_name;
-
       d3.select(this).append("div").attr("class","nextbus_route").text(nextbus_route);
 
       var svg = d3.select(this).append("svg:svg")
@@ -259,4 +255,3 @@ function timelineChart(p) {
 
   return my;
 }
-
