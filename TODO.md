@@ -22,5 +22,4 @@ Frontend:
 * only show arrows for currently live routes
 
 * only show one of inbound/outbound at a time, to reduce DOM elements
-* Gzip all static assets
 
