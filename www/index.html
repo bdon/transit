@@ -14,16 +14,16 @@
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="src/index.js"/></script>
     <script>
-      var p = Transit.Page();
+      var p = Transit.Page("http://localhost:8080/static", "http://162.243.156.169");
 
       function draw() {
         var cl = d3.select("#chartlist").selectAll(".route").data(p.routes(), function(d) { return d.id });
         var enters = cl.enter().append("div").attr("class","route");
-        enters.call(timelineChart(p.zoom(), p.timeScale(), p.dispatch()));
+        enters.call(timelineChart(p));
         cl.exit().remove();
       }
 
-      d3.json("http://localhost:8081/static/routes.json",function(data) {
+      d3.json(p.static_endpoint() + "/routes.json",function(data) {
         d3.select("#chooser").selectAll(".rollsign").data(data).enter()
           .append("div").attr("class","rollsign").text(function(d) { return d.short_name })
           .on("click", function(d) {
@@ -40,7 +40,6 @@
           p.showRoute(data.filter(function(d) { return d.id == "1071" })[0]);
           d3.selectAll(".rollsign").filter(function(d) { return d.id == "1071" }).classed("displayed", true);
           draw();
-          
       });
 
       setInterval(function() {

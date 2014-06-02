@@ -1,7 +1,7 @@
 (function(exports) {
   var Transit = exports.Transit = {};
 
-  Transit.Page = function() {
+  Transit.Page = function(static_endpoint, live_endpoint) {
     var my = {};
     var routes = {};
 
@@ -54,25 +54,28 @@
       dispatch.update();
     }
 
+    my.static_endpoint = function() {
+      return static_endpoint;
+    }
+
+    my.live_endpoint = function() {
+      return live_endpoint;
+    }
+
     return my;
   }
 
 })(this);
 
-var STATIC_ENDPOINT = "http://localhost:8081/static";
-var LIVE_ENDPOINT = "http://localhost:8080";
-
-function timelineChart(z,ts,disp) {
-  var timeScale = ts;
+function timelineChart(p) {
   var stopsScale = d3.scale.linear().domain([0,1000]).range([0,150]);
-  var axis = d3.svg.axis().scale(timeScale).orient("top")
+  var axis = d3.svg.axis().scale(p.timeScale()).orient("top")
   var data = [];
   var ends = [];
   var line = d3.svg.line()
-    .x(function(d) { return timeScale(d.time*1000) })
+    .x(function(d) { return p.timeScale()(d.time*1000) })
     .y(function(d) { return stopsScale(d.index) })
     .interpolate("linear");
-  var zoom = z;
   var inbound = true;
 
   // ???
@@ -86,9 +89,9 @@ function timelineChart(z,ts,disp) {
     // this only handles a single one...
     selection.each(function(d, i) {
       console.log("Registering with the Page.")
-      disp.on("zoom." + d.id,drawUnanimated);
+      p.dispatch().on("zoom." + d.id,drawUnanimated);
       timestamp = new Date().getTime();
-      disp.on("update." + d.id, function() {
+      p.dispatch().on("update." + d.id, function() {
         getDataSince(timestamp)
         timestamp = new Date().getTime();
       });
@@ -132,14 +135,14 @@ function timelineChart(z,ts,disp) {
         .attr("class", "pane")
         .attr("width","1020")
         .attr("height","550")
-        .call(zoom);
+        .call(p.zoom());
 
       var clipped = mainChart.append("g")
         .attr("clip-path", "url(#clip)")
       var clippedBack = clipped.append("g");
       clippedFore = clipped.append("g");
 
-      d3.json(STATIC_ENDPOINT + "/stops/" + d.id + ".json", function(stops) {
+      d3.json(p.static_endpoint() + "/stops/" + d.id + ".json", function(stops) {
         vis.append("g").attr("transform","translate(1024,23)").selectAll(".stop").data(stops).enter().append("text")
             .attr("class", "stop")
             .attr("text-anchor", "begin")
@@ -148,7 +151,7 @@ function timelineChart(z,ts,disp) {
         drawUnanimated();
       });
 
-      d3.json(STATIC_ENDPOINT + "/schedules/" + d.id + ".json", function(trips) {
+      d3.json(p.static_endpoint() + "/schedules/" + d.id + ".json", function(trips) {
         var min = d3.min(trips, function(trip) {
           return d3.min(trip.stops, function(stop) { return stop.time })
         })
@@ -179,12 +182,10 @@ function timelineChart(z,ts,disp) {
     }); // /selection.each
   }
 
-  // copied
-
   function vehicleSymbolTransform(d) {
-    var x1 = timeScale(d.one.time*1000);
+    var x1 = p.timeScale()(d.one.time*1000);
     var y1 = stopsScale(d.one.index);
-    var x2 = timeScale(d.two.time*1000);
+    var x2 = p.timeScale()(d.two.time*1000);
     var y2 = stopsScale(d.two.index);
     var angle = Math.atan2(-(y2-y1),x2-x1)*180/Math.PI;
     return "translate(" + x2 + "," + y2 + ") rotate(" + -angle + ")";
@@ -229,7 +230,6 @@ function timelineChart(z,ts,disp) {
       .attr("transform", vehicleSymbolTransform);
   }
 
-
   function endsWithFlattenedData(flattened) {
     var ends = [];
     for (l in flattened) {
@@ -250,7 +250,7 @@ function timelineChart(z,ts,disp) {
   }
 
   function getPastData() {
-    d3.json(LIVE_ENDPOINT + "/locations.json?route=" + nextbus_route, function(response) {
+    d3.json(p.live_endpoint() + "/locations.json?route=" + nextbus_route, function(response) {
       var flattened = [];
       for(var key in response) {
         flattened.push({"run":response[key],"key":key});
@@ -263,7 +263,7 @@ function timelineChart(z,ts,disp) {
   }
 
   function getDataSince(timestamp) {
-    d3.json(LIVE_ENDPOINT + "/locations.json?route=" + nextbus_route + "&after=" + Math.floor(timestamp/1000), function(response) {
+    d3.json(p.live_endpoint() + "/locations.json?route=" + nextbus_route + "&after=" + Math.floor(timestamp/1000), function(response) {
       // for every run
       for (var run in response) {
         var match = data.filter(function(d) { return d.key == run})
@@ -281,8 +281,6 @@ function timelineChart(z,ts,disp) {
     });
   }
 
-
   return my;
 }
-
 
