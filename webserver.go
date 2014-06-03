@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -28,7 +27,6 @@ func Webserver(agencyState *AgencyState) {
 		if _, ok := r.Form["route"]; ok {
 			route = r.Form["route"][0]
 		}
-		log.Println("READ LOCK")
 
 		var result []byte
 		var runs interface{} //hack hack
@@ -48,7 +46,6 @@ func Webserver(agencyState *AgencyState) {
 			return
 		}
 
-		log.Println("READ UNLOCKED")
 		w.Header().Set("Content-Type", "application/json")
 		// You should override this in nginx
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -57,6 +54,5 @@ func Webserver(agencyState *AgencyState) {
 
 	http.HandleFunc("/locations.json", handler)
 	http.HandleFunc("/", healthHandler)
-	log.Println("Serving on port 8080.")
 	http.ListenAndServe(":8080", nil)
 }

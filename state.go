@@ -102,7 +102,6 @@ func newToken(vehicleId string, timestamp int) string {
 
 // Must be called in chronological order
 func (a *AgencyState) AddResponse(foo nextbus.Response, unixtime int) {
-	log.Println("AddResponse")
 	for _, report := range foo.Reports {
 		routeTag := report.RouteTag
 		s, ok := a.RouteStates[routeTag]
@@ -200,7 +199,6 @@ func (a *AgencyState) Start() {
 	a.ticker = time.NewTicker(10 * time.Second)
 
 	tick := func(unixtime int) {
-		log.Println("Fetching from NextBus...")
 		response := nextbus.Response{}
 		//Accept-Encoding: gzip, deflate
 		get, err := http.Get("http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=sf-muni&t=0")
@@ -212,11 +210,9 @@ func (a *AgencyState) Start() {
 		str, _ := ioutil.ReadAll(get.Body)
 		xml.Unmarshal(str, &response)
 
-		log.Println("Locking")
 		a.Mutex.Lock()
 		a.AddResponse(response, unixtime)
 		a.Mutex.Unlock()
-		log.Println("Done Fetching.")
 	}
 
 	go func() {
@@ -252,12 +248,10 @@ func (a *AgencyState) Persist(p string) {
 		}
 	}
 	a.Mutex.RUnlock()
-	log.Println("Done dumping")
 }
 
 // TODO should probably have a Mutex here.
 func (a *AgencyState) Restore(p string) {
-	log.Println("RESTORE")
 	// glob all files and return one agency state.
 	// need to create current routes
 

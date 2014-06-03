@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"github.com/bdon/go.gtfs"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -19,7 +18,6 @@ func init() {
 
 func main() {
 	flag.Parse()
-	log.Println("Starting...")
 	if emitFiles {
 		feed := gtfs.Load("muni_gtfs", true)
 		EmitStops(feed)
@@ -29,7 +27,6 @@ func main() {
 		EmitRoot(feed)
 	} else {
 		feed := gtfs.Load("muni_gtfs", false)
-		log.Println("Parsed...")
 
 		agencyState := NewAgencyState(feed)
 		agencyState.Restore("static/history")
