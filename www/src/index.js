@@ -55,10 +55,12 @@
       }
     }
 
-    my.trips = function() { 
+    my.trips = function(dir) { 
       var retval = [];
       for (k in trips) {
-        retval.push({"key":k,"run":trips[k]});
+        if(!arguments.length || trips[k].dir == dir) {
+          retval.push({"key":k,"run":trips[k]});
+        }
       }
       return retval;
     };
@@ -84,12 +86,16 @@
       for (var trip in response) {
         for (var stop in response[trip].stops) {
           response[trip].stops[stop].time = response[trip].stops[stop].time + midnightUnix;
+          response[trip].dir = +response[trip].dir;
         }
       }
       trips = response;
     }
 
-    my.trips = function() {
+    my.trips = function(dir) {
+      if (arguments.length) {
+        return trips.filter(function(t) { return t.dir == dir; });
+      }
       return trips;
     }
 
@@ -107,7 +113,7 @@
 function timelineChart(p) {
   var routeState = Transit.RouteState();
   var routeSchedule = Transit.RouteSchedule();
-  var inbound = true;
+  var dir = 1;
 
   var stopsScale = d3.scale.linear().domain([0,1000]).range([0,150]);
   var axis = d3.svg.axis().scale(p.timeScale()).orient("top");
@@ -118,6 +124,7 @@ function timelineChart(p) {
 
   var vis;
   var clippedFore;
+  var clippedBack;
   var timestamp;
   
   function my(selection) {
@@ -149,7 +156,9 @@ function timelineChart(p) {
       var switchG = vis.append("g").attr("transform","translate(1040,0)");
       switchG.append("rect").attr("width",100).attr("height",20).style("fill","#aaa")
         .on("click", function(d) {
-          inbound = !inbound;
+          if (dir == 0) dir = 1;
+          else dir = 0;
+          bind();
           draw();
         });
       switchG.append("text").text("Switch").attr("y",15);
@@ -171,7 +180,7 @@ function timelineChart(p) {
         .call(p.zoom());
       var clipped = mainChart.append("g")
         .attr("clip-path", "url(#clip_" + d.id + ")")
-      var clippedBack = clipped.append("g");
+      clippedBack = clipped.append("g");
       clippedFore = clipped.append("g");
 
       d3.json(p.static_endpoint() + "/stops/" + d.id + ".json", function(stops) {
@@ -180,28 +189,35 @@ function timelineChart(p) {
             .attr("text-anchor", "begin")
             .attr("y", function(d) { return stopsScale(d.index) })
             .text(function(d) { return d.name });
+        bind();
         draw();
       });
 
       d3.json(p.static_endpoint() + "/schedules/" + d.id + ".json", function(trips) {
         var now = (new Date()).getTime() / 1000;
         routeSchedule.parse(trips, now);
-        clippedBack.selectAll(".guide").data(routeSchedule.trips()).enter().append("path")
-          .attr("class","guide");
+        bind();
         draw();
       });
 
       d3.json(p.live_endpoint() + "/locations.json?route=" + d.short_name , function(response) {
         routeState.add(response);
+        bind();
         draw();
       });
     }); // selection.each
   }
 
+  function bind() {
+    var s1 = clippedBack.selectAll(".guide").data(routeSchedule.trips(dir))
+    s1.enter().append("path").attr("class","guide");
+    s1.exit().remove();
+    var s2 = clippedFore.selectAll(".vehiclePath").data(routeState.trips(dir), function(d) { return d.key })
+    s2.enter().append("path").attr("class","vehiclePath");
+    s2.exit().remove();
+  }
+
   function draw() {
-    clippedFore.selectAll(".vehiclePath").data(routeState.trips(), function(d) { return d.key }).enter()
-      .append("path")
-      .attr("class","vehiclePath");
     vis.selectAll(".vehiclePath").attr("d", function(d) { return line(d.run.states); })
     vis.selectAll(".guide").attr("d", function(d) { return line(d.stops) });
     vis.selectAll(".time.axis").call(axis);

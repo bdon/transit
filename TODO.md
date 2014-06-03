@@ -21,6 +21,9 @@ Frontend:
 
 * fix arrows coming from nowhere
 * only show arrows for currently live routes
-* only show one of inbound/outbound at a time, to reduce DOM elements
+* directions are backwards
+* direction should be a string
 
 * Use correct GTFS schedule.
+
+
