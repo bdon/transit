@@ -55,7 +55,7 @@ func EmitRoot(feed gtfs.Feed) {
 		r := RouteRepr{Id: route.Id, ShortName: route.ShortName, LongName: route.LongName}
 		output = append(output, r)
 	}
-	marshalled, _ := json.Marshal(output)
+	marshalled, _ := json.MarshalIndent(output,"","  ")
 	fmt.Printf(string(marshalled))
 }
 
