@@ -15,12 +15,10 @@
     zoom.scale(1);
 
     my.showRoute = function(route) {
-      console.log("Showing ", route);
       routes[route.id] = route;
     }
 
     my.removeRoute = function(route) {
-      console.log("Removing ", route);
       dispatch.on("." + route.id, null);
       delete routes[route.id];
     }
@@ -120,22 +118,24 @@ function timelineChart(p) {
 
   var vis;
   var clippedFore;
-  var nextbus_route;
   var timestamp;
   
   function my(selection) {
     // this only handles a single one...
     selection.each(function(d, i) {
-      console.log("Registering with the Page.")
+
       p.dispatch().on("zoom." + d.id,draw);
+
       timestamp = new Date().getTime();
       p.dispatch().on("update." + d.id, function() {
-        getDataSince(timestamp)
+        d3.json(p.live_endpoint() + "/locations.json?route=" + d.short_name + "&after=" + Math.floor(timestamp/1000), function(response) {
+          routeState.add(response);
+          draw();
+        });
         timestamp = new Date().getTime();
       });
       
-      nextbus_route = d.short_name;
-      d3.select(this).append("div").attr("class","nextbus_route").text(nextbus_route + " " + d.long_name);
+      d3.select(this).append("div").attr("class","nextbus_route").text(d.short_name + " " + d.long_name);
 
       var svg = d3.select(this).append("svg:svg")
         .attr("width","100%")
@@ -191,7 +191,10 @@ function timelineChart(p) {
         draw();
       });
 
-      getPastData();
+      d3.json(p.live_endpoint() + "/locations.json?route=" + d.short_name , function(response) {
+        routeState.add(response);
+        draw();
+      });
     }); // selection.each
   }
 
@@ -202,20 +205,6 @@ function timelineChart(p) {
     vis.selectAll(".vehiclePath").attr("d", function(d) { return line(d.run.states); })
     vis.selectAll(".guide").attr("d", function(d) { return line(d.stops) });
     vis.selectAll(".time.axis").call(axis);
-  }
-
-  function getPastData() {
-    d3.json(p.live_endpoint() + "/locations.json?route=" + nextbus_route, function(response) {
-      routeState.add(response);
-      draw();
-    });
-  }
-
-  function getDataSince(timestamp) {
-    d3.json(p.live_endpoint() + "/locations.json?route=" + nextbus_route + "&after=" + Math.floor(timestamp/1000), function(response) {
-      routeState.add(response);
-      draw();
-    });
   }
 
   return my;
