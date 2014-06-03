@@ -13,13 +13,14 @@
 
 Frontend:
 * show hash state in URL
-* fix arrows coming from nowhere
 * store stop_id -> latlong to show on map?
 
 * add reset.css
 * how do we define "inbound" - shape order?
 * Indexes should be culled to last scheduled stop.
-* only show arrows for currently live routes
 
+* fix arrows coming from nowhere
+* only show arrows for currently live routes
 * only show one of inbound/outbound at a time, to reduce DOM elements
+
 * Use correct GTFS schedule.

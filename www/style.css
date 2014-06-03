@@ -26,7 +26,6 @@ body {
   user-select: none;
 }
 
-
 .rollsign:hover {
   background-color: magenta;
 }
@@ -35,7 +34,6 @@ body {
   background-color: cyan;
 }
 
-
 .container {
   width:80%;
   max-width: 1200px;
@@ -43,7 +41,6 @@ body {
   margin-right: auto;
   background-color: #eee;
 }
-
 
 @media only screen 
 and (min-device-width : 320px) 
@@ -101,10 +98,6 @@ svg *::-webkit-selection {
 
 path {
   fill: none;
-}
-
-.hidden {
-  display: none;
 }
 
 .vehiclePath {

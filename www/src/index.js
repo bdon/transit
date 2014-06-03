@@ -42,21 +42,82 @@
   }
 
   Transit.RouteState = function() {
+    var my = {};
+    var trips = {};
 
+    my.add = function(resp) {
+      for (var k in resp) {
+        if(trips[k]) {
+          for (var s in resp[k].states) {
+            trips[k].states.push(resp[k].states[s]);
+          }
+        } else {
+          trips[k] = resp[k];
+        } 
+      }
+    }
+
+    my.trips = function() { 
+      var retval = [];
+      for (k in trips) {
+        retval.push({"key":k,"run":trips[k]});
+      }
+      return retval;
+    };
+
+    return my;
+  }
+
+  Transit.RouteSchedule = function() {
+    var my = {};
+    var trips = [];
+
+    my.parse = function(response, now) {
+      var min = d3.min(response, function(trip) {
+        return d3.min(trip.stops, function(stop) { return stop.time })
+      })
+
+      var midnightUnix = Transit.Midnight(now);
+
+      if (now - midnightUnix < min) {
+        midnightUnix = midnightUnix - 86400;
+      }
+
+      for (var trip in response) {
+        for (var stop in response[trip].stops) {
+          response[trip].stops[stop].time = response[trip].stops[stop].time + midnightUnix;
+        }
+      }
+      trips = response;
+    }
+
+    my.trips = function() {
+      return trips;
+    }
+
+    return my;
+  }
+
+  Transit.Midnight = function(epoch) {
+    var date = new Date(epoch * 1000);
+    date.setHours(0,0,0,0);
+    return date.getTime() / 1000;
   }
 
 })(this);
 
 function timelineChart(p) {
+  var routeState = Transit.RouteState();
+  var routeSchedule = Transit.RouteSchedule();
+  var inbound = true;
+
   var stopsScale = d3.scale.linear().domain([0,1000]).range([0,150]);
-  var axis = d3.svg.axis().scale(p.timeScale()).orient("top")
-  var data = [];
-  var ends = [];
+  var axis = d3.svg.axis().scale(p.timeScale()).orient("top");
   var line = d3.svg.line()
     .x(function(d) { return p.timeScale()(d.time*1000) })
     .y(function(d) { return stopsScale(d.index) })
     .interpolate("linear");
-  var inbound = true;
+
   var vis;
   var clippedFore;
   var nextbus_route;
@@ -66,7 +127,7 @@ function timelineChart(p) {
     // this only handles a single one...
     selection.each(function(d, i) {
       console.log("Registering with the Page.")
-      p.dispatch().on("zoom." + d.id,drawUnanimated);
+      p.dispatch().on("zoom." + d.id,draw);
       timestamp = new Date().getTime();
       p.dispatch().on("update." + d.id, function() {
         getDataSince(timestamp)
@@ -89,8 +150,7 @@ function timelineChart(p) {
       switchG.append("rect").attr("width",100).attr("height",20).style("fill","#aaa")
         .on("click", function(d) {
           inbound = !inbound;
-          vis.selectAll(".inbound").classed("hidden",!inbound);
-          vis.selectAll(".outbound").classed("hidden",inbound);
+          draw();
         });
       switchG.append("text").text("Switch").attr("y",15);
 
@@ -98,21 +158,17 @@ function timelineChart(p) {
       mainChartWAxis.append("g")
         .attr("transform", "translate(0,10)")
         .attr("class", "time axis")
-
       var mainChart = mainChartWAxis.append("g").attr("transform","translate(0,20)")
-
       mainChart.append("clipPath")
         .attr("id", "clip_" + d.id)
         .append("rect")
           .attr("width","1020")
           .attr("height","550");
-
       mainChart.append("rect")
         .attr("class", "pane")
         .attr("width","1020")
         .attr("height","550")
         .call(p.zoom());
-
       var clipped = mainChart.append("g")
         .attr("clip-path", "url(#clip_" + d.id + ")")
       var clippedBack = clipped.append("g");
@@ -124,136 +180,41 @@ function timelineChart(p) {
             .attr("text-anchor", "begin")
             .attr("y", function(d) { return stopsScale(d.index) })
             .text(function(d) { return d.name });
-        drawUnanimated();
+        draw();
       });
 
       d3.json(p.static_endpoint() + "/schedules/" + d.id + ".json", function(trips) {
-        var min = d3.min(trips, function(trip) {
-          return d3.min(trip.stops, function(stop) { return stop.time })
-        })
-
-        var midnight = new Date();
-        midnight.setHours(0,0,0,0);
-        var midnightUnix = midnight.getTime() / 1000;
-
-        // if we're beyond the first departure of the day, do it for the current day
-        // otherwise, midnight of yesterday
-        if ((new Date()).getTime()/1000 - midnightUnix < min) {
-          midnightUnix = midnightUnix - 24 * 60 * 60;
-        }
-
-        for (var trip in trips) {
-          for (var stop in trips[trip].stops) {
-            trips[trip].stops[stop].time = trips[trip].stops[stop].time + midnightUnix;
-          }
-        }
-        clippedBack.selectAll(".guide").data(trips).enter().append("path")
-          .attr("class","guide")
-          .classed("outbound", function(d) { return d.dir == "0" })
-          .classed("inbound", function(d) { return d.dir == "1" });
-        vis.selectAll(".outbound").classed("hidden",inbound);
-        drawUnanimated();
+        var now = (new Date()).getTime() / 1000;
+        routeSchedule.parse(trips, now);
+        clippedBack.selectAll(".guide").data(routeSchedule.trips()).enter().append("path")
+          .attr("class","guide");
+        draw();
       });
+
       getPastData();
-    }); // /selection.each
+    }); // selection.each
   }
 
-  function vehicleSymbolTransform(d) {
-    var x1 = p.timeScale()(d.one.time*1000);
-    var y1 = stopsScale(d.one.index);
-    var x2 = p.timeScale()(d.two.time*1000);
-    var y2 = stopsScale(d.two.index);
-    var angle = Math.atan2(-(y2-y1),x2-x1)*180/Math.PI;
-    return "translate(" + x2 + "," + y2 + ") rotate(" + -angle + ")";
-  }
-
-  function subDraw () {
-    clippedFore.selectAll(".vehiclePath").data(data, function(d) { return d.key }).enter()
+  function draw() {
+    clippedFore.selectAll(".vehiclePath").data(routeState.trips(), function(d) { return d.key }).enter()
       .append("path")
-      .attr("id", function(d) { return "vp_" + d.key })
-      .attr("class","vehiclePath")
-      .classed("inbound", function(d) { return d.run.dir == 0 })
-      .classed("outbound", function(d) { return d.run.dir == 1 })
-
-    clippedFore.selectAll(".vehicleSymbol").data(ends, function(d) { return d.key }).enter()
-      .append("polygon")
-      .attr("class", "vehicleSymbol")
-      .attr("points", "0,3 6,0 0,-3")
-      .classed("inbound", function(d) { return d.dir == 0 })
-      .classed("outbound", function(d) { return d.dir == 1 })
-
-    vis.selectAll(".time.axis").call(axis);
+      .attr("class","vehiclePath");
     vis.selectAll(".vehiclePath").attr("d", function(d) { return line(d.run.states); })
     vis.selectAll(".guide").attr("d", function(d) { return line(d.stops) });
-  }
-
-  function drawUnanimated() {
-    console.log("Draw Unanimated");
-    subDraw();
-    vis.selectAll(".vehicleSymbol")
-      .style("fill", "black")
-      .attr("transform", vehicleSymbolTransform);
-  }
-
-  function drawAnimated() {
-    console.log("Draw Animated");
-    subDraw();
-    vis.selectAll(".vehicleSymbol")
-      .style("fill", "#96ff30")
-      .transition()
-      .duration(1000)
-      .style("fill", "black")
-      .attr("transform", vehicleSymbolTransform);
-  }
-
-  function endsWithFlattenedData(flattened) {
-    var ends = [];
-    for (l in flattened) {
-      var states = flattened[l].run.states;
-      if (states.length == 1) {
-        ends.push({"key":flattened[l].key,
-                   "two":states[0],
-                   "one":states[0],
-                   "dir":flattened[l].run.dir});
-      } else {
-        ends.push({"key":flattened[l].key,
-                   "two":states[states.length - 1],
-                   "one":states[states.length - 2],
-                   "dir":flattened[l].run.dir});
-      }
-    }
-    return ends;
+    vis.selectAll(".time.axis").call(axis);
   }
 
   function getPastData() {
     d3.json(p.live_endpoint() + "/locations.json?route=" + nextbus_route, function(response) {
-      var flattened = [];
-      for(var key in response) {
-        flattened.push({"run":response[key],"key":key});
-      }
-      data = flattened;
-      ends = endsWithFlattenedData(data);
-      drawUnanimated();
-      vis.selectAll(".outbound").classed("hidden",inbound);
+      routeState.add(response);
+      draw();
     });
   }
 
   function getDataSince(timestamp) {
     d3.json(p.live_endpoint() + "/locations.json?route=" + nextbus_route + "&after=" + Math.floor(timestamp/1000), function(response) {
-      // for every run
-      for (var run in response) {
-        var match = data.filter(function(d) { return d.key == run})
-        
-        if (match.length > 0) {
-          for (var stat in response[run].states) {
-            match[0].run.states.push(response[run].states[stat]);
-          }
-        } else {
-          data.push({"key":response[run].key,"run":response[run]});
-        }
-      }
-      ends = endsWithFlattenedData(data);
-      drawAnimated();
+      routeState.add(response);
+      draw();
     });
   }
 
