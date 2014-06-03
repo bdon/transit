@@ -30,6 +30,7 @@
 
   # This will force the persist/restore code to start at a new date...
   # may bleed over some of the next day's stuff into new day, but that's OK.
+  # this won't work...
   - name: restart the API process at 2AM every day
     cron: hour=2 state=present job="service api restart" name="restartapi"
 

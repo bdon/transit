@@ -41,6 +41,10 @@
     return my;
   }
 
+  Transit.RouteState = function() {
+
+  }
+
 })(this);
 
 function timelineChart(p) {

@@ -14,7 +14,7 @@
 Frontend:
 * show hash state in URL
 * fix arrows coming from nowhere
-* store stopid -> latlong to show on map?
+* store stop_id -> latlong to show on map?
 
 * add reset.css
 * how do we define "inbound" - shape order?
@@ -22,3 +22,4 @@ Frontend:
 * only show arrows for currently live routes
 
 * only show one of inbound/outbound at a time, to reduce DOM elements
+* Use correct GTFS schedule.
