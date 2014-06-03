@@ -34,7 +34,11 @@
     cron: hour=2 state=present job="service api restart" name="restartapi"
 
   - name: copy over muni_gtfs
+    stat: path=/var/api/muni_gtfs
+    register: muni_exists
+  - name: copy over muni_gtfs
     copy: src=../muni_gtfs dest=/var/api owner=transit group=transit directory_mode=yes
+    when: not muni_exists.stat.exists 
   - name: copy over linux64 binary
     copy: src=../bin/transit_timelines dest=/var/api/transit_timelines owner=transit group=transit mode=744
   - name: start the api service
