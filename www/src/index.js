@@ -98,7 +98,7 @@ function timelineChart(p) {
       var mainChart = mainChartWAxis.append("g").attr("transform","translate(0,20)")
 
       mainChart.append("clipPath")
-        .attr("id", "clip")
+        .attr("id", "clip_" + d.id)
         .append("rect")
           .attr("width","1020")
           .attr("height","550");
@@ -110,7 +110,7 @@ function timelineChart(p) {
         .call(p.zoom());
 
       var clipped = mainChart.append("g")
-        .attr("clip-path", "url(#clip)")
+        .attr("clip-path", "url(#clip_" + d.id + ")")
       var clippedBack = clipped.append("g");
       clippedFore = clipped.append("g");
 

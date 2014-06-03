@@ -22,4 +22,3 @@ Frontend:
 * only show arrows for currently live routes
 
 * only show one of inbound/outbound at a time, to reduce DOM elements
-* clip path url seems to interfere between routes

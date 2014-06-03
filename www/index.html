@@ -14,7 +14,7 @@
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="src/index.js"/></script>
     <script>
-      var p = Transit.Page("http://localhost:8080/static", "http://162.243.156.169");
+      var p = Transit.Page("http://localhost:8081/static", "http://162.243.156.169");
 
       function draw() {
         var cl = d3.select("#chartlist").selectAll(".route").data(p.routes(), function(d) { return d.id });
