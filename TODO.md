@@ -12,6 +12,7 @@
 * how do we define "inbound" - shape order?
 * Indexes should be culled to last scheduled stop.
 * add tutorial
+* trip headsigns
 
 Future features:
 * store stop_id -> latlong to show on map?
