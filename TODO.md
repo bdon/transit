@@ -8,7 +8,6 @@
 * idempotent line simplification - cut out points that are less than 1 minute apart? or distance?
 * flesh out README
 * add another agency (timezone!)
-* add reset.css
 * how do we define "inbound" - shape order?
 * Indexes should be culled to last scheduled stop.
 * directions are backwards
