@@ -65,13 +65,17 @@
       return retval;
     };
 
-    my.liveVehicles = function(now) {
+    my.liveVehicles = function(now, dir) {
       retval = [];
       for (k in trips) {
         var states = trips[k].states;
         var state = states[states.length-1];
-        if(now - state.time < 15 * 60) {
-          retval.push({"time":state.time,"index":state.index,"key":k});
+        if(now - state.time < 60) {
+          if(arguments.length == 1 || trips[k].dir == dir) {
+            if(state.index > 50 && state.index < 950) {
+              retval.push({"time":state.time,"index":state.index,"key":k});
+            }
+          }
         }
       }
       return retval;
@@ -231,7 +235,7 @@ function timelineChart(p) {
     var s2 = clippedFore.selectAll(".vehiclePath").data(routeState.trips(dir), function(d) { return d.key });
     s2.enter().append("path").attr("class","vehiclePath");
     s2.exit().remove();
-    var newdata = routeState.liveVehicles(Transit.Now());
+    var newdata = routeState.liveVehicles(Transit.Now(), dir);
     var s3 = clippedFore.selectAll(".liveVehicle").data(newdata, function(d) { return d.key });
     s3.enter().append("circle").attr("class","liveVehicle");
     s3.exit().remove();
@@ -244,6 +248,7 @@ function timelineChart(p) {
       .attr("cx",function(d) {  return p.timeScale()(d.time*1000); })
       .attr("cy",function(d) { return stopsScale(d.index); })
       .attr("r",2);
+
     vis.selectAll(".time.axis").call(axis);
   }
 

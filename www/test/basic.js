@@ -86,14 +86,21 @@ describe("Transit", function () {
           "vehicle_id":"1406",
           "dir":1,
           "states":[
-            {"time":1401754800 - 60 * 20,"index":455}
+            {"time":1401754800 - 65,"index":455}
           ]
         },
         "1406_1401754999":{
           "vehicle_id":"1406",
           "dir":0,
           "states":[
-            {"time":1401754800 - 60 * 10,"index":450}
+            {"time":1401754800 - 45,"index":450}
+          ]
+        },
+        "1408_1401754999":{
+          "vehicle_id":"1408",
+          "dir":1,
+          "states":[
+            {"time":1401754800 - 45,"index":445}
           ]
         }
       }
@@ -102,10 +109,38 @@ describe("Transit", function () {
       s.add(resp);
       var now = 1401754800;
       var l = s.liveVehicles(now);
-      expect(l.length).to.eql(1);
-      expect(l[0].time).to.eql(1401754800 - 60 * 10);
+      expect(l.length).to.eql(2);
+      expect(l[0].time).to.eql(1401754800 - 45);
       expect(l[0].index).to.eql(450);
       expect(l[0].key).to.eql("1406_1401754999");
+
+      var l = s.liveVehicles(now,1);
+      expect(l[0].time).to.eql(1401754800 - 45);
+      expect(l[0].index).to.eql(445);
+      expect(l[0].key).to.eql("1408_1401754999");
+    });
+
+    it("culls live vehicles to only ones between 50 and 950", function() {
+      var resp = {
+        "1406_1401754326":{
+          "vehicle_id":"1406",
+          "dir":1,
+          "states":[
+            {"time":1401754800,"index":960}
+          ]
+        },
+        "1406_1401754326":{
+          "vehicle_id":"1406",
+          "dir":1,
+          "states":[
+            {"time":1401754800,"index":40}
+          ]
+        },
+      }
+      var s = Transit.RouteState();
+      s.add(resp);
+      var l = s.liveVehicles(1401754800);
+      expect(l.length).to.eql(0);
     });
 
     it("enforces the order of timestamps in route state");
