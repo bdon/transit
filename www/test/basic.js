@@ -30,30 +30,34 @@ describe("Transit", function () {
           "vehicle_id":"1406",
           "dir":1,
           "states":[
-            {"time":1401754326,"index":454}
+            {"time":1401754800 - 65,"index":454}
           ]}}
       var s = Transit.RouteState();
+      var now = 1401754800;
       s.add(resp);
-      expect(s.trips().length).to.eql(1);
-      expect(s.trips()[0].key).to.eql("1406_1401754326");
-      expect(s.trips()[0].run.states.length).to.eql(1);
+      expect(s.trips(now).length).to.eql(1);
+      expect(s.trips(now)[0].key).to.eql("1406_1401754326");
+      expect(s.trips(now)[0].run.states.length).to.eql(1);
+      expect(s.trips(now)[0].isLive).to.eql(false);
 
       var resp = {
         "1406_1401754326":{
           "vehicle_id":"1406",
           "dir":1,
           "states":[
-            {"time":1401754327,"index":455}
+            {"time":1401754800-55,"index":455}
           ]}}
 
       s.add(resp);
-      expect(s.trips().length).to.eql(1);
-      var states = s.trips()[0].run.states;
+      expect(s.trips(now).length).to.eql(1);
+      expect(s.trips(now)[0].isLive).to.eql(true);
+      var states = s.trips(now)[0].run.states;
       expect(states.length).to.eql(2);
-      expect(states[0].time).to.eql(1401754326);
+      expect(states[0].time).to.eql(now - 65);
       expect(states[0].index).to.eql(454);
-      expect(states[1].time).to.eql(1401754327);
+      expect(states[1].time).to.eql(now - 55);
       expect(states[1].index).to.eql(455);
+      
     });
 
     it("can filter trips by direction", function() {
@@ -76,8 +80,9 @@ describe("Transit", function () {
 
       var s = Transit.RouteState();
       s.add(resp);
-      expect(s.trips(1).length).to.eql(1);
-      expect(s.trips(1)[0].run.dir).to.eql(1);
+      var now = 1401754800;
+      expect(s.trips(now,1).length).to.eql(1);
+      expect(s.trips(now,1)[0].run.dir).to.eql(1);
     });
 
     it("can retrieve only live vehicles, for arrows", function() {

@@ -55,11 +55,14 @@
       }
     }
 
-    my.trips = function(dir) { 
+    my.trips = function(now, dir) { 
       var retval = [];
       for (k in trips) {
-        if(!arguments.length || trips[k].dir == dir) {
-          retval.push({"key":k,"run":trips[k]});
+        if(arguments.length < 2 || trips[k].dir == dir) {
+          var states = trips[k].states;
+          var state = states[states.length-1];
+          var isLive = now - state.time < 60;
+          retval.push({"key":k,"run":trips[k],"isLive":isLive});
         }
       }
       return retval;
@@ -164,6 +167,7 @@ function timelineChart(p) {
       });
       
       d3.select(this).append("div").attr("class","nextbus_route").text(d.short_name + " " + d.long_name);
+      d3.select(this).append("div").text("Switch");
 
       var svg = d3.select(this).append("svg:svg")
         .attr("width","100%")
@@ -236,20 +240,23 @@ function timelineChart(p) {
   }
 
   function bind() {
+    now = Transit.Now();
     var s1 = clippedBack.selectAll(".guide").data(routeSchedule.trips(dir));
     s1.enter().append("path").attr("class","guide");
     s1.exit().remove();
-    var s2 = clippedFore.selectAll(".vehiclePath").data(routeState.trips(dir), function(d) { return d.key });
+    var s2 = clippedFore.selectAll(".vehiclePath").data(routeState.trips(now,dir), function(d) { return d.key });
     s2.enter().append("path").attr("class","vehiclePath");
     s2.exit().remove();
-    var newdata = routeState.liveVehicles(Transit.Now(), dir);
+    var newdata = routeState.liveVehicles(now,dir);
     var s3 = clippedFore.selectAll(".liveVehicle").data(newdata, function(d) { return d.key });
     s3.enter().append("circle").attr("class","liveVehicle");
     s3.exit().remove();
   }
 
   function draw() {
-    vis.selectAll(".vehiclePath").attr("d", function(d) { return line(d.run.states); })
+    vis.selectAll(".vehiclePath")
+      .attr("d", function(d) { return line(d.run.states); })
+      .classed("live", function(d) { return d.isLive });
     vis.selectAll(".guide").attr("d", function(d) { return line(d.stops) });
     vis.selectAll(".liveVehicle")
       .attr("cx",function(d) {  return p.timeScale()(d.time*1000); })

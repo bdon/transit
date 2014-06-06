@@ -26,9 +26,14 @@
         </div>
       </div>
       <h3>Agency: SFMTA</h3>
+      <div id="datepicker">
+      </div>
       <div id="chooser">
       </div>
       <div id="chartlist">
+      </div>
+      <div id="credits">
+        Data via GTFS. San Francisco MTA. NextBus.
       </div>
     </div>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
@@ -60,6 +65,9 @@
           draw();
           p.showRoute(data.filter(function(d) { return d.id == "1071" })[0]);
           d3.selectAll(".rollsign").filter(function(d) { return d.id == "1071" }).classed("displayed", true);
+          draw();
+          p.showRoute(data.filter(function(d) { return d.id == "8701" })[0]);
+          d3.selectAll(".rollsign").filter(function(d) { return d.id == "8701" }).classed("displayed", true);
           draw();
       });
 

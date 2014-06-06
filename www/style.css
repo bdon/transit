@@ -155,8 +155,12 @@ path {
 }
 
 .vehiclePath {
-  stroke-width: 1.1;
-  stroke: black;
+  stroke-width: 1.2;
+  stroke: #555;
+}
+
+.vehiclePath.live {
+  stroke: red;
 }
 
 .vehicleSymbol {
@@ -165,7 +169,7 @@ path {
 }
 
 .guide {
-  stroke: #aaa;
+  stroke: #ccc;
   stroke-width: 1.1px;
 }
 
