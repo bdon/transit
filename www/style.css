@@ -203,3 +203,7 @@ and (max-device-width : 568px) {
 .emph {
   font-weight: bold;
 }
+
+.liveVehicle {
+  fill: red;
+}

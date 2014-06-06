@@ -91,6 +91,7 @@ describe("Transit", function () {
           "vehicle_id":"1406",
           "dir":1,
           "states":[
+            {"time":1401754800 - 65,"index":450},
             {"time":1401754800 - 65,"index":455}
           ]
         },
@@ -98,6 +99,7 @@ describe("Transit", function () {
           "vehicle_id":"1406",
           "dir":0,
           "states":[
+            {"time":1401754800 - 65,"index":460},
             {"time":1401754800 - 45,"index":450}
           ]
         },
@@ -105,7 +107,15 @@ describe("Transit", function () {
           "vehicle_id":"1408",
           "dir":1,
           "states":[
+            {"time":1401754800 - 65,"index":440},
             {"time":1401754800 - 45,"index":445}
+          ]
+        },
+        "only_one_state":{
+          "vehicle_id":"1409",
+          "dir":1,
+          "states":[
+            {"time":1401754800 - 35,"index":440}
           ]
         }
       }
@@ -118,6 +128,8 @@ describe("Transit", function () {
       expect(l[0].time).to.eql(1401754800 - 45);
       expect(l[0].index).to.eql(450);
       expect(l[0].key).to.eql("1406_1401754999");
+      expect(l[0].prev.time).to.eql(1401754800-65);
+      expect(l[0].prev.index).to.eql(460);
 
       var l = s.liveVehicles(now,1);
       expect(l[0].time).to.eql(1401754800 - 45);
@@ -131,6 +143,7 @@ describe("Transit", function () {
           "vehicle_id":"1406",
           "dir":1,
           "states":[
+            {"time":1401754800-20,"index":940},
             {"time":1401754800,"index":960}
           ]
         },
@@ -138,6 +151,7 @@ describe("Transit", function () {
           "vehicle_id":"1406",
           "dir":1,
           "states":[
+            {"time":1401754800-20,"index":60},
             {"time":1401754800,"index":40}
           ]
         },
@@ -147,8 +161,6 @@ describe("Transit", function () {
       var l = s.liveVehicles(1401754800);
       expect(l.length).to.eql(0);
     });
-
-    it("enforces the order of timestamps in route state");
   });
 
 

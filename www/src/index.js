@@ -72,11 +72,19 @@
       retval = [];
       for (k in trips) {
         var states = trips[k].states;
-        var state = states[states.length-1];
-        if(now - state.time < 60) {
+        if (states.length < 2) continue;
+        var lastState = states[states.length-1];
+        var beforeState = states[states.length-2];
+    
+        if(now - lastState.time < 60) {
           if(arguments.length == 1 || trips[k].dir == dir) {
-            if(state.index > 50 && state.index < 950) {
-              retval.push({"time":state.time,"index":state.index,"key":k});
+            if(lastState.index > 50 && lastState.index < 950) {
+              retval.push({
+                "time":lastState.time,
+                "index":lastState.index,
+                "key":k,
+                "prev":{"time":beforeState.time,"index":beforeState.index}
+              });
             }
           }
         }
@@ -249,7 +257,9 @@ function timelineChart(p) {
     s2.exit().remove();
     var newdata = routeState.liveVehicles(now,dir);
     var s3 = clippedFore.selectAll(".liveVehicle").data(newdata, function(d) { return d.key });
-    s3.enter().append("circle").attr("class","liveVehicle");
+    s3.enter().append("polygon")
+       .attr("class", "liveVehicle")
+       .attr("points", "0,3 6,0 0,-3")
     s3.exit().remove();
   }
 
@@ -259,9 +269,14 @@ function timelineChart(p) {
       .classed("live", function(d) { return d.isLive });
     vis.selectAll(".guide").attr("d", function(d) { return line(d.stops) });
     vis.selectAll(".liveVehicle")
-      .attr("cx",function(d) {  return p.timeScale()(d.time*1000); })
-      .attr("cy",function(d) { return stopsScale(d.index); })
-      .attr("r",2);
+      .attr("transform", function(d) {
+        var x2 = p.timeScale()(d.time*1000);
+        var y2 = stopsScale(d.index);
+        var x1 = p.timeScale()(d.prev.time*1000);
+        var y1 = stopsScale(d.prev.index);
+        var angle = Math.atan2(-(y2-y1),x2-x1)*180/Math.PI;
+        return "translate(" + x1 + "," + y1 + ") rotate(" + -angle + ")";
+      });
 
     vis.selectAll(".time.axis").call(axis);
   }
