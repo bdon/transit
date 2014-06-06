@@ -180,6 +180,7 @@ path {
 
 #help svg {
   background-color: #ccc;
+  display: inline-block;
 }
 
 #help .half {
@@ -196,8 +197,8 @@ and (max-device-width : 568px) {
   }
 }
 
-#help .right p {
-  display: inline;
+#help .half.right p {
+  display: inline-block;
 }
 
 .emph {
@@ -206,4 +207,23 @@ and (max-device-width : 568px) {
 
 .liveVehicle {
   fill: red;
+}
+
+.nextbus_route {
+  font-size: 20px;
+  display: inline;
+}
+
+.switch_button {
+  margin-left: 8px;
+  font-size: 12px;
+  display: inline;
+  background-color: #aaa;
+  padding: 2px;
+}
+
+.bigtitle {
+  font-weight: bold;
+  font-size: 20px;
+  padding: 10px;
 }

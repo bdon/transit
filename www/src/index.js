@@ -6,13 +6,15 @@
     var routes = {};
     var timeScale = d3.time.scale().range([0,1020]);
     var dispatch = d3.dispatch("zoom","update");
-    var zoom = d3.behavior.zoom().scaleExtent([1,4]).on("zoom", function() { dispatch.zoom(); });
+    var zoom = d3.behavior.zoom().scaleExtent([3,3]).on("zoom", function() { dispatch.zoom(); })
     var prevMidnight = (new Date()).setHours(0,0,0,0);
     var nextMidnight = (new Date()).setHours(24,0,0,0);
 
     timeScale.domain([prevMidnight, nextMidnight]);
     zoom.x(timeScale);
-    zoom.scale(1);
+    zoom.scale(3);
+    var trans = timeScale((new Date).getTime()) - 900;
+    zoom.translate([-trans,0]);
 
     my.showRoute = function(route) {
       routes[route.id] = route;
@@ -175,7 +177,12 @@ function timelineChart(p) {
       });
       
       d3.select(this).append("div").attr("class","nextbus_route").text(d.short_name + " " + d.long_name);
-      d3.select(this).append("div").text("Switch");
+      d3.select(this).append("div").attr("class","switch_button").text("Switch").on("click", function(d) {
+          if (dir == 0) dir = 1;
+          else dir = 0;
+          bind();
+          draw();
+      });
 
       var svg = d3.select(this).append("svg:svg")
         .attr("width","100%")
@@ -185,16 +192,6 @@ function timelineChart(p) {
         .attr("preserveAspectRatio","xMaxYMid slice");
       vis = svg.append("svg:g")
           .attr("transform", "translate(16,16)");
-
-      var switchG = vis.append("g").attr("transform","translate(1040,0)");
-      switchG.append("rect").attr("width",100).attr("height",20).style("fill","#aaa")
-        .on("click", function(d) {
-          if (dir == 0) dir = 1;
-          else dir = 0;
-          bind();
-          draw();
-        });
-      switchG.append("text").text("Switch").attr("y",15);
 
       var mainChartWAxis = vis.append("g").attr("transform","translate(0,0)")
       mainChartWAxis.append("g")
