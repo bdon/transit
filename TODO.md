@@ -11,8 +11,8 @@
 * add another agency (timezone!)
 * how do we define "inbound" - shape order?
 * Indexes should be culled to last scheduled stop.
-* add tutorial
 * trip headsigns
+* media queries broken, and not very mobile friendly
 
 Future features:
 * store stop_id -> latlong to show on map?

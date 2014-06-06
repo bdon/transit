@@ -49,6 +49,10 @@ table {
 
 /* end reset */
 
+html {
+  overflow-y: scroll;
+}
+
 body {
   font-family: sans-serif;
 }
@@ -85,7 +89,7 @@ body {
 }
 
 .container {
-  width:80%;
+  width:90%;
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
@@ -163,4 +167,35 @@ path {
 .guide {
   stroke: #aaa;
   stroke-width: 1.1px;
+}
+
+#help {
+  background-color: #ddd;
+  font-size: 12px;
+}
+
+#help svg {
+  background-color: #ccc;
+}
+
+#help .half {
+  display: inline-block;
+  width: 50%;
+}
+
+@media only screen 
+and (min-device-width : 320px) 
+and (max-device-width : 568px) { 
+  #help .half {
+    display: block;
+    width: 100%;
+  }
+}
+
+#help .right p {
+  display: inline;
+}
+
+.emph {
+  font-weight: bold;
 }

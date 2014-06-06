@@ -194,11 +194,18 @@ function timelineChart(p) {
         .append("rect")
           .attr("width","1020")
           .attr("height","550");
-      mainChart.append("rect")
+      var rect = mainChart.append("rect")
         .attr("class", "pane")
         .attr("width","1020")
         .attr("height","550")
         .call(p.zoom());
+
+      rect.on("wheel.zoom",null);
+      rect.on("mousewheel.zoom",null);
+      rect.on("mousemove.hover", function() {
+        console.log("Hovering");
+      });
+      
       var clipped = mainChart.append("g")
         .attr("clip-path", "url(#clip_" + d.id + ")")
       clippedBack = clipped.append("g");
