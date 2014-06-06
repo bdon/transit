@@ -80,9 +80,35 @@ describe("Transit", function () {
       expect(s.trips(1)[0].run.dir).to.eql(1);
     });
 
-    it("can retrieve only live vehicles, for arrows");
+    it("can retrieve only live vehicles, for arrows", function() {
+      var resp = {
+        "1406_1401754326":{
+          "vehicle_id":"1406",
+          "dir":1,
+          "states":[
+            {"time":1401754800 - 60 * 20,"index":455}
+          ]
+        },
+        "1406_1401754999":{
+          "vehicle_id":"1406",
+          "dir":0,
+          "states":[
+            {"time":1401754800 - 60 * 10,"index":450}
+          ]
+        }
+      }
+
+      var s = Transit.RouteState();
+      s.add(resp);
+      var now = 1401754800;
+      var l = s.liveVehicles(now);
+      expect(l.length).to.eql(1);
+      expect(l[0].time).to.eql(1401754800 - 60 * 10);
+      expect(l[0].index).to.eql(450);
+      expect(l[0].key).to.eql("1406_1401754999");
+    });
+
     it("enforces the order of timestamps in route state");
-    
   });
 
 

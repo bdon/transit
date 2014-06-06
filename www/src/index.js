@@ -65,6 +65,18 @@
       return retval;
     };
 
+    my.liveVehicles = function(now) {
+      retval = [];
+      for (k in trips) {
+        var states = trips[k].states;
+        var state = states[states.length-1];
+        if(now - state.time < 15 * 60) {
+          retval.push({"time":state.time,"index":state.index,"key":k});
+        }
+      }
+      return retval;
+    }
+
     return my;
   }
 
@@ -108,6 +120,10 @@
     return date.getTime() / 1000;
   }
 
+  Transit.Now = function() {
+    return Math.floor((new Date()).getTime() / 1000);
+  }
+
 })(this);
 
 function timelineChart(p) {
@@ -137,6 +153,7 @@ function timelineChart(p) {
       p.dispatch().on("update." + d.id, function() {
         d3.json(p.live_endpoint() + "/locations.json?route=" + d.short_name + "&after=" + Math.floor(timestamp/1000), function(response) {
           routeState.add(response);
+          bind();
           draw();
         });
         timestamp = new Date().getTime();
@@ -194,8 +211,7 @@ function timelineChart(p) {
       });
 
       d3.json(p.static_endpoint() + "/schedules/" + d.id + ".json", function(trips) {
-        var now = (new Date()).getTime() / 1000;
-        routeSchedule.parse(trips, now);
+        routeSchedule.parse(trips, Transit.Now());
         bind();
         draw();
       });
@@ -209,17 +225,25 @@ function timelineChart(p) {
   }
 
   function bind() {
-    var s1 = clippedBack.selectAll(".guide").data(routeSchedule.trips(dir))
+    var s1 = clippedBack.selectAll(".guide").data(routeSchedule.trips(dir));
     s1.enter().append("path").attr("class","guide");
     s1.exit().remove();
-    var s2 = clippedFore.selectAll(".vehiclePath").data(routeState.trips(dir), function(d) { return d.key })
+    var s2 = clippedFore.selectAll(".vehiclePath").data(routeState.trips(dir), function(d) { return d.key });
     s2.enter().append("path").attr("class","vehiclePath");
     s2.exit().remove();
+    var newdata = routeState.liveVehicles(Transit.Now());
+    var s3 = clippedFore.selectAll(".liveVehicle").data(newdata, function(d) { return d.key });
+    s3.enter().append("circle").attr("class","liveVehicle");
+    s3.exit().remove();
   }
 
   function draw() {
     vis.selectAll(".vehiclePath").attr("d", function(d) { return line(d.run.states); })
     vis.selectAll(".guide").attr("d", function(d) { return line(d.stops) });
+    vis.selectAll(".liveVehicle")
+      .attr("cx",function(d) {  return p.timeScale()(d.time*1000); })
+      .attr("cy",function(d) { return stopsScale(d.index); })
+      .attr("r",2);
     vis.selectAll(".time.axis").call(axis);
   }
 
