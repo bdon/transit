@@ -19,8 +19,6 @@ describe("Transit", function () {
       p.removeRoute(fixtures.N);
       expect(p.routes()).to.eql([]);
     });
-
-    it("Sets a hash state of the selected routes.");
   });
 
   describe("Transit.RouteState", function() {

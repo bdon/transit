@@ -3,6 +3,7 @@
 * agency ids and nextbus agencys dont match
 * directions are backwards
 * direction should be a string
+* direction should have trip headsign
 * combine schedules and stops
 * error logging
 * configure CORS
@@ -11,7 +12,6 @@
 * add another agency (timezone!)
 * how do we define "inbound" - shape order?
 * Indexes should be culled to last scheduled stop.
-* trip headsigns
 * media queries broken, and not very mobile friendly
 
 Future features:
