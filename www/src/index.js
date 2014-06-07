@@ -141,6 +141,12 @@
     return Math.floor((new Date()).getTime() / 1000);
   }
 
+  Transit.Camelize = function(input) {
+    return input.toLowerCase().replace(/(\b|-)\w/g,function(m) {
+      return m.toUpperCase();
+    });
+  }
+
 })(this);
 
 function timelineChart(p) {
@@ -176,7 +182,9 @@ function timelineChart(p) {
         timestamp = new Date().getTime();
       });
       
-      d3.select(this).append("div").attr("class","nextbus_route").text(d.short_name + " " + d.long_name);
+      d3.select(this).append("div").attr("class","route_short_name").text(d.short_name);
+      d3.select(this).append("div").attr("class","route_long_name").text(Transit.Camelize(d.long_name));
+      d3.select(this).append("div").attr("class","close_button").text("Close");
       d3.select(this).append("div").attr("class","switch_button").text("Switch").on("click", function(d) {
           if (dir == 0) dir = 1;
           else dir = 0;

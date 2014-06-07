@@ -257,6 +257,13 @@ describe("Transit", function () {
     });
   });
 
+  describe("Transit.Camelize", function() {
+    it("converts names correctly", function() {
+      expect(Transit.Camelize("JUDAH")).to.eql("Judah");
+      expect(Transit.Camelize("HAIGHT-NORIEGA")).to.eql("Haight-Noriega");
+    });
+  });
+
   it("Requests from the static endpoint if the chosen date < today");
   it("Requests from the live endpoint if the chosen date = today");
   it("Chooses the correct GTFS schedule for a day");
