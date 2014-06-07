@@ -5,7 +5,6 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/bdon/go.gtfs"
-	"github.com/bdon/go.nextbus"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -33,9 +32,9 @@ type VehicleState struct {
 
 // One inbound or outbound run of a vehicle
 type VehicleRun struct {
-	VehicleId string            `json:"vehicle_id"`
-	StartTime int               `json:"-"`
-	Dir       nextbus.Direction `json:"dir"`
+	VehicleId string    `json:"vehicle_id"`
+	StartTime int       `json:"-"`
+	Dir       Direction `json:"dir"`
 
 	States []VehicleState `json:"states"`
 }
@@ -101,7 +100,7 @@ func newToken(vehicleId string, timestamp int) string {
 }
 
 // Must be called in chronological order
-func (a *AgencyState) AddResponse(foo nextbus.Response, unixtime int) {
+func (a *AgencyState) AddResponse(foo Response, unixtime int) {
 	for _, report := range foo.Reports {
 		routeTag := report.RouteTag
 		s, ok := a.RouteStates[routeTag]
@@ -199,7 +198,7 @@ func (a *AgencyState) Start() {
 	a.ticker = time.NewTicker(10 * time.Second)
 
 	tick := func(unixtime int) {
-		response := nextbus.Response{}
+		response := Response{}
 		//Accept-Encoding: gzip, deflate
 		get, err := http.Get("http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=sf-muni&t=0")
 		if err != nil {

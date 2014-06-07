@@ -26,8 +26,8 @@ type TripRepr struct {
 }
 
 type ScheduleRepr struct {
-  Stops []StopRepr `json:"stops"`
-  Trips []TripRepr `json:"trips"`
+	Stops []StopRepr `json:"stops"`
+	Trips []TripRepr `json:"trips"`
 }
 
 type RouteRepr struct {
@@ -94,7 +94,7 @@ func EmitSchedules(feed gtfs.Feed) {
 			stops = append(stops, StopRepr{Index: index, Name: stop.Name})
 		}
 
-    schedule := ScheduleRepr{Trips:trips, Stops:stops}
+		schedule := ScheduleRepr{Trips: trips, Stops: stops}
 
 		marshalled, _ := json.Marshal(schedule)
 		return string(marshalled), true

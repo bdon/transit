@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/bdon/go.gtfs"
-	"github.com/bdon/go.nextbus"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -24,8 +23,8 @@ func TestLeadingVehicle(t *testing.T) {
 	feed := gtfs.Load("muni_gtfs", false)
 	a := NewAgencyState(feed)
 
-	testResponse := nextbus.Response{}
-	report1 := nextbus.VehicleReport{LeadingVehicleId: "something", RouteTag: "N"}
+	testResponse := Response{}
+	report1 := VehicleReport{LeadingVehicleId: "something", RouteTag: "N"}
 	testResponse.Reports = append(testResponse.Reports, report1)
 	a.AddResponse(testResponse, 10000000)
 
@@ -38,8 +37,8 @@ func TestOne(t *testing.T) {
 	feed := gtfs.Load("muni_gtfs", false)
 	a := NewAgencyState(feed)
 
-	testResponse := nextbus.Response{}
-	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
+	testResponse := Response{}
+	report1 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
 		LeadingVehicleId: "", RouteTag: "N"}
 
@@ -54,8 +53,8 @@ func TestOne(t *testing.T) {
 		t.Error("First run should have 1 state")
 	}
 
-	testResponse2 := nextbus.Response{}
-	report2 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
+	testResponse2 := Response{}
+	report2 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
 		LeadingVehicleId: "", RouteTag: "N"}
 
@@ -69,8 +68,8 @@ func TestOne(t *testing.T) {
 		t.Error("First run should have still 1 state if position has not changed")
 	}
 
-	testResponse3 := nextbus.Response{}
-	report3 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.1",
+	testResponse3 := Response{}
+	report3 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.1",
 		LonString: "-122.1", SecsSinceReport: 15,
 		LeadingVehicleId: "", RouteTag: "N"}
 
@@ -89,16 +88,16 @@ func TestTwo(t *testing.T) {
 	feed := gtfs.Load("muni_gtfs", false)
 	a := NewAgencyState(feed)
 
-	testResponse := nextbus.Response{}
-	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
+	testResponse := Response{}
+	report1 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
 		LeadingVehicleId: "", RouteTag: "N"}
 
 	testResponse.Reports = append(testResponse.Reports, report1)
 	a.AddResponse(testResponse, 10000000)
 
-	testResponse2 := nextbus.Response{}
-	report2 := nextbus.VehicleReport{VehicleId: "1001", DirTag: "IB", LatString: "37.0",
+	testResponse2 := Response{}
+	report2 := VehicleReport{VehicleId: "1001", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
 		LeadingVehicleId: "", RouteTag: "N"}
 
@@ -114,8 +113,8 @@ func TestIgnoreFifteenMinutes(t *testing.T) {
 	feed := gtfs.Load("muni_gtfs", false)
 	a := NewAgencyState(feed)
 
-	response := nextbus.Response{}
-	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
+	response := Response{}
+	report1 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
 		LeadingVehicleId: "", RouteTag: "N"}
 
@@ -126,8 +125,8 @@ func TestIgnoreFifteenMinutes(t *testing.T) {
 		t.Error("Runs should have 1 element")
 	}
 
-	laterResponse := nextbus.Response{}
-	laterReport := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.1",
+	laterResponse := Response{}
+	laterReport := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.1",
 		LonString: "-122.1", SecsSinceReport: 15,
 		LeadingVehicleId: "", RouteTag: "N"}
 
@@ -143,8 +142,8 @@ func TestChangeDirection(t *testing.T) {
 	feed := gtfs.Load("muni_gtfs", false)
 	a := NewAgencyState(feed)
 
-	response := nextbus.Response{}
-	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
+	response := Response{}
+	report1 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
 		LeadingVehicleId: "", RouteTag: "N"}
 
@@ -155,8 +154,8 @@ func TestChangeDirection(t *testing.T) {
 		t.Error("Runs should have 1 element")
 	}
 
-	laterResponse := nextbus.Response{}
-	laterReport := nextbus.VehicleReport{VehicleId: "1000", DirTag: "OB", LatString: "37.1",
+	laterResponse := Response{}
+	laterReport := VehicleReport{VehicleId: "1000", DirTag: "OB", LatString: "37.1",
 		LonString: "-122.1", SecsSinceReport: 15,
 		LeadingVehicleId: "", RouteTag: "N"}
 
@@ -169,7 +168,7 @@ func TestChangeDirection(t *testing.T) {
 }
 
 func TestSimplify(t *testing.T) {
-	run := VehicleRun{VehicleId: "1", Dir: nextbus.Inbound}
+	run := VehicleRun{VehicleId: "1", Dir: Inbound}
 	run.States = []VehicleState{}
 
 	state1 := VehicleState{LatString: "0.01", LonString: "0.01"}
@@ -188,16 +187,16 @@ func TestFilteredByTime(t *testing.T) {
 	feed := gtfs.Load("muni_gtfs", false)
 	a := NewAgencyState(feed)
 
-	response := nextbus.Response{}
-	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
+	response := Response{}
+	report1 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
 		LeadingVehicleId: "", RouteTag: "N"}
 
 	response.Reports = append(response.Reports, report1)
 	a.AddResponse(response, 10000015)
 
-	response2 := nextbus.Response{}
-	report2 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.1",
+	response2 := Response{}
+	report2 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.1",
 		LonString: "-122.1", SecsSinceReport: 15,
 		LeadingVehicleId: "", RouteTag: "N"}
 
@@ -221,8 +220,8 @@ func TestSaveAndRestore(t *testing.T) {
 	defer os.Remove(tmpdir)
 	feed := gtfs.Load("muni_gtfs", false)
 	a := NewAgencyState(feed)
-	response := nextbus.Response{}
-	report1 := nextbus.VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
+	response := Response{}
+	report1 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
 		LeadingVehicleId: "", RouteTag: "N"}
 
