@@ -4,7 +4,6 @@
 * directions are backwards
 * direction should be a string
 * direction should have trip headsign
-* combine schedules and stops
 * error logging
 * configure CORS
 * idempotent line simplification - cut out points that are less than 1 minute apart? or distance?

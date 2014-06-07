@@ -20,7 +20,6 @@ func main() {
 	flag.Parse()
 	if emitFiles {
 		feed := gtfs.Load("muni_gtfs", true)
-		EmitStops(feed)
 		EmitSchedules(feed)
 	} else if emitRoot {
 		feed := gtfs.Load("muni_gtfs", false)
