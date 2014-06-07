@@ -229,8 +229,8 @@ function timelineChart(p) {
       clippedFore = clipped.append("g");
 
       d3.json(p.static_endpoint() + "/schedules/" + d.id + ".json", function(trips) {
-        routeSchedule.parse(trips.Trips, Transit.Now());
-        vis.append("g").attr("transform","translate(1024,23)").selectAll(".stop").data(trips.Stops).enter().append("text")
+        routeSchedule.parse(trips.trips, Transit.Now());
+        vis.append("g").attr("transform","translate(1024,23)").selectAll(".stop").data(trips.stops).enter().append("text")
             .attr("class", "stop")
             .attr("text-anchor", "begin")
             .attr("y", function(d) { return stopsScale(d.index) })
