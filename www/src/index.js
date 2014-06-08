@@ -186,9 +186,8 @@ function timelineChart(p) {
       d3.select(this).append("div").attr("class","route_long_name").text(Transit.Camelize(d.long_name));
       d3.select(this).append("div").attr("class","close_button").text("×");
 
+
       var contain = d3.select(this).append("div").attr("class","toggle_container");
-      contain.append("div").attr("class","dir_toggle selected").text("Caltrain via Downtown");
-      contain.append("div").attr("class","dir_toggle").text("Ocean Beach");
       //d3.select(this).append("div").attr("class","switch_button").text("Switch").on("click", function(d) {
       //    if (dir == 0) dir = 1;
       //    else dir = 0;
@@ -233,6 +232,9 @@ function timelineChart(p) {
       clippedFore = clipped.append("g");
 
       d3.json(p.static_endpoint() + "/schedules/" + d.id + ".json", function(trips) {
+        contain.append("div").attr("class","dir_toggle selected").text(trips.headsigns[0]);
+        contain.append("div").attr("class","dir_toggle").text(trips.headsigns[1]);
+
         routeSchedule.parse(trips.trips, Transit.Now());
         vis.append("g").attr("transform","translate(1024,23)").selectAll(".stop").data(trips.stops).enter().append("text")
             .attr("class", "stop")
