@@ -184,13 +184,17 @@ function timelineChart(p) {
       
       d3.select(this).append("div").attr("class","route_short_name").text(d.short_name);
       d3.select(this).append("div").attr("class","route_long_name").text(Transit.Camelize(d.long_name));
-      d3.select(this).append("div").attr("class","close_button").text("Close");
-      d3.select(this).append("div").attr("class","switch_button").text("Switch").on("click", function(d) {
-          if (dir == 0) dir = 1;
-          else dir = 0;
-          bind();
-          draw();
-      });
+      d3.select(this).append("div").attr("class","close_button").text("×");
+
+      var contain = d3.select(this).append("div").attr("class","toggle_container");
+      contain.append("div").attr("class","dir_toggle selected").text("Caltrain via Downtown");
+      contain.append("div").attr("class","dir_toggle").text("Ocean Beach");
+      //d3.select(this).append("div").attr("class","switch_button").text("Switch").on("click", function(d) {
+      //    if (dir == 0) dir = 1;
+      //    else dir = 0;
+      //    bind();
+      //    draw();
+      //});
 
       var svg = d3.select(this).append("svg:svg")
         .attr("width","100%")

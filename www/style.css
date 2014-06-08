@@ -54,8 +54,9 @@ html {
 }
 
 body {
-  font-family: "Helvetica Neue", "Helvetica", sans-serif;
+  font-family: "Helvetica Neue", Helvetica, arial, sans-serif;
 }
+
 
 .chooser {
   width: 100%;
@@ -119,6 +120,11 @@ and (max-device-width : 568px) {
 .stop {
   fill: black;
   font-size: 10px;
+  opacity: 0;
+}
+
+.stop:first-child {
+  opacity: 1;
 }
 
 .pane {
@@ -209,6 +215,10 @@ and (max-device-width : 568px) {
   fill: magenta;
 }
 
+.route:hover {
+  background-color: #f4f4f4;
+}
+
 .route_short_name {
   margin-left: 15px;
   font-size: 20px;
@@ -234,6 +244,7 @@ and (max-device-width : 568px) {
 }
 
 .bigtitle {
+  display: inline-block;
   font-weight: bold;
   font-size: 20px;
   padding: 10px;
@@ -256,8 +267,8 @@ and (max-device-width : 568px) {
 }
 
 .agency.selected {
-  color: black;
-  background-color: #ccc;
+  color: white;
+  background-color: black;
 }
 
 .agency_header {
@@ -265,10 +276,29 @@ and (max-device-width : 568px) {
 }
 
 .close_button {
+  cursor: pointer;
   float: right;
   margin-right: 15px;
-  background-color: #ccc;
-  color: #777;
-  padding: 4px;
+  color: #aaa;
+  font-size: 20px;
+}
+
+.toggle_container {
+  float: right;
+  display: inline-block;
+  margin-right: 136px;
+}
+
+.dir_toggle {
+  margin-top: 6px;
+  float: right;
+  display: inline-block;
   font-size: 12px;
+  padding: 3px;
+  background-color: #ccc;
+}
+
+.dir_toggle.selected {
+  background-color: black;
+  color: white;
 }

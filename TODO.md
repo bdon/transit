@@ -1,7 +1,6 @@
 * how do i find the route name etc?, PM, PH, C cable cars
 * place to list all available routes.
 * agency ids and nextbus agencys dont match
-* directions are backwards
 * direction should be a string
 * direction should have trip headsign
 * error logging
@@ -12,6 +11,7 @@
 * how do we define "inbound" - shape order?
 * Indexes should be culled to last scheduled stop.
 * media queries broken, and not very mobile friendly
+* look at other agencies for directions
 
 Future features:
 * store stop_id -> latlong to show on map?
