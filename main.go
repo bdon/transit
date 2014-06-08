@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	"github.com/bdon/go.gtfs"
+	"io/ioutil"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -27,7 +29,11 @@ func main() {
 	} else {
 		feed := gtfs.Load("muni_gtfs", false)
 
-		agencyState := NewAgencyState(feed)
+		desc, _ := ioutil.ReadFile("names.json")
+		log.Println(desc)
+		names := NewNameDict(desc)
+		log.Println(names)
+		agencyState := NewAgencyState(feed, names)
 		agencyState.Restore("static/history")
 
 		c := make(chan os.Signal, 1)

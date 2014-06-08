@@ -1,9 +1,10 @@
+
 (function(exports) {
   var Transit = exports.Transit = {};
 
   Transit.Page = function(static_endpoint, live_endpoint) {
     var my = {};
-    var routes = {};
+    var routes = [];
     var timeScale = d3.time.scale().range([0,1020]);
     var dispatch = d3.dispatch("zoom","update");
     var zoom = d3.behavior.zoom().scaleExtent([3,3]).on("zoom", function() { dispatch.zoom(); })
@@ -17,18 +18,23 @@
     zoom.translate([-trans,0]);
 
     my.showRoute = function(route) {
-      routes[route.id] = route;
+      for(r in routes) {
+        if(routes[r].id == route.id) return;
+      }
+      routes.unshift(route);
     }
 
     my.removeRoute = function(route) {
       dispatch.on("." + route.id, null);
-      delete routes[route.id];
+      var newArr = [];
+      for(r in routes) {
+        if(routes[r].id != route.id) newArr.push(routes[r]);
+      }
+      routes = newArr;
     }
 
     my.routes = function() {
-      vals = [];
-      for(var k in routes) vals.push(routes[k]);
-      return vals;
+      return routes;
     }
 
     my.zoom = function() { return zoom; }
@@ -152,7 +158,7 @@
 function timelineChart(p) {
   var routeState = Transit.RouteState();
   var routeSchedule = Transit.RouteSchedule();
-  var dir = 1;
+  var dir = 0;
 
   var stopsScale = d3.scale.linear().domain([0,1000]).range([0,150]);
   var axis = d3.svg.axis().scale(p.timeScale()).orient("top");
@@ -186,15 +192,7 @@ function timelineChart(p) {
       d3.select(this).append("div").attr("class","route_long_name").text(Transit.Camelize(d.long_name));
       d3.select(this).append("div").attr("class","close_button").text("×");
 
-
       var contain = d3.select(this).append("div").attr("class","toggle_container");
-      //d3.select(this).append("div").attr("class","switch_button").text("Switch").on("click", function(d) {
-      //    if (dir == 0) dir = 1;
-      //    else dir = 0;
-      //    bind();
-      //    draw();
-      //});
-
       var svg = d3.select(this).append("svg:svg")
         .attr("width","100%")
         .attr("height","200px")
@@ -232,8 +230,16 @@ function timelineChart(p) {
       clippedFore = clipped.append("g");
 
       d3.json(p.static_endpoint() + "/schedules/" + d.id + ".json", function(trips) {
-        contain.append("div").attr("class","dir_toggle selected").text(trips.headsigns[0]);
-        contain.append("div").attr("class","dir_toggle").text(trips.headsigns[1]);
+        var dir0 = contain.append("div").attr("class","dir_toggle selected").text(trips.headsigns[0]);
+        var dir1 = contain.append("div").attr("class","dir_toggle").text(trips.headsigns[1]);
+        contain.on("click", function() {
+          dir = (dir == 0 ? 1 : 0);
+          dir0.classed("selected",dir == 0);
+          dir1.classed("selected",dir == 1);
+          bind();
+          draw();
+        });
+
 
         routeSchedule.parse(trips.trips, Transit.Now());
         vis.append("g").attr("transform","translate(1024,23)").selectAll(".stop").data(trips.stops).enter().append("text")

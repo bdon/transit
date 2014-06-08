@@ -12,8 +12,12 @@
         </div>
         <div class="half">
           <p>
-            Visualize the health of transit around the world. 
-            This paragraph is going to be longer, but I need to write some solid and non-cheesy copy. 
+           Transit systems measure quality of service in different ways. 
+           Headways vs on-time performance.
+           On-time performance is subject to arbitrary accounting methods
+           Headway is more important than OTP.
+           http://www.sfgate.com/bayarea/article/In-S-F-Muni-slows-crime-grows-5132822.php
+            
           </p>
         </div><div class="half right">
           <div>
@@ -51,8 +55,10 @@
       <div id="chartlist">
       </div>
       <div id="credits">
-        Credits
-        Data via GTFS. San Francisco MTA. NextBus. Link to Protovis example. Tufte book. Contact information.
+        <h1>Credits</h1>
+        <p>Data via GTFS. San Francisco MTA. NextBus.</p>
+        <p>Design derived from original train schedule by E.J. Marey.</p>
+        <p>For inquiries, contact bdon@bdon.org</p>
       </div>
     </div>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
@@ -62,9 +68,11 @@
       //var p = Transit.Page("http://162.243.156.169/static", "http://162.243.156.169");
 
       function draw() {
+        console.log(p.routes());
         var cl = d3.select("#chartlist").selectAll(".route").data(p.routes(), function(d) { return d.id });
         var enters = cl.enter().append("div").attr("class","route");
         enters.call(timelineChart(p));
+        cl.order();
         cl.exit().remove();
       }
 

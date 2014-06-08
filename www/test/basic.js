@@ -3,13 +3,15 @@ describe("Transit", function () {
   describe("Transit.Page", function() {
     fixtures = {};
     fixtures.N = {"id":"1093","short_name":"N","long_name":"Judah"}
+    fixtures.M = {"id":"1094","short_name":"M","long_name":"Ocean View"}
 
-    it("Can add a line", function() {
+    it("Can add a line to the front", function() {
       //tt.addLine({"routeName":"N","routeNum":"1093"});
       var p = Transit.Page();
       p.showRoute(fixtures.N);
       p.showRoute(fixtures.N);
-      expect(p.routes()).to.eql([fixtures.N]);
+      p.showRoute(fixtures.M);
+      expect(p.routes()).to.eql([fixtures.M, fixtures.N]);
     });
 
     it("Can delete a line", function() {
@@ -48,6 +50,7 @@ describe("Transit", function () {
 
       s.add(resp);
       expect(s.trips(now).length).to.eql(1);
+      console.log(s.trips(now));
       expect(s.trips(now)[0].isLive).to.eql(true);
       var states = s.trips(now)[0].run.states;
       expect(states.length).to.eql(2);

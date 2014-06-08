@@ -37,6 +37,7 @@ type RouteRepr struct {
 	LongName  string `json:"long_name"`
 }
 
+// emit the calendar as well.
 func EmitRoot(feed gtfs.Feed) {
 	output := []RouteRepr{}
 	for _, route := range feed.Routes {

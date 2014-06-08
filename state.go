@@ -57,13 +57,14 @@ type RouteState struct {
 type AgencyState struct {
 	RouteStates map[string]*RouteState
 	Feed        gtfs.Feed
+	Names       NameDict
 
 	Mutex  sync.RWMutex
 	ticker *time.Ticker
 }
 
-func NewAgencyState(feed gtfs.Feed) *AgencyState {
-	retval := AgencyState{Feed: feed, Mutex: sync.RWMutex{}}
+func NewAgencyState(feed gtfs.Feed, names NameDict) *AgencyState {
+	retval := AgencyState{Feed: feed, Mutex: sync.RWMutex{}, Names: names}
 	retval.RouteStates = make(map[string]*RouteState)
 	return &retval
 }
@@ -72,6 +73,11 @@ func (a AgencyState) NewRouteState(routeTag string) (*RouteState, bool) {
 	retval := RouteState{Id: routeTag}
 	retval.Runs = map[string]*VehicleRun{}
 	retval.CurrentRuns = make(map[string]*VehicleRun)
+
+	resolve := a.Names.Resolve(routeTag)
+	if resolve != "" {
+		routeTag = resolve
+	}
 	route := a.Feed.RouteByShortName(routeTag)
 	longestShape := route.LongestShape()
 	if longestShape == nil {

@@ -55,6 +55,13 @@ html {
 
 body {
   font-family: "Helvetica Neue", Helvetica, arial, sans-serif;
+
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 
@@ -72,13 +79,7 @@ body {
   text-overflow: clip;
   text-align: center;
   font-size: 12px;
-
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+  cursor: pointer;
 }
 
 .rollsign:hover {
@@ -86,7 +87,8 @@ body {
 }
 
 .rollsign.displayed {
-  background-color: cyan;
+  background-color: black;
+  color: white;
 }
 
 .container {
@@ -251,7 +253,14 @@ and (max-device-width : 568px) {
 }
 
 #credits {
-  height: 140px;
+  height: 80px;
+  padding: 12px;
+  font-size: 12px;
+  color: #555;
+}
+
+#credits h1 {
+  font-weight: bold;
 }
 
 #agencylist {
@@ -296,6 +305,8 @@ and (max-device-width : 568px) {
   font-size: 12px;
   padding: 3px;
   background-color: #ccc;
+  color: #777;
+  cursor: pointer;
 }
 
 .dir_toggle.selected {
