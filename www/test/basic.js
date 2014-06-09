@@ -58,7 +58,6 @@ describe("Transit", function () {
 
       s.add(resp);
       expect(s.trips(now).length).to.eql(1);
-      console.log(s.trips(now));
       expect(s.trips(now)[0].isLive).to.eql(true);
       var states = s.trips(now)[0].run.states;
       expect(states.length).to.eql(2);
