@@ -69,6 +69,10 @@ body {
   width: 100%;
 }
 
+#chartlist {
+  margin-top: 10px;
+}
+
 .rollsign {
   width: 50px;
   height: 20px;
@@ -83,7 +87,7 @@ body {
 }
 
 .rollsign:hover {
-  background-color: magenta;
+  background-color: red;
 }
 
 .rollsign.displayed {
@@ -96,7 +100,6 @@ body {
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
-  background-color: #eee;
 }
 
 @media only screen 
@@ -168,7 +171,7 @@ path {
 }
 
 .vehiclePath.live {
-  stroke: magenta;
+  stroke: red;
 }
 
 .vehicleSymbol {
@@ -177,12 +180,12 @@ path {
 }
 
 .guide {
-  stroke: #ccc;
-  stroke-width: 1.1px;
+  stroke: #aaa;
+  stroke-width: 1px;
 }
 
 #help {
-  background-color: #ddd;
+  background-color: #eee;
   font-size: 12px;
 }
 
@@ -214,7 +217,7 @@ and (max-device-width : 568px) {
 }
 
 .liveVehicle {
-  fill: magenta;
+  fill: red;
 }
 
 .route:hover {
@@ -264,6 +267,7 @@ and (max-device-width : 568px) {
 }
 
 #agencylist {
+  margin-top: 10px;
   display: inline-block;
 }
 
@@ -310,6 +314,6 @@ and (max-device-width : 568px) {
 }
 
 .dir_toggle.selected {
-  background-color: black;
+  background-color: red;
   color: white;
 }

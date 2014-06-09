@@ -11,6 +11,7 @@
 * Indexes should be culled to last scheduled stop.
 * media queries broken, and not very mobile friendly
 * look at other agencies for directions
+* add a "Now" line
 
 Future features:
 * store stop_id -> latlong to show on map?
