@@ -241,9 +241,9 @@ function timelineChart(p) {
       clippedBack = clipped.append("g");
       clippedFore = clipped.append("g");
 
-      d3.json(p.static_endpoint() + "/schedules/" + d.id + ".json", function(trips) {
-        var dir0 = contain.append("div").attr("class","dir_toggle selected").text(trips.headsigns[0]);
-        var dir1 = contain.append("div").attr("class","dir_toggle").text(trips.headsigns[1]);
+      d3.json(p.static_endpoint() + "/stops/" + d.id + ".json", function(sch) {
+        var dir0 = contain.append("div").attr("class","dir_toggle selected").text(sch.headsigns[0]);
+        var dir1 = contain.append("div").attr("class","dir_toggle").text(sch.headsigns[1]);
         contain.on("click", function() {
           dir = (dir == 0 ? 1 : 0);
           dir0.classed("selected",dir == 0);
@@ -252,13 +252,18 @@ function timelineChart(p) {
           draw();
         });
 
-
-        routeSchedule.parse(trips.trips, Transit.Now());
-        vis.append("g").attr("transform","translate(1024,23)").selectAll(".stop").data(trips.stops).enter().append("text")
+        vis.append("g").attr("transform","translate(1024,23)").selectAll(".stop").data(sch.stops).enter().append("text")
             .attr("class", "stop")
             .attr("text-anchor", "begin")
             .attr("y", function(d) { return stopsScale(d.index) })
             .text(function(d) { return d.name });
+        bind();
+        draw();
+      });
+
+      var serviceId = p.serviceId(Transit.Now());
+      d3.json(p.static_endpoint() + "/schedules/" + serviceId + "/" + d.id + ".json", function(trips) {
+        routeSchedule.parse(trips, Transit.Now());
         bind();
         draw();
       });

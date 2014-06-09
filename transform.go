@@ -73,8 +73,8 @@ func perRoute(feed gtfs.Feed, dirname string, f func(*gtfs.Route) (string, bool)
 	}
 }
 
-func EmitSchedules(feed gtfs.Feed) {
-	perRoute(feed, "schedules", func(route *gtfs.Route) (string, bool) {
+func EmitStops(feed gtfs.Feed) {
+	perRoute(feed, "stops", func(route *gtfs.Route) (string, bool) {
 		// TODO: handle missing shape
 		shape := route.LongestShape()
 		if shape == nil {
@@ -82,30 +82,56 @@ func EmitSchedules(feed gtfs.Feed) {
 		}
 		referencer := NewReferencer(shape.Coords)
 
-		trips := []TripRepr{}
-		for _, trip := range route.Trips {
-			// TODO: we're only caring about weekdays for now
-			if trip.Service != "1" {
-				continue
-			}
-			tripRepr := TripRepr{TripId: trip.Id, Dir: trip.Direction}
-			for _, stoptime := range trip.StopTimes {
-				index := referencer.Reference(stoptime.Stop.Coord.Lat, stoptime.Stop.Coord.Lon)
-				newStopTime := StopTimeRepr{Time: stoptime.Time, Index: index}
-				tripRepr.StopTimes = append(tripRepr.StopTimes, newStopTime)
-			}
-			trips = append(trips, tripRepr)
-		}
-
 		stops := []StopRepr{}
 		for _, stop := range route.Stops() {
 			index := referencer.Reference(stop.Coord.Lat, stop.Coord.Lon)
 			stops = append(stops, StopRepr{Index: index, Name: stop.Name})
 		}
 
-		schedule := ScheduleRepr{Trips: trips, Stops: stops, Headsigns: route.Headsigns()}
-
+		schedule := ScheduleRepr{Stops: stops, Headsigns: route.Headsigns()}
 		marshalled, _ := json.Marshal(schedule)
 		return string(marshalled), true
+	})
+}
+
+func jsonForRouteAndServiceId(route *gtfs.Route, serviceId string) (string, bool) {
+	// TODO: handle missing shape
+	shape := route.LongestShape()
+	if shape == nil {
+		return "", false
+	}
+	referencer := NewReferencer(shape.Coords)
+
+	trips := []TripRepr{}
+	for _, trip := range route.Trips {
+		if trip.Service != serviceId {
+			continue
+		}
+		tripRepr := TripRepr{TripId: trip.Id, Dir: trip.Direction}
+		for _, stoptime := range trip.StopTimes {
+			index := referencer.Reference(stoptime.Stop.Coord.Lat, stoptime.Stop.Coord.Lon)
+			newStopTime := StopTimeRepr{Time: stoptime.Time, Index: index}
+			tripRepr.StopTimes = append(tripRepr.StopTimes, newStopTime)
+		}
+		trips = append(trips, tripRepr)
+	}
+
+	marshalled, _ := json.Marshal(trips)
+	return string(marshalled), true
+}
+
+func EmitSchedules(feed gtfs.Feed) {
+	os.Mkdir("static/schedules", 0755)
+	os.Mkdir("static/schedules/1", 0755)
+	os.Mkdir("static/schedules/2", 0755)
+	os.Mkdir("static/schedules/3", 0755)
+	perRoute(feed, "schedules/1", func(route *gtfs.Route) (string, bool) {
+		return jsonForRouteAndServiceId(route, "1")
+	})
+	perRoute(feed, "schedules/2", func(route *gtfs.Route) (string, bool) {
+		return jsonForRouteAndServiceId(route, "2")
+	})
+	perRoute(feed, "schedules/3", func(route *gtfs.Route) (string, bool) {
+		return jsonForRouteAndServiceId(route, "3")
 	})
 }

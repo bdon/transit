@@ -68,7 +68,6 @@
       //var p = Transit.Page("http://162.243.156.169/static", "http://162.243.156.169");
 
       function draw() {
-        console.log(p.routes());
         var cl = d3.select("#chartlist").selectAll(".route").data(p.routes(), function(d) { return d.id });
         var enters = cl.enter().append("div").attr("class","route");
         enters.call(timelineChart(p));
@@ -77,6 +76,7 @@
       }
 
       d3.json(p.static_endpoint() + "/routes.json",function(data) {
+        p.setCalendar(data.calendar);
         d3.select("#chooser").selectAll(".rollsign").data(data.routes).enter()
           .append("div").attr("class","rollsign").text(function(d) { return d.short_name })
           .on("click", function(d) {
