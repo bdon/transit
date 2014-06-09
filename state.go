@@ -74,8 +74,8 @@ func (a AgencyState) NewRouteState(routeTag string) (*RouteState, bool) {
 	retval.Runs = map[string]*VehicleRun{}
 	retval.CurrentRuns = make(map[string]*VehicleRun)
 
-	resolve := a.Names.Resolve(routeTag)
-	if resolve != "" {
+	resolve, ok := a.Names.NtoG(routeTag)
+	if ok {
 		routeTag = resolve
 	}
 	route := a.Feed.RouteByShortName(routeTag)
@@ -269,8 +269,14 @@ func (a *AgencyState) Restore(p string) {
 		r := RouteState{}
 		json.Unmarshal(desc, &r)
 
-		route := a.Feed.RouteByShortName(r.Id)
+		routeTag := r.Id
+		resolve, ok := a.Names.NtoG(routeTag)
+		if ok {
+			routeTag = resolve
+		}
+		route := a.Feed.RouteByShortName(routeTag)
 		longestShape := route.LongestShape()
+
 		if longestShape == nil {
 			log.Printf("Couldn't find %s", r.Id)
 			continue

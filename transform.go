@@ -31,20 +31,27 @@ type ScheduleRepr struct {
 	Headsigns []string   `json:"headsigns"`
 }
 
+type Root struct {
+	Calendar []string    `json:"calendar"`
+	Routes   []RouteRepr `json:"routes"`
+}
+
 type RouteRepr struct {
 	Id        string `json:"id"`
 	ShortName string `json:"short_name"`
 	LongName  string `json:"long_name"`
 }
 
-// emit the calendar as well.
+// emit the calendar, and GTFS routes
 func EmitRoot(feed gtfs.Feed) {
 	output := []RouteRepr{}
 	for _, route := range feed.Routes {
 		r := RouteRepr{Id: route.Id, ShortName: route.ShortName, LongName: route.LongName}
 		output = append(output, r)
 	}
-	marshalled, _ := json.MarshalIndent(output, "", "  ")
+
+	root := Root{Routes: output, Calendar: feed.Calendar()}
+	marshalled, _ := json.MarshalIndent(root, "", "  ")
 	fmt.Printf(string(marshalled))
 }
 

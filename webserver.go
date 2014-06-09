@@ -29,6 +29,11 @@ func Webserver(agencyState *AgencyState) {
 			route = r.Form["route"][0]
 		}
 
+		resolve, rok := agencyState.Names.GtoN(route)
+		if rok {
+			route = resolve
+		}
+
 		var result []byte
 		var runs interface{} //hack hack
 		var ok bool

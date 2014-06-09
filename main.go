@@ -4,7 +4,6 @@ import (
 	"flag"
 	"github.com/bdon/go.gtfs"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -20,6 +19,10 @@ func init() {
 
 func main() {
 	flag.Parse()
+
+	desc, _ := ioutil.ReadFile("names.json")
+	names := NewNameDict(desc)
+
 	if emitFiles {
 		feed := gtfs.Load("muni_gtfs", true)
 		EmitSchedules(feed)
@@ -29,10 +32,6 @@ func main() {
 	} else {
 		feed := gtfs.Load("muni_gtfs", false)
 
-		desc, _ := ioutil.ReadFile("names.json")
-		log.Println(desc)
-		names := NewNameDict(desc)
-		log.Println(names)
 		agencyState := NewAgencyState(feed, names)
 		agencyState.Restore("static/history")
 

@@ -77,7 +77,7 @@
       }
 
       d3.json(p.static_endpoint() + "/routes.json",function(data) {
-        d3.select("#chooser").selectAll(".rollsign").data(data).enter()
+        d3.select("#chooser").selectAll(".rollsign").data(data.routes).enter()
           .append("div").attr("class","rollsign").text(function(d) { return d.short_name })
           .on("click", function(d) {
             var displayed = d3.select(this).classed("displayed");
@@ -87,13 +87,13 @@
           });
 
           // pre-select some routes
-          p.showRoute(data.filter(function(d) { return d.id == "1093" })[0]);
+          p.showRoute(data.routes.filter(function(d) { return d.id == "1093" })[0]);
           d3.selectAll(".rollsign").filter(function(d) { return d.id == "1093" }).classed("displayed", true);
           draw();
-          p.showRoute(data.filter(function(d) { return d.id == "1071" })[0]);
+          p.showRoute(data.routes.filter(function(d) { return d.id == "1071" })[0]);
           d3.selectAll(".rollsign").filter(function(d) { return d.id == "1071" }).classed("displayed", true);
           draw();
-          p.showRoute(data.filter(function(d) { return d.id == "8701" })[0]);
+          p.showRoute(data.routes.filter(function(d) { return d.id == "8701" })[0]);
           d3.selectAll(".rollsign").filter(function(d) { return d.id == "8701" }).classed("displayed", true);
           draw();
       });

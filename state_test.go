@@ -11,7 +11,8 @@ import (
 
 func TestEmpty(t *testing.T) {
 	feed := gtfs.Load("muni_gtfs", false)
-	a := NewAgencyState(feed)
+	names := NewNameDict([]byte(`[]`))
+	a := NewAgencyState(feed, names)
 	stat, _ := a.NewRouteState("N")
 
 	if len(stat.Runs) != 0 {
@@ -21,7 +22,8 @@ func TestEmpty(t *testing.T) {
 
 func TestLeadingVehicle(t *testing.T) {
 	feed := gtfs.Load("muni_gtfs", false)
-	a := NewAgencyState(feed)
+	names := NewNameDict([]byte(`[]`))
+	a := NewAgencyState(feed, names)
 
 	testResponse := Response{}
 	report1 := VehicleReport{LeadingVehicleId: "something", RouteTag: "N"}
@@ -35,7 +37,8 @@ func TestLeadingVehicle(t *testing.T) {
 
 func TestOne(t *testing.T) {
 	feed := gtfs.Load("muni_gtfs", false)
-	a := NewAgencyState(feed)
+	names := NewNameDict([]byte(`[]`))
+	a := NewAgencyState(feed, names)
 
 	testResponse := Response{}
 	report1 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
@@ -86,7 +89,8 @@ func TestOne(t *testing.T) {
 
 func TestTwo(t *testing.T) {
 	feed := gtfs.Load("muni_gtfs", false)
-	a := NewAgencyState(feed)
+	names := NewNameDict([]byte(`[]`))
+	a := NewAgencyState(feed, names)
 
 	testResponse := Response{}
 	report1 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
@@ -111,7 +115,8 @@ func TestTwo(t *testing.T) {
 
 func TestIgnoreFifteenMinutes(t *testing.T) {
 	feed := gtfs.Load("muni_gtfs", false)
-	a := NewAgencyState(feed)
+	names := NewNameDict([]byte(`[]`))
+	a := NewAgencyState(feed, names)
 
 	response := Response{}
 	report1 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
@@ -140,7 +145,8 @@ func TestIgnoreFifteenMinutes(t *testing.T) {
 
 func TestChangeDirection(t *testing.T) {
 	feed := gtfs.Load("muni_gtfs", false)
-	a := NewAgencyState(feed)
+	names := NewNameDict([]byte(`[]`))
+	a := NewAgencyState(feed, names)
 
 	response := Response{}
 	report1 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
@@ -185,7 +191,8 @@ func TestSimplify(t *testing.T) {
 
 func TestFilteredByTime(t *testing.T) {
 	feed := gtfs.Load("muni_gtfs", false)
-	a := NewAgencyState(feed)
+	names := NewNameDict([]byte(`[]`))
+	a := NewAgencyState(feed, names)
 
 	response := Response{}
 	report1 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
@@ -219,7 +226,8 @@ func TestSaveAndRestore(t *testing.T) {
 	tmpdir, _ := ioutil.TempDir("", "test")
 	defer os.Remove(tmpdir)
 	feed := gtfs.Load("muni_gtfs", false)
-	a := NewAgencyState(feed)
+	names := NewNameDict([]byte(`[]`))
+	a := NewAgencyState(feed, names)
 	response := Response{}
 	report1 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
@@ -228,7 +236,7 @@ func TestSaveAndRestore(t *testing.T) {
 	response.Reports = append(response.Reports, report1)
 	a.AddResponse(response, 10000015)
 	a.Persist(tmpdir)
-	b := NewAgencyState(feed)
+	b := NewAgencyState(feed, names)
 	b.Restore(tmpdir)
 
 	if len(b.RouteStates["N"].Runs) != 1 {

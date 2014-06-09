@@ -1,7 +1,14 @@
-{
-  "59":"Powell-Mason",
-  "60":"Powell-Hyde",
-  "61":"CALIFORNIA STREET",
-  "N_OWL":"N-OWL"
-}
-
+[
+  {
+    "gtfs_short_name":"Powell-Mason",
+    "nextbus_name":"59"
+  },
+  {
+    "gtfs_short_name":"Powell-Hyde",
+    "nextbus_name":"60"
+  },
+  {
+    "gtfs_short_name":"CALIFORNIA STREET",
+    "nextbus_name":"61"
+  }
+]
