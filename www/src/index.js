@@ -5,6 +5,7 @@
   Transit.Page = function(static_endpoint, live_endpoint) {
     var my = {};
     var routes = [];
+    var calendar = ["1","1","1","1","1","1","1"];
     var timeScale = d3.time.scale().range([0,1020]);
     var dispatch = d3.dispatch("zoom","update");
     var zoom = d3.behavior.zoom().scaleExtent([3,3]).on("zoom", function() { dispatch.zoom(); })
@@ -35,6 +36,17 @@
 
     my.routes = function() {
       return routes;
+    }
+
+    my.setCalendar = function(a) {
+      my.calendar = a;
+    }
+
+    my.serviceId = function(epoch) {
+      var d = new Date(epoch* 1000)
+      var day = d.getDay();
+      if (day == 0) day = 7;
+      return my.calendar[day - 1];
     }
 
     my.zoom = function() { return zoom; }

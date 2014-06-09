@@ -6,7 +6,6 @@ describe("Transit", function () {
     fixtures.M = {"id":"1094","short_name":"M","long_name":"Ocean View"}
 
     it("Can add a line to the front", function() {
-      //tt.addLine({"routeName":"N","routeNum":"1093"});
       var p = Transit.Page();
       p.showRoute(fixtures.N);
       p.showRoute(fixtures.N);
@@ -20,6 +19,15 @@ describe("Transit", function () {
       p.showRoute(fixtures.N);
       p.removeRoute(fixtures.N);
       expect(p.routes()).to.eql([]);
+    });
+
+    it("Chooses the correct GTFS schedule for a day", function() {
+      var p = Transit.Page();
+      p.setCalendar(["1","1","1","1","1","2","3"]);
+      var now = 1402291384;
+      expect(p.serviceId(now)).to.eql(3);
+      expect(p.serviceId(now-86400)).to.eql(2);
+      expect(p.serviceId(now+86400)).to.eql(1);
     });
   });
 
@@ -267,6 +275,5 @@ describe("Transit", function () {
 
   it("Requests from the static endpoint if the chosen date < today");
   it("Requests from the live endpoint if the chosen date = today");
-  it("Chooses the correct GTFS schedule for a day");
 });
 
