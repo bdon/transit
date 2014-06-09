@@ -183,6 +183,7 @@ function timelineChart(p) {
   var clippedFore;
   var clippedBack;
   var timestamp;
+  var cursor;
   
   function my(selection) {
     // this only handles a single one...
@@ -241,6 +242,12 @@ function timelineChart(p) {
       clippedBack = clipped.append("g");
       clippedFore = clipped.append("g");
 
+      cursor = clippedFore.append("line")
+        .datum(new Date()) 
+        .attr({"x1":0,"x2":0,"y1":0,"y2":150}).style("stroke","black")
+        .style("stroke-width",0.5)
+        .style("stroke-dasharray","2,2")
+
       d3.json(p.static_endpoint() + "/stops/" + d.id + ".json", function(sch) {
         var dir0 = contain.append("div").attr("class","dir_toggle selected").text(sch.headsigns[0]);
         var dir1 = contain.append("div").attr("class","dir_toggle").text(sch.headsigns[1]);
@@ -278,6 +285,7 @@ function timelineChart(p) {
 
   function bind() {
     now = Transit.Now();
+    cursor.datum(new Date());
     var s1 = clippedBack.selectAll(".guide").data(routeSchedule.trips(dir));
     s1.enter().append("path").attr("class","guide");
     s1.exit().remove();
@@ -293,6 +301,7 @@ function timelineChart(p) {
   }
 
   function draw() {
+    cursor.attr("transform",function(d) { return "translate(" + p.timeScale()(d) + ",0)"})
     vis.selectAll(".vehiclePath")
       .attr("d", function(d) { return line(d.run.states); })
       .classed("live", function(d) { return d.isLive });
