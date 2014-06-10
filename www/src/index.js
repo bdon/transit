@@ -234,7 +234,16 @@ function timelineChart(p) {
       rect.on("wheel.zoom",null);
       rect.on("mousewheel.zoom",null);
       rect.on("mousemove.hover", function() {
-        console.log("Hovering");
+        var selectedIndex = stopsScale.invert(d3.mouse(this)[1]);
+        wasSet = false;
+        vis.selectAll(".stop").each(function(d,i) {
+          if(!wasSet && d.index > selectedIndex) {
+            d3.select(this).classed("stopHighlighted",true);
+            wasSet = true;
+          } else {
+            d3.select(this).classed("stopHighlighted",false);
+          }
+        });
       });
       
       var clipped = mainChart.append("g")

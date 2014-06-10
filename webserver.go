@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -48,7 +47,6 @@ func Webserver(agencyState *AgencyState) {
 		if ok {
 			result, _ = json.Marshal(runs)
 		} else {
-			log.Printf("Bad request for %s", r.Form)
 			http.Error(w, "BAD REQUEST", http.StatusBadGateway)
 			return
 		}

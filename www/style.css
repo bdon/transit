@@ -128,7 +128,15 @@ and (max-device-width : 568px) {
   opacity: 0;
 }
 
+.stop.stopHighlighted {
+  opacity: 1;
+}
+
 .stop:first-child {
+  opacity: 1;
+}
+
+.stop:last-child {
   opacity: 1;
 }
 

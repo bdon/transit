@@ -7,12 +7,19 @@ import (
 	"log"
 	"os"
 	"path"
+	"sort"
 )
 
 type StopRepr struct {
 	Index int    `json:"index"`
 	Name  string `json:"name"`
 }
+
+type StopByIndex []StopRepr
+
+func (a StopByIndex) Len() int           { return len(a) }
+func (a StopByIndex) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a StopByIndex) Less(i, j int) bool { return a[i].Index < a[j].Index }
 
 type StopTimeRepr struct {
 	Time  int `json:"time"`
@@ -87,6 +94,8 @@ func EmitStops(feed gtfs.Feed) {
 			index := referencer.Reference(stop.Coord.Lat, stop.Coord.Lon)
 			stops = append(stops, StopRepr{Index: index, Name: stop.Name})
 		}
+
+		sort.Sort(StopByIndex(stops))
 
 		schedule := ScheduleRepr{Stops: stops, Headsigns: route.Headsigns()}
 		marshalled, _ := json.Marshal(schedule)
