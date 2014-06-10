@@ -10,11 +10,9 @@ import (
 )
 
 var emitFiles bool
-var emitRoot bool
 
 func init() {
 	flag.BoolVar(&emitFiles, "emitFiles", false, "emit files")
-	flag.BoolVar(&emitRoot, "emitRoot", false, "emit root")
 }
 
 func main() {
@@ -27,8 +25,6 @@ func main() {
 		feed := gtfs.Load("muni_gtfs", true)
 		EmitSchedules(feed)
 		EmitStops(feed)
-	} else if emitRoot {
-		feed := gtfs.Load("muni_gtfs", false)
 		EmitRoot(feed)
 	} else {
 		feed := gtfs.Load("muni_gtfs", false)

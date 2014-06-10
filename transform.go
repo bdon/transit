@@ -57,9 +57,16 @@ func EmitRoot(feed gtfs.Feed) {
 		output = append(output, r)
 	}
 
+	fmt.Println("Writing ", "static/routes.json")
+	file, err := os.Create("static/routes.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
 	root := Root{Routes: output, Calendar: feed.Calendar()}
 	marshalled, _ := json.MarshalIndent(root, "", "  ")
-	fmt.Printf(string(marshalled))
+	file.WriteString(string(marshalled))
 }
 
 func perRoute(feed gtfs.Feed, dirname string, f func(*gtfs.Route) (string, bool)) {
