@@ -233,7 +233,6 @@ func (a *AgencyState) Start() {
 }
 
 func (a *AgencyState) Persist(p string) {
-	log.Println("DUMP")
 	t := time.Now()
 	MkdirpForTime(p, t)
 
@@ -253,6 +252,24 @@ func (a *AgencyState) Persist(p string) {
 		}
 	}
 	a.Mutex.RUnlock()
+}
+
+func (a *AgencyState) DeleteRunsBeforeDay(unixtime int) int {
+	totalDeleted := 0
+	ty, tm, td := time.Now().Date()
+	a.Mutex.Lock()
+	for _, routeState := range a.RouteStates {
+		for k, run := range routeState.Runs {
+			// if the last vehicle state of the run is not on today... throw it out
+			oy, om, od := run.EndDay()
+			if od != td || om != tm || oy != ty {
+				delete(routeState.Runs, k)
+				totalDeleted++
+			}
+		}
+	}
+	a.Mutex.Unlock()
+	return totalDeleted
 }
 
 // TODO should probably have a Mutex here.
@@ -311,4 +328,9 @@ func MkdirpForTime(p string, t time.Time) {
 	os.Mkdir(filepath.Join(p, "/", y), 0755)
 	os.Mkdir(filepath.Join(p, "/", y, "/", m), 0755)
 	os.Mkdir(filepath.Join(p, "/", y, "/", m, "/", d), 0755)
+}
+
+func (v VehicleRun) EndDay() (int, time.Month, int) {
+	lastState := v.States[len(v.States)-1]
+	return time.Unix(int64(lastState.Time), 0).Date()
 }

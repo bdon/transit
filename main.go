@@ -4,9 +4,11 @@ import (
 	"flag"
 	"github.com/bdon/go.gtfs"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 var emitFiles bool
@@ -39,7 +41,21 @@ func main() {
 		go func() {
 			<-c
 			agencyState.Persist("static/history")
+			log.Println("Done persisting.")
 			os.Exit(0)
+		}()
+
+		ticker := time.NewTicker(60 * time.Second)
+		go func() {
+			for {
+				select {
+				case <-ticker.C:
+					x := agencyState.DeleteRunsBeforeDay(int(time.Now().Unix()))
+					log.Printf("%d runs deleted.", x)
+					agencyState.Persist("static/history")
+					log.Println("Done persisting.")
+				}
+			}
 		}()
 
 		agencyState.Start()

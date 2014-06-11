@@ -255,11 +255,51 @@ func TestSaveAndRestore(t *testing.T) {
 	}
 }
 
-func TestSaveAndRestoreTimeBoundary(t *testing.T) {
-	// if the vehicle reports are from a different day then today:
-	// flush them to their day
-	if false {
-		t.Error("")
+func TestEndDateOfRun(t *testing.T) {
+	run := VehicleRun{VehicleId: "1", Dir: Inbound}
+	run.States = []VehicleState{}
+
+	state1 := VehicleState{LatString: "0.01", LonString: "0.01", Time: 1402463820}
+	state2 := VehicleState{LatString: "0.02", LonString: "0.02", Time: 1402463820}
+	state3 := VehicleState{LatString: "0.03", LonString: "0.03", Time: 1402463820}
+	run.States = append(run.States, state1)
+	run.States = append(run.States, state2)
+	run.States = append(run.States, state3)
+
+	y, m, d := run.EndDay()
+
+	if y != 2014 && m != 6 && d != 10 {
+		t.Errorf("Expected to get the day")
+	}
+}
+
+func TestDeleteNotOnToday(t *testing.T) {
+	// delete all vehicle reports that are not on Today.
+	feed := gtfs.Load("muni_gtfs", false)
+	names := NewNameDict([]byte(`[]`))
+	a := NewAgencyState(feed, names)
+	response1 := Response{}
+	response3 := Response{}
+	report1 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
+		LonString: "-122.0", SecsSinceReport: 0,
+		LeadingVehicleId: "", RouteTag: "N"}
+
+	report3 := VehicleReport{VehicleId: "1001", DirTag: "IB", LatString: "37.0",
+		LonString: "-122.0", SecsSinceReport: 0,
+		LeadingVehicleId: "", RouteTag: "N"}
+
+	response1.Reports = append(response1.Reports, report1)
+	response3.Reports = append(response3.Reports, report3)
+	a.AddResponse(response1, 1402463820-86401)
+	a.AddResponse(response3, 1402463820)
+
+	x := a.DeleteRunsBeforeDay(1402463820)
+	if x != 1 {
+		t.Error("expected to delete 1 run")
+	}
+
+	if len(a.RouteStates["N"].Runs) > 1 {
+		t.Error("Should only have 1 run total")
 	}
 }
 
