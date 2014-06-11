@@ -49,6 +49,13 @@
       return my.calendar[day - 1];
     }
 
+    my.draw = function() {
+      var cl = d3.select("#chartlist").selectAll(".route").data(p.routes(), function(d) { return d.id });
+      cl.enter().append("div").attr("class","route").call(timelineChart(p));
+      cl.order();
+      cl.exit().remove();
+    }
+
     my.zoom = function() { return zoom; }
     my.timeScale = function() { return timeScale; }
     my.dispatch = function() { return dispatch; }
@@ -203,7 +210,12 @@ function timelineChart(p) {
       
       d3.select(this).append("div").attr("class","route_short_name").text(d.short_name);
       d3.select(this).append("div").attr("class","route_long_name").text(Transit.Camelize(d.long_name));
-      d3.select(this).append("div").attr("class","close_button").text("×");
+      d3.select(this).append("div").attr("class","close_button").text("×").on("click", function() {
+        p.removeRoute(d);
+        p.draw();
+        // TODO: hackety hack
+        d3.selectAll(".rollsign").filter(function(e) { return e.id == d.id }).classed("displayed", false);
+      });
 
       var contain = d3.select(this).append("div").attr("class","toggle_container");
       var svg = d3.select(this).append("svg:svg")

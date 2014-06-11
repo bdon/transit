@@ -91,14 +91,6 @@
       var p = Transit.Page("http://transit.bdon.org/static", "http://transit.bdon.org");
       //var p = Transit.Page("http://162.243.156.169/static", "http://162.243.156.169");
 
-      function draw() {
-        var cl = d3.select("#chartlist").selectAll(".route").data(p.routes(), function(d) { return d.id });
-        var enters = cl.enter().append("div").attr("class","route");
-        enters.call(timelineChart(p));
-        cl.order();
-        cl.exit().remove();
-      }
-
       d3.json(p.static_endpoint() + "/routes.json",function(data) {
         p.setCalendar(data.calendar);
         d3.select("#chooser").selectAll(".rollsign").data(data.routes).enter()
@@ -106,20 +98,19 @@
           .on("click", function(d) {
             var displayed = d3.select(this).classed("displayed");
             displayed ? p.removeRoute(d) : p.showRoute(d);
-            draw();
+            p.draw();
             d3.select(this).classed("displayed",!displayed); 
           });
 
-          // pre-select some routes
-          p.showRoute(data.routes.filter(function(d) { return d.id == "1093" })[0]);
-          d3.selectAll(".rollsign").filter(function(d) { return d.id == "1093" }).classed("displayed", true);
-          draw();
-          p.showRoute(data.routes.filter(function(d) { return d.id == "1071" })[0]);
-          d3.selectAll(".rollsign").filter(function(d) { return d.id == "1071" }).classed("displayed", true);
-          draw();
-          p.showRoute(data.routes.filter(function(d) { return d.id == "9584" })[0]);
-          d3.selectAll(".rollsign").filter(function(d) { return d.id == "9584" }).classed("displayed", true);
-          draw();
+          var preselect = function(short_name) {
+            p.showRoute(data.routes.filter(function(d) { return d.short_name == short_name })[0]);
+            d3.selectAll(".rollsign").filter(function(d) { return d.short_name == short_name }).classed("displayed", true);
+            p.draw();
+          }
+
+          preselect("N");
+          preselect("71");
+          preselect("1");
       });
 
       setInterval(function() {
