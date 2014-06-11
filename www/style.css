@@ -76,7 +76,7 @@ body {
 .rollsign {
   width: 50px;
   height: 20px;
-  margin:2px;
+  margin:1px;
   background-color: #ddd;
   display: inline-block;
   overflow: hidden;
@@ -87,11 +87,12 @@ body {
 }
 
 .rollsign:hover {
-  background-color: red;
+  background-color: black;
 }
 
 .rollsign.displayed {
-  background-color: black;
+  font-weight: bold;
+  background-color: #F5355B;
   color: white;
 }
 
@@ -175,20 +176,15 @@ path {
 
 .vehiclePath {
   stroke-width: 1.2;
-  stroke: #555;
+  stroke: #222222;
 }
 
 .vehiclePath.live {
-  stroke: red;
-}
-
-.vehicleSymbol {
-  fill: black;
-  stroke-width: 0px;
+  stroke: #F5355B;
 }
 
 .guide {
-  stroke: #aaa;
+  stroke: #999999;
   stroke-width: 1px;
 }
 
@@ -225,7 +221,7 @@ and (max-device-width : 568px) {
 }
 
 .liveVehicle {
-  fill: red;
+  fill: #F5355B;
 }
 
 .route:hover {
@@ -296,12 +292,21 @@ and (max-device-width : 568px) {
   font-weight: bold;
 }
 
+.control_row {
+  padding-top: 5px;
+}
+
+#help .close_button {
+  margin-top: 3px;
+}
+
 .close_button {
   cursor: pointer;
   float: right;
-  margin-right: 15px;
+  margin-right: 10px;
   color: #aaa;
   font-size: 20px;
+  margin-top: -2px;
 }
 
 .toggle_container {
@@ -311,7 +316,6 @@ and (max-device-width : 568px) {
 }
 
 .dir_toggle {
-  margin-top: 6px;
   float: right;
   display: inline-block;
   font-size: 12px;
@@ -322,6 +326,6 @@ and (max-device-width : 568px) {
 }
 
 .dir_toggle.selected {
-  background-color: red;
+  background-color: #F5355B;
   color: white;
 }

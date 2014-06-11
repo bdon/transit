@@ -207,17 +207,18 @@ function timelineChart(p) {
         });
         timestamp = new Date().getTime();
       });
-      
-      d3.select(this).append("div").attr("class","route_short_name").text(d.short_name);
-      d3.select(this).append("div").attr("class","route_long_name").text(Transit.Camelize(d.long_name));
-      d3.select(this).append("div").attr("class","close_button").text("×").on("click", function() {
+
+      var control_row = d3.select(this).append("div").attr("class","control_row");
+      control_row.append("div").attr("class","route_short_name").text(d.short_name);
+      control_row.append("div").attr("class","route_long_name").text(Transit.Camelize(d.long_name));
+      control_row.append("div").attr("class","close_button").text("×").on("click", function() {
         p.removeRoute(d);
         p.draw();
         // TODO: hackety hack
         d3.selectAll(".rollsign").filter(function(e) { return e.id == d.id }).classed("displayed", false);
       });
 
-      var contain = d3.select(this).append("div").attr("class","toggle_container");
+      var contain = control_row.append("div").attr("class","toggle_container");
       var svg = d3.select(this).append("svg:svg")
         .attr("width","100%")
         .attr("height","200px")
