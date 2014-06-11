@@ -75,7 +75,7 @@ body {
 
 .rollsign {
   width: 50px;
-  height: 20px;
+  height: 16px;
   margin:1px;
   background-color: #ddd;
   display: inline-block;
@@ -84,6 +84,7 @@ body {
   text-align: center;
   font-size: 12px;
   cursor: pointer;
+  padding-top: 2px;
 }
 
 .rollsign:hover {
@@ -176,7 +177,7 @@ path {
 
 .vehiclePath {
   stroke-width: 1.2;
-  stroke: #222222;
+  stroke: #34373F;
 }
 
 .vehiclePath.live {
@@ -307,6 +308,10 @@ and (max-device-width : 568px) {
   color: #aaa;
   font-size: 20px;
   margin-top: -2px;
+}
+
+.close_button:hover {
+  color: black;
 }
 
 .toggle_container {
