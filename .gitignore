@@ -4,7 +4,7 @@
 .DS_Store
 serve
 static
-transit_timelines
+transit
 bower_components
 node_modules
 hosts

@@ -38,7 +38,7 @@
     copy: src=../muni_gtfs dest=/var/api owner=transit group=transit directory_mode=yes
     when: not muni_exists.stat.exists 
   - name: copy over linux64 binary
-    copy: src=../bin/transit_timelines dest=/var/api/transit_timelines owner=transit group=transit mode=744
+    copy: src=../bin/transit dest=/var/api/transit owner=transit group=transit mode=744
   - name: start the api service
     service: name=api state=started enabled=yes
 

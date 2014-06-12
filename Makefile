@@ -1,5 +1,5 @@
 all:
-	gox -output="bin/transit_timelines" -osarch="linux/amd64"
+	gox -output="bin/transit" -osarch="linux/amd64"
 	ansible-playbook -i hosts contrib/playbook.yml
 
 cp:
