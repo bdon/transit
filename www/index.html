@@ -89,7 +89,6 @@
     <script src="src/index.js"/></script>
     <script>
       var p = Transit.Page("http://transit.bdon.org/static", "http://transit.bdon.org");
-      //var p = Transit.Page("http://162.243.156.169/static", "http://162.243.156.169");
 
       d3.json(p.static_endpoint() + "/routes.json",function(data) {
         p.setCalendar(data.calendar);
