@@ -21,6 +21,12 @@ func (a StopByIndex) Len() int           { return len(a) }
 func (a StopByIndex) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a StopByIndex) Less(i, j int) bool { return a[i].Index < a[j].Index }
 
+type RouteByShortName []RouteRepr
+
+func (a RouteByShortName) Len() int           { return len(a) }
+func (a RouteByShortName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a RouteByShortName) Less(i, j int) bool { return a[i].ShortName < a[j].ShortName }
+
 type StopTimeRepr struct {
 	Time  int `json:"time"`
 	Index int `json:"index"`
@@ -63,6 +69,8 @@ func EmitRoot(feed gtfs.Feed) {
 		log.Fatal(err)
 	}
 	defer file.Close()
+
+	sort.Sort(RouteByShortName(output))
 
 	root := Root{Routes: output, Calendar: feed.Calendar()}
 	marshalled, _ := json.MarshalIndent(root, "", "  ")
