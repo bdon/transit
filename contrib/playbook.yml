@@ -6,8 +6,6 @@
     apt: cache_valid_time=86400 update-cache=yes
   - name: Install nginx
     apt: pkg=nginx state=installed
-  - name: Install htop
-    apt: pkg=htop state=installed
   - name: disable default nginx vhost
     file: state=absent path=/etc/nginx/sites-enabled/default
   - name: add an nginx site
@@ -28,9 +26,6 @@
   - name: install upstart file
     copy: dest=/etc/init/api.conf src=templates/api.conf
 
-  - name: restart the API process at 2AM every day
-    cron: hour=2 state=absent job="service api restart" name="restartapi"
-
   - name: copy over muni_gtfs
     stat: path=/var/api/muni_gtfs
     register: muni_exists
@@ -41,17 +36,3 @@
     copy: src=../bin/transit dest=/var/api/transit owner=transit group=transit mode=744
   - name: start the api service
     service: name=api state=started enabled=yes
-
-#dd if=/dev/zero of=/extraswap bs=1M count=512
-#mkswap /extraswap
-#..and add it to /etc/fstab:
-#
-#/extraswap         none            swap    sw                0       0
-#and then turn it on:
-#
-#swapon -a
-
-# http://charles.lescampeurs.org/2008/11/14/fix-nginx-increase-server_names_hash_bucket_size
-# https://www.digitalocean.com/community/questions/help-optimizing-the-server-for-wordpress-ubuntu-nginx-varnish
-# server_names_hash_bucket_size 64;
-#types_hash_max_size 2048;
