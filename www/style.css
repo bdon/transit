@@ -77,7 +77,7 @@ body {
   width: 50px;
   height: 16px;
   margin:1px;
-  background-color: #ddd;
+  background-color: #F3F2EA;
   display: inline-block;
   overflow: hidden;
   text-overflow: clip;
@@ -85,15 +85,17 @@ body {
   font-size: 12px;
   cursor: pointer;
   padding-top: 2px;
+  color: black;
 }
 
 .rollsign:hover {
-  background-color: black;
+  background-color: #333;
+  color: white;
 }
 
 .rollsign.displayed {
   font-weight: bold;
-  background-color: #F5355B;
+  background-color: #00DD73;
   color: white;
 }
 
@@ -181,16 +183,21 @@ path {
 }
 
 .vehiclePath.live {
-  stroke: #F5355B;
+  stroke: #00DD73;
+  stroke-width: 1.6;
+}
+
+.liveVehicle {
+  fill: #00DD73;
 }
 
 .guide {
-  stroke: #999999;
+  stroke: #BDBBAC;
   stroke-width: 1px;
 }
 
 #help {
-  background-color: #eee;
+  background-color: #F3F2EA;
   font-size: 12px;
 }
 
@@ -221,12 +228,9 @@ and (max-device-width : 568px) {
   font-weight: bold;
 }
 
-.liveVehicle {
-  fill: #F5355B;
-}
 
 .route:hover {
-  background-color: #f4f4f4;
+  background-color: #FAF9F7;
 }
 
 .route_short_name {
@@ -241,16 +245,6 @@ and (max-device-width : 568px) {
   font-size: 14px;
   font-weight: bold;
   display: inline;
-}
-
-.switch_button {
-  margin-left: 8px;
-  font-size: 12px;
-  display: inline;
-  float: right;
-  margin-right: 60px;
-  background-color: #aaa;
-  padding: 4px;
 }
 
 .bigtitle {
@@ -280,13 +274,13 @@ and (max-device-width : 568px) {
   display: inline-block;
   font-size: 12px;
   color: #999;
-  background-color: #ddd;
+  background-color: #E9E6DF;
   padding: 5px;
 }
 
 .agency.selected {
   color: white;
-  background-color: black;
+  background-color: #34373F;
 }
 
 .agency_header {
@@ -325,12 +319,13 @@ and (max-device-width : 568px) {
   display: inline-block;
   font-size: 12px;
   padding: 3px;
-  background-color: #ccc;
-  color: #777;
+  background-color: #34373F;
+  color: white;
   cursor: pointer;
 }
 
 .dir_toggle.selected {
-  background-color: #F5355B;
+  background-color: #00DD73;
   color: white;
 }
+

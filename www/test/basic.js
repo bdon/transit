@@ -272,6 +272,15 @@ describe("Transit", function () {
     });
   });
 
+  describe("Transit.Classname", function() {
+    it("converts names correctly", function() {
+      expect(Transit.Classname("route","28L")).to.eql("route_28l");
+      expect(Transit.Classname("route","1AX")).to.eql("route_1ax");
+      expect(Transit.Classname("route","Powell-Mason")).to.eql("route_powellmason");
+      expect(Transit.Classname("route","L-OWL")).to.eql("route_lowl");
+    });
+  });
+
   it("Requests from the static endpoint if the chosen date < today");
   it("Requests from the live endpoint if the chosen date = today");
 });

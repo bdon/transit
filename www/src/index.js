@@ -51,7 +51,7 @@
 
     my.draw = function() {
       var cl = d3.select("#chartlist").selectAll(".route").data(p.routes(), function(d) { return d.id });
-      cl.enter().append("div").attr("class","route").call(timelineChart(p));
+      cl.enter().append("div").attr("class", "route").call(timelineChart(p));
       cl.order();
       cl.exit().remove();
     }
@@ -170,6 +170,10 @@
     return input.toLowerCase().replace(/(\b|-)\w/g,function(m) {
       return m.toUpperCase();
     });
+  }
+
+  Transit.Classname = function(prefix, token) {
+    return prefix + "_" + token.toLowerCase().replace(/[^a-z0-9]/,"");
   }
 
 })(this);
@@ -314,11 +318,13 @@ function timelineChart(p) {
     var s2 = clippedFore.selectAll(".vehiclePath").data(routeState.trips(now,dir), function(d) { return d.key });
     s2.enter().append("path").attr("class","vehiclePath");
     s2.exit().remove();
+
     var newdata = routeState.liveVehicles(now,dir);
     var s3 = clippedFore.selectAll(".liveVehicle").data(newdata, function(d) { return d.key });
-    s3.enter().append("polygon")
+    var tmp = s3.enter().append("g")
        .attr("class", "liveVehicle")
-       .attr("points", "0,3 6,0 0,-3")
+    tmp.append("polygon").attr("points", "0,4 7,0 0,-4").style("fill","black");
+    tmp.append("polygon").attr("points", "0,3 6,0 0,-3")
     s3.exit().remove();
   }
 
