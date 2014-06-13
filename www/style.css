@@ -106,6 +106,10 @@ body {
   margin-right: auto;
 }
 
+.container a {
+  color: #888;
+}
+
 @media only screen 
 and (min-device-width : 320px) 
 and (max-device-width : 568px) { 
@@ -198,12 +202,24 @@ path {
 
 #help {
   background-color: #F3F2EA;
-  font-size: 12px;
+  font-size: 13px;
+}
+
+#help .copy {
+  line-height: 1.4em;
+}
+
+#help ul {
+  list-style: circle;
+}
+
+#help ul li {
+   list-style-position:inside;
 }
 
 #help svg {
-  background-color: white;
   display: inline-block;
+  border: 1px solid #999;
 }
 
 #help .half {
@@ -218,6 +234,19 @@ and (max-device-width : 568px) {
     display: block;
     width: 100%;
   }
+}
+
+.helpPath {
+  stroke: #00DD73;
+  stroke-width: 1.5px;
+}
+
+.helpShape {
+  fill: #00DD73;
+}
+
+.helpshapeCasing {
+  fill: black;
 }
 
 #help .half.right p {

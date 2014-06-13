@@ -11,50 +11,59 @@
           <div class="close_button">×</div>
         </div>
         <div class="half">
-          <p style="padding: 10px">
-           Transit systems measure quality of service in different ways. 
-           Headways vs on-time performance.
-           On-time performance is subject to arbitrary accounting methods
-           Headway is more important than OTP.
-           http://www.sfgate.com/bayarea/article/In-S-F-Muni-slows-crime-grows-5132822.php
-            
-          </p>
+          <div style="padding: 10px" class="copy">
+           <p>San Francisco's MUNI system has <a href="http://www.sfgate.com/bayarea/article/In-S-F-Muni-slows-crime-grows-5132822.php">a stated on-time performance of 57.2%</a>
+            , which counts vehicles that run within 4 minutes of schedule.</p>
+           <p>This visualization expresses many factors in perceived transit quality, including:
+            <ul>
+              <li>Frequency of scheduled service</li>
+              <li>Maximum headway between vehicles</li>
+              <li>Catastrophic failures and delays.</li>
+            </ul>
+            </p>
+          </div>
         </div><div class="half right">
           <div>
             <svg width="70" height="30" class="tutorial">
-              <line x1="-10" y1="30" x2="30" y2="0" class="guide"/>
-              <line x1="10" y1="30" x2="50" y2="0" class="guide"/>
-              <line x1="30" y1="30" x2="70" y2="0" class="guide"/>
-              <line x1="50" y1="30" x2="90" y2="0" class="guide"/>
-              <path d="M 10 50 L 20 35 L 35 32 L 40 30 L 50 20" class="vehiclePath"/>
-              <polygon points="0,3 6,0 0,-3" transform="translate(50,20) rotate(-45)"/>
+              <line x1="-10" y1="30" x2="10" y2="0" class="guide"/>
+              <line x1="10" y1="30" x2="30" y2="0" class="guide"/>
+              <line x1="30" y1="30" x2="50" y2="0" class="guide"/>
+              <line x1="50" y1="30" x2="70" y2="0" class="guide"/>
+              <path d="M 10 30 L 20 15 L 45 15 L 50 8" class="helpPath"/>
+              <polygon points="0,4 7,0 0,-4" transform="translate(50,8) rotate(-60)" class="helpShapeCasing"/>
+              <polygon points="0,3 6,0 0,-3" transform="translate(50,8) rotate(-60)" class="helpShape"/>
             </svg>
-            <p><span class="emph">Delays:</span> Vehicles become behind schedule due to street traffic.</p>
+            <p><span class="emph">Delays:</span> Vehicles become behind schedule due to street traffic or other factors.</p>
           </div>
           <div>
             <svg width="70" height="30" class="tutorial">
-              <line x1="-10" y1="30" x2="30" y2="0" class="guide"/>
-              <line x1="10" y1="30" x2="50" y2="0" class="guide"/>
-              <line x1="30" y1="30" x2="70" y2="0" class="guide"/>
-              <line x1="50" y1="30" x2="90" y2="0" class="guide"/>
-              <path d="M 10 50 L 20 35 L 35 35 L 55 30 L 60 25" class="vehiclePath"/>
-              <polygon points="0,3 6,0 0,-3" transform="translate(60,25) rotate(-45)"/>
-              <path d="M 30 50 L 40 35 L 55 32 L 60 30" class="vehiclePath"/>
-              <polygon points="0,3 6,0 0,-3" transform="translate(60,30) rotate(-45)"/>
+              <line x1="-10" y1="30" x2="10" y2="0" class="guide"/>
+              <line x1="10" y1="30" x2="30" y2="0" class="guide"/>
+              <line x1="30" y1="30" x2="50" y2="0" class="guide"/>
+              <line x1="50" y1="30" x2="70" y2="0" class="guide"/>
+              <path d="M 10 30 L 20 15 L 45 15 L 50 8" class="helpPath"/>
+              <polygon points="0,4 7,0 0,-4" transform="translate(50,8) rotate(-60)" class="helpShapeCasing"/>
+              <polygon points="0,3 6,0 0,-3" transform="translate(50,8) rotate(-60)" class="helpShape"/>
+
+              <path d="M 30 34 L 40 19 L 45 19 L 50 14" class="helpPath"/>
+              <polygon points="0,4 7,0 0,-4" transform="translate(50,14) rotate(-60)" class="helpShapeCasing"/>
+              <polygon points="0,3 6,0 0,-3" transform="translate(50,14) rotate(-60)" class="helpShape"/>
             </svg>
             <p><span class="emph">Bunching:</span> Late vehicles get later as they need to pick up more passengers.</p>
           </div>
           <div>
             <svg width="70" height="30" class="tutorial">
-              <line x1="-10" y1="30" x2="30" y2="0" class="guide"/>
-              <line x1="10" y1="30" x2="50" y2="0" class="guide"/>
-              <line x1="30" y1="30" x2="70" y2="0" class="guide"/>
-              <line x1="50" y1="30" x2="90" y2="0" class="guide"/>
-              <path d="M 13 50 L 53 0" class="vehiclePath"/>
-              <path d="M 53 50 L 60 41" class="vehiclePath"/>
-              <polygon points="0,3 6,0 0,-3" transform="translate(60,41) rotate(-45)"/>
+              <line x1="-10" y1="30" x2="10" y2="0" class="guide"/>
+              <line x1="10" y1="30" x2="30" y2="0" class="guide"/>
+              <line x1="30" y1="30" x2="50" y2="0" class="guide"/>
+              <line x1="50" y1="30" x2="70" y2="0" class="guide"/>
+
+              <path d="M 10 30 L 30 0" class="helpPath"/>
+              <path d="M 50 30 L 65 8" class="helpPath"/>
+              <polygon points="0,4 7,0 0,-4" transform="translate(65,8) rotate(-60)" class="helpShapeCasing"/>
+              <polygon points="0,3 6,0 0,-3" transform="translate(65,8) rotate(-60)" class="helpShape"/>
             </svg>
-            <p><span class="emph">Infrequent Service:</span> Service is smooth but inconsistent.</p>
+            <p><span class="emph">Infrequent Service:</span> Large headways due to less vehicles in service than scheduled.</p>
           </div>
         </div>
       </div>
@@ -80,9 +89,10 @@
       </div>
       <div id="credits">
         <h1>Credits</h1>
-        <p>Data via GTFS. San Francisco MTA. NextBus.http://sfmta.com/about-sfmta/reports/gtfs-transit-data </p> 
+        <p>Schedule data via San Francisco MTA. <a href="http://sfmta.com/about-sfmta/reports/gtfs-transit-data">GTFS Feed</a>.</p> 
+        <p>Vehicle location data via <a href="http://www.nextbus.com/xmlFeedDocs/NextBusXMLFeed.pdf">NextBus API</a>.</p> 
         <p>Design derived from original train schedule by E.J. Marey.</p>
-        <p>For inquiries, contact bdon@bdon.org</p>
+        <p>For inquiries, contact <a id="mailto_link"></a> or twitter: <a href="http://twitter.com/bdon">@bdon</a>.</p>
       </div>
     </div>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
@@ -113,9 +123,10 @@
       });
 
       setInterval(function() {
-        console.log("Global update");
         p.update();
       }, 10 * 1000);
+
+      d3.select("#mailto_link").attr("href","mailto:bdon@" + location.host).text("bdon@" + location.host);
     </script>
   </body>
 </html>
