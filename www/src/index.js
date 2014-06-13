@@ -88,7 +88,7 @@
         if(arguments.length < 2 || trips[k].dir == dir) {
           var states = trips[k].states;
           var state = states[states.length-1];
-          var isLive = now - state.time < 60;
+          var isLive = now - state.time < 120;
           retval.push({"key":k,"run":trips[k],"isLive":isLive});
         }
       }
@@ -103,7 +103,7 @@
         var lastState = states[states.length-1];
         var beforeState = states[states.length-2];
     
-        if(now - lastState.time < 60) {
+        if(now - lastState.time < 120) {
           if(arguments.length == 1 || trips[k].dir == dir) {
             if(lastState.index > 50 && lastState.index < 950) {
               retval.push({

@@ -38,7 +38,7 @@ describe("Transit", function () {
           "vehicle_id":"1406",
           "dir":1,
           "states":[
-            {"time":1401754800 - 65,"index":454}
+            {"time":1401754800 - 125,"index":454}
           ]}}
       var s = Transit.RouteState();
       var now = 1401754800;
@@ -53,7 +53,7 @@ describe("Transit", function () {
           "vehicle_id":"1406",
           "dir":1,
           "states":[
-            {"time":1401754800-55,"index":455}
+            {"time":1401754800-115,"index":455}
           ]}}
 
       s.add(resp);
@@ -61,9 +61,9 @@ describe("Transit", function () {
       expect(s.trips(now)[0].isLive).to.eql(true);
       var states = s.trips(now)[0].run.states;
       expect(states.length).to.eql(2);
-      expect(states[0].time).to.eql(now - 65);
+      expect(states[0].time).to.eql(now - 125);
       expect(states[0].index).to.eql(454);
-      expect(states[1].time).to.eql(now - 55);
+      expect(states[1].time).to.eql(now - 115);
       expect(states[1].index).to.eql(455);
       
     });
@@ -99,31 +99,31 @@ describe("Transit", function () {
           "vehicle_id":"1406",
           "dir":1,
           "states":[
-            {"time":1401754800 - 65,"index":450},
-            {"time":1401754800 - 65,"index":455}
+            {"time":1401754800 - 125,"index":450},
+            {"time":1401754800 - 125,"index":455}
           ]
         },
         "1406_1401754999":{
           "vehicle_id":"1406",
           "dir":0,
           "states":[
-            {"time":1401754800 - 65,"index":460},
-            {"time":1401754800 - 45,"index":450}
+            {"time":1401754800 - 125,"index":460},
+            {"time":1401754800 - 105,"index":450}
           ]
         },
         "1408_1401754999":{
           "vehicle_id":"1408",
           "dir":1,
           "states":[
-            {"time":1401754800 - 65,"index":440},
-            {"time":1401754800 - 45,"index":445}
+            {"time":1401754800 - 125,"index":440},
+            {"time":1401754800 - 105,"index":445}
           ]
         },
         "only_one_state":{
           "vehicle_id":"1409",
           "dir":1,
           "states":[
-            {"time":1401754800 - 35,"index":440}
+            {"time":1401754800 - 95,"index":440}
           ]
         }
       }
@@ -133,14 +133,14 @@ describe("Transit", function () {
       var now = 1401754800;
       var l = s.liveVehicles(now);
       expect(l.length).to.eql(2);
-      expect(l[0].time).to.eql(1401754800 - 45);
+      expect(l[0].time).to.eql(1401754800 - 105);
       expect(l[0].index).to.eql(450);
       expect(l[0].key).to.eql("1406_1401754999");
-      expect(l[0].prev.time).to.eql(1401754800-65);
+      expect(l[0].prev.time).to.eql(1401754800-125);
       expect(l[0].prev.index).to.eql(460);
 
       var l = s.liveVehicles(now,1);
-      expect(l[0].time).to.eql(1401754800 - 45);
+      expect(l[0].time).to.eql(1401754800 - 105);
       expect(l[0].index).to.eql(445);
       expect(l[0].key).to.eql("1408_1401754999");
     });
