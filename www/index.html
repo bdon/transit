@@ -4,6 +4,7 @@
       <title>Transit Delays</title>
       <link rel="stylesheet" href="style.css"/>
       <meta charset="utf-8">
+      <meta property="og:image" content="http://bdon.org/transit/og.png"/>
   </head>
   <body>
     <div class="container">
@@ -128,6 +129,17 @@
       }, 10 * 1000);
 
       d3.select("#mailto_link").attr("href","mailto:bdon@" + location.host).text("bdon@" + location.host);
+    </script>
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-12698166-2']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
     </script>
   </body>
 </html>
