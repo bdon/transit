@@ -358,3 +358,12 @@ and (max-device-width : 568px) {
   color: white;
 }
 
+.nowLine {
+  stroke-width: 1;
+  stroke-dasharray: 2,2;
+  stroke: #00DD73;
+}
+
+.timeCursor {
+  font-size: 10px;
+}

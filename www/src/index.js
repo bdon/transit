@@ -194,7 +194,8 @@ function timelineChart(p) {
   var dir = 0;
 
   var stopsScale = d3.scale.linear().domain([0,1000]).range([0,150]);
-  var axis = d3.svg.axis().scale(p.timeScale()).orient("top");
+  var axisTimeFormat = d3.time.format("%-I %p");
+  var axis = d3.svg.axis().scale(p.timeScale()).orient("top").tickFormat(axisTimeFormat);
   var line = d3.svg.line()
     .x(function(d) { return p.timeScale()(d.time*1000) })
     .y(function(d) { return stopsScale(d.index) })
@@ -204,6 +205,7 @@ function timelineChart(p) {
   var clippedFore;
   var clippedBack;
   var timestamp;
+  var nowLine;
   var cursor;
   
   function my(selection) {
@@ -258,10 +260,13 @@ function timelineChart(p) {
         .attr("height","550")
         .call(p.zoom());
 
+      var format = d3.time.format(":%M");
+
       rect.on("wheel.zoom",null);
       rect.on("mousewheel.zoom",null);
       rect.on("mousemove.hover", function() {
-        var selectedIndex = stopsScale.invert(d3.mouse(this)[1]);
+        var mous = d3.mouse(this);
+        var selectedIndex = stopsScale.invert(mous[1]);
         wasSet = false;
         vis.selectAll(".stop").each(function(d,i) {
           if(!wasSet && d.index > selectedIndex) {
@@ -271,6 +276,19 @@ function timelineChart(p) {
             d3.select(this).classed("stopHighlighted",false);
           }
         });
+
+        var selectedTime = p.timeScale().invert(mous[0]);
+        var mins = selectedTime.getMinutes();
+        if (mins > 4 && mins < 45) {
+          cursor.attr("x", mous[0])
+            .text(format(selectedTime));
+        } else {
+          cursor.attr("x",-100);
+        }
+      });
+      mainChart.on("mouseleave", function() {
+        cursor.attr("x",-100);
+        vis.selectAll(".stop").classed("stopHighlighted",false); 
       });
       
       var clipped = mainChart.append("g")
@@ -278,11 +296,14 @@ function timelineChart(p) {
       clippedBack = clipped.append("g");
       clippedFore = clipped.append("g");
 
-      cursor = clippedFore.append("line")
+      cursor = mainChartWAxis.append("text")
+        .attr("class","timeCursor")
+        .attr("y",1);
+
+      nowLine = clippedFore.append("line")
+        .attr("class","nowLine")
         .datum(new Date()) 
-        .attr({"x1":0,"x2":0,"y1":0,"y2":150}).style("stroke","black")
-        .style("stroke-width",0.5)
-        .style("stroke-dasharray","2,2")
+        .attr({"x1":0,"x2":0,"y1":0,"y2":150});
 
       d3.json(p.static_endpoint() + "/stops/" + d.id + ".json", function(sch) {
         var dir0 = contain.append("div").attr("class","dir_toggle selected").text(sch.headsigns[0]);
@@ -321,7 +342,7 @@ function timelineChart(p) {
 
   function bind() {
     now = Transit.Now();
-    cursor.datum(new Date());
+    nowLine.datum(new Date());
     var s1 = clippedBack.selectAll(".guide").data(routeSchedule.trips(dir));
     s1.enter().append("path").attr("class","guide");
     s1.exit().remove();
@@ -339,7 +360,7 @@ function timelineChart(p) {
   }
 
   function draw() {
-    cursor.attr("transform",function(d) { return "translate(" + p.timeScale()(d) + ",0)"})
+    nowLine.attr("transform",function(d) { return "translate(" + p.timeScale()(d) + ",0)"})
     vis.selectAll(".vehiclePath")
       .attr("d", function(d) { return line(d.run.states); })
       .classed("live", function(d) { return d.isLive });
