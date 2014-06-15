@@ -176,6 +176,16 @@
     return prefix + "_" + token.toLowerCase().replace(/[^a-z0-9]/,"");
   }
 
+  Transit.ShortenName = function(str) {
+    if (str.length < 6) return str;
+    if (str.indexOf("-") > 0) {
+      return str.replace(/([A-Z])[a-z]*/g, function(m) {
+        return m[0];
+      });
+    }
+    return str.substring(0,5) + "."; 
+  }
+
 })(this);
 
 function timelineChart(p) {

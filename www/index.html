@@ -105,7 +105,7 @@
       d3.json(p.static_endpoint() + "/routes.json",function(data) {
         p.setCalendar(data.calendar);
         d3.select("#chooser").selectAll(".rollsign").data(data.routes).enter()
-          .append("div").attr("class","rollsign").text(function(d) { return d.short_name })
+          .append("div").attr("class","rollsign").text(function(d) { return Transit.ShortenName(d.short_name) })
           .on("click", function(d) {
             var displayed = d3.select(this).classed("displayed");
             displayed ? p.removeRoute(d) : p.showRoute(d);

@@ -281,6 +281,14 @@ describe("Transit", function () {
     });
   });
 
+  describe("Transit.ShortenName", function() {
+    it("shortens names correctly", function() {
+      expect(Transit.ShortenName("N-OWL")).to.eql("N-OWL");
+      expect(Transit.ShortenName("CALIFORNIA")).to.eql("CALIF.");
+      expect(Transit.ShortenName("Powell-Hyde")).to.eql("P-H");
+    });
+  });
+
   it("Requests from the static endpoint if the chosen date < today");
   it("Requests from the live endpoint if the chosen date = today");
 });
