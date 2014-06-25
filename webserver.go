@@ -12,6 +12,8 @@ func Webserver(agencyState *AgencyState) {
 
 	healthHandler := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
+		// You should override this in nginx
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		fmt.Fprintf(w, string(result))
 	}
 
