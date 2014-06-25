@@ -7,6 +7,7 @@ import (
 	"github.com/bdon/go.gtfs"
 	"io/ioutil"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -333,4 +334,41 @@ func MkdirpForTime(p string, t time.Time) {
 func (v VehicleRun) EndDay() (int, time.Month, int) {
 	lastState := v.States[len(v.States)-1]
 	return time.Unix(int64(lastState.Time), 0).Date()
+}
+
+type FsDate struct {
+	Day   int `json:"day"`
+	Month int `json:"month"`
+	Year  int `json:"year"`
+}
+
+func DateRangeFs(p string) FsDate {
+	years, _ := filepath.Glob(p + "/*")
+	minYear := math.MaxInt64
+	for _, x := range years {
+		res, _ := strconv.Atoi(filepath.Base(x))
+		if res < minYear {
+			minYear = res
+		}
+	}
+
+	minYearMonths, _ := filepath.Glob(p + "/" + strconv.Itoa(minYear) + "/*")
+	minYearMinMonth := math.MaxInt64
+	for _, x := range minYearMonths {
+		res, _ := strconv.Atoi(filepath.Base(x))
+		if res < minYearMinMonth {
+			minYearMinMonth = res
+		}
+	}
+
+	minMonthDays, _ := filepath.Glob(p + "/" + strconv.Itoa(minYear) + "/" + strconv.Itoa(minYearMinMonth) + "/*")
+	minMonthMinDay := math.MaxInt64
+	for _, x := range minMonthDays {
+		res, _ := strconv.Atoi(filepath.Base(x))
+		if res < minMonthMinDay {
+			minMonthMinDay = res
+		}
+	}
+
+	return FsDate{Year: minYear, Month: minYearMinMonth, Day: minMonthMinDay}
 }

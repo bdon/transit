@@ -297,7 +297,7 @@ func TestDeleteNotOnToday(t *testing.T) {
 	if x != 1 {
 		t.Errorf("expected to delete 1 run, deleted %d", x)
 	}
-  x = len(a.RouteStates["N"].Runs)
+	x = len(a.RouteStates["N"].Runs)
 	if x != 1 {
 		t.Errorf("Should only have 1 run total, got %d", x)
 	}
@@ -321,5 +321,25 @@ func TestMkdirpForTime(t *testing.T) {
 	fileinfo, _ := os.Stat(filepath.Join(tmpdir, "2014/5/31"))
 	if fileinfo == nil || !fileinfo.IsDir() {
 		t.Error("Expected directory")
+	}
+}
+
+func TestDateRangeFs(t *testing.T) {
+	tmpdir, _ := ioutil.TempDir("", "test")
+	defer os.Remove(tmpdir)
+	template := "Jan 2 15:04:05 -0700 MST 2006"
+	tim, _ := time.Parse(template, "Dec 20 14:23:00 -0700 PST 2014")
+	MkdirpForTime(tmpdir, tim)
+	tim, _ = time.Parse(template, "Jan 5 14:23:00 -0700 PST 2015")
+	MkdirpForTime(tmpdir, tim)
+	result := DateRangeFs(tmpdir)
+	if result.Month != 12 {
+		t.Error("Start should be 5")
+	}
+	if result.Day != 20 {
+		t.Error("Start should be day 31")
+	}
+	if result.Year != 2014 {
+		t.Error("Year should be 2014")
 	}
 }

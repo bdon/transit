@@ -8,10 +8,11 @@ import (
 )
 
 func Webserver(agencyState *AgencyState) {
+	result, _ := json.Marshal(DateRangeFs("static/history"))
 
 	healthHandler := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprintf(w, "Hello there.")
+		fmt.Fprintf(w, string(result))
 	}
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
