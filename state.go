@@ -256,7 +256,7 @@ func (a *AgencyState) Persist(p string) {
 
 func (a *AgencyState) DeleteRunsBeforeDay(unixtime int) int {
 	totalDeleted := 0
-	ty, tm, td := time.Now().Date()
+	ty, tm, td := time.Unix(int64(unixtime), 0).Date()
 	a.Mutex.Lock()
 	for _, routeState := range a.RouteStates {
 		for k, run := range routeState.Runs {

@@ -295,11 +295,11 @@ func TestDeleteNotOnToday(t *testing.T) {
 
 	x := a.DeleteRunsBeforeDay(1402463820)
 	if x != 1 {
-		t.Error("expected to delete 1 run")
+		t.Errorf("expected to delete 1 run, deleted %d", x)
 	}
-
-	if len(a.RouteStates["N"].Runs) > 1 {
-		t.Error("Should only have 1 run total")
+  x = len(a.RouteStates["N"].Runs)
+	if x != 1 {
+		t.Errorf("Should only have 1 run total, got %d", x)
 	}
 }
 
