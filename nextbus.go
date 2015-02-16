@@ -39,7 +39,7 @@ func (report VehicleReport) Lon() float64 {
 }
 
 func (report VehicleReport) Dir() Direction {
-	if strings.Contains(report.DirTag, "IB") {
+	if strings.Contains(report.DirTag, "I_") {
 		return Inbound
 	} else {
 		return Outbound

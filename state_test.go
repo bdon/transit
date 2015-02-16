@@ -149,7 +149,7 @@ func TestChangeDirection(t *testing.T) {
 	a := NewAgencyState(feed, names)
 
 	response := Response{}
-	report1 := VehicleReport{VehicleId: "1000", DirTag: "IB", LatString: "37.0",
+	report1 := VehicleReport{VehicleId: "1000", DirTag: "I_", LatString: "37.0",
 		LonString: "-122.0", SecsSinceReport: 15,
 		LeadingVehicleId: "", RouteTag: "N"}
 
@@ -161,7 +161,7 @@ func TestChangeDirection(t *testing.T) {
 	}
 
 	laterResponse := Response{}
-	laterReport := VehicleReport{VehicleId: "1000", DirTag: "OB", LatString: "37.1",
+	laterReport := VehicleReport{VehicleId: "1000", DirTag: "O_", LatString: "37.1",
 		LonString: "-122.1", SecsSinceReport: 15,
 		LeadingVehicleId: "", RouteTag: "N"}
 
